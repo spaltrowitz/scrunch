@@ -236,4 +236,22 @@ export const SEED_PRODUCTS: SeedProduct[] = [
   { brand: 'Innersense', name: 'I Create Finish Hairspray', category: 'spray_refresher', cg_status: 'not_approved', cruelty_free: 'yes', notes: 'CFK. Contains drying alcohol' },
   { brand: 'Pantene Pro-V', name: 'Lightweight Finish Level 2 Hairspray', category: 'spray_refresher', cg_status: 'not_approved', cruelty_free: null, notes: 'Contains drying alcohol and silicone' },
   { brand: 'Rizos Curls', name: 'Volumizing Hairspray', category: 'spray_refresher', cg_status: 'approved', cruelty_free: null, notes: null },
+
+  // ── CLARIFYING SHAMPOO ──────────────────────────────────────────────
+  // Recommended FIRST wash when starting CG. Use infrequently for removing buildup.
+  { brand: 'Aveda', name: 'Rosemary Mint Purifying Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: null, notes: 'Contains sulfate (intentional for clarifying)' },
+  { brand: 'Bumble and Bumble', name: 'Sunday Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: 'yes', notes: 'Contains sulfate (intentional for clarifying)' },
+  { brand: 'Garnier', name: 'Pure Clean Clarifying Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: null, notes: 'Contains sulfate and drying alcohol' },
+  { brand: 'Giovanni', name: '50:50 Balanced Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: null, notes: 'Contains sulfate' },
+  { brand: 'Kinky Curly', name: 'Come Clean Shampoo', category: 'clarifying_shampoo', cg_status: 'approved', cruelty_free: 'yes', notes: 'Chelating (sulfate-free clarifier)' },
+  { brand: 'Kristin Ess', name: 'Deep Clean Clarifying Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: null, notes: 'Contains sulfate' },
+  { brand: 'Malibu C', name: 'Hard Water Wellness Shampoo', category: 'clarifying_shampoo', cg_status: 'approved', cruelty_free: 'yes', notes: 'Chelating (sulfate-free)' },
+  { brand: 'Malibu C', name: 'Un-Do-Goo pH 9 Shampoo', category: 'clarifying_shampoo', cg_status: 'approved', cruelty_free: 'yes', notes: null },
+  { brand: 'Noughty', name: 'Detox Dynamo Shampoo', category: 'clarifying_shampoo', cg_status: 'approved', cruelty_free: null, notes: 'Chelating (sulfate-free)' },
+  { brand: 'Ouai', name: 'Detox Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: null, notes: 'Chelating. Contains drying alcohol' },
+  { brand: 'Ouidad', name: 'Water Works Clarifying Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: null, notes: 'Chelating. Contains sulfate and drying alcohol' },
+  { brand: "Sally's", name: 'Ion Hard Water Shampoo', category: 'clarifying_shampoo', cg_status: 'approved', cruelty_free: 'unclear', notes: 'Chelating' },
+  { brand: 'Suave', name: 'Essentials Daily Clarifying Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: 'yes', notes: 'Suave "Naturally Derived" are NOT clarifying. Contains sulfate' },
+  { brand: 'Twist by Ouidad', name: 'Hit Reset Clarifying Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: null, notes: 'Contains sulfate and drying alcohol' },
+  { brand: 'VO5', name: 'Clarifying Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: 'no', notes: 'NOT 2- or 3-in-one. Contains sulfate' },
 ]

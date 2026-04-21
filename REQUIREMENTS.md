@@ -166,6 +166,25 @@ Authenticated users can log products they've used and record their experience.
 - Most common pros/cons extracted from reviews
 - "People like you also liked..." recommendations
 
+### F3.5: Request a Missing Product
+
+Users should be able to request products that aren't in the database yet.
+
+**Request flow:**
+- "Can't find your product?" button visible on the products page and search results
+- Simple form: Brand name, Product name, Product category (dropdown), optional link to product page or photo
+- No auth required for submitting a request (lowers friction), but logged-in users get notified when their request is fulfilled
+- Requests go into a moderation queue
+- Community can upvote existing requests ("I want this too") to help prioritize
+- Moderators/admins can approve and add the product to the database
+- Automated ingredient analysis runs on newly added products
+
+**Request lifecycle:**
+1. User submits request → status: `pending`
+2. Community upvotes → surfaces popular requests
+3. Moderator reviews → adds product with ingredients → status: `approved`
+4. Requester notified (if logged in) → status: `fulfilled`
+
 ### F4: Personalized Recommendations Engine
 
 Recommend products based on collaborative filtering — find users with similar hair profiles and surface what works for them.

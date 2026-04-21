@@ -3,6 +3,7 @@ import { PRODUCT_CATEGORY_LABELS, CG_STATUS_CONFIG } from '../lib/constants'
 import type { ProductCategory, CgStatus } from '../lib/database.types'
 import { SEED_PRODUCTS } from '../data/seedProducts'
 import { ProductImage } from '../hooks/useProductImage'
+import { RequestProductForm } from '../components/products/RequestProductForm'
 
 type ProductAction = 'tried' | 'liked' | 'bookmarked'
 type ProductActions = Record<string, Set<ProductAction>>
@@ -31,6 +32,7 @@ export function Products() {
   const [categoryFilter, setCategoryFilter] = useState<ProductCategory | ''>('')
   const [statusFilter, setStatusFilter] = useState<CgStatus | ''>('')
   const [actions, setActions] = useState<ProductActions>(getStoredActions)
+  const [showRequestForm, setShowRequestForm] = useState(false)
 
   const toggleAction = (productKey: string, action: ProductAction) => {
     setActions(prev => {
@@ -94,7 +96,21 @@ export function Products() {
         </select>
       </div>
 
-      <p className="text-xs text-gray-400 mb-4">{filteredProducts.length} products shown</p>
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-xs text-gray-400">{filteredProducts.length} products shown</p>
+        <button
+          onClick={() => setShowRequestForm(true)}
+          className="text-xs px-3 py-1.5 text-violet-600 border border-violet-200 rounded-lg hover:bg-violet-50 cursor-pointer"
+        >
+          Can't find a product? Request it →
+        </button>
+      </div>
+
+      {showRequestForm && (
+        <div className="mb-6">
+          <RequestProductForm onClose={() => setShowRequestForm(false)} />
+        </div>
+      )}
 
       {/* Product Grid */}
       {filteredProducts.length === 0 ? (
