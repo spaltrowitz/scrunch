@@ -423,9 +423,31 @@ Getting product images for niche curly hair products is challenging — most are
 | 3 | **UPCitemdb API** | Search by product name | ~30-40% | Free tier: 100 req/day. Good for drugstore brands |
 | 4 | **Datakick API** | UPC/name lookup | Variable | Free, no rate limits, CC-BY-SA license |
 | 5 | **Reddit image scraping** | Search r/curlyhair for product photos in posts | High for popular products | Real photos posted by community members. Search `{brand} {product}` in subreddit. Filter for image posts. Many "shelfie" and "holy grail" posts include product photos |
-| 6 | **Brand press/media pages** | Scrape brand websites | High for major brands | Most brands have press kits or product catalogs with downloadable images |
+| 6 | **Curly hair blogs & editorial sites** | Scrape product images from review articles | High for popular products | Sites like Curl Maven, Naturally Curly, Curly Girl Says, The Everygirl, Real Simple, Allure, and Byrdie regularly publish product roundups with photos. Search `"{brand}" "{product}" curly girl review` |
+| 7 | **Brand press/media pages** | Scrape brand websites | High for major brands | Most brands have press kits or product catalogs with downloadable images |
 | 7 | **User-uploaded photos** | Community contribution | Grows over time | Users can upload product photos with reviews. Incentivize with badges |
 | 8 | **Brand-colored placeholder** | Generated client-side | 100% fallback | Brand initials on brand-specific color background |
+
+### Curly Hair Editorial Sites for Product Images
+
+These sites regularly publish product roundups, reviews, and "best of" lists with high-quality product photos:
+
+| Site | Content Type | Example Articles |
+|---|---|---|
+| [Naturally Curly](https://www.naturallycurly.com/) | Product reviews, best-of lists, CG-approved roundups | "Best Gels for Curly Hair," "CG-Approved Conditioners" |
+| [Curl Maven](https://curlmaven.ie/) | In-depth product reviews with photos, European focus | Individual product reviews with multiple product shots |
+| [Curly Girl Says](https://curlygirlysays.com/) | CG-approved product lists with images | "What Curly Girl Products Are Approved?" |
+| [Byrdie](https://www.byrdie.com/) | Beauty editorial with professional product photography | "Best Products for Curly Hair" roundups |
+| [Allure](https://www.allure.com/) | Best-of lists, award winners | "Best of Beauty" awards often feature CG products |
+| [Real Simple](https://www.realsimple.com/) | Practical product reviews | CGM product reviews with stock photography |
+| [The Everygirl](https://theeverygirl.com/) | Routine breakdowns with product photos | CGM routine articles |
+| [Cosmopolitan](https://www.cosmopolitan.com/) | Product roundups | "Best Curly Hair Products" lists |
+
+**Search strategy for editorial images:**
+- `"{brand}" "{product name}" review` — finds dedicated product reviews
+- `best curly girl products {category}` — finds roundup articles with multiple product photos
+- `"{product name}" curly hair` — broader search for any article mentioning the product
+- AI can extract the product image URL from the article page
 
 ### Reddit as an Image Source
 
