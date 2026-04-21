@@ -410,6 +410,52 @@ Curated educational content from trusted sources across the web — surfaced con
 
 ---
 
+## Product Image Sourcing Strategy
+
+Getting product images for niche curly hair products is challenging — most aren't in standard product databases. We use a multi-layer approach, trying each source in order until we find an image.
+
+### Image Waterfall (priority order)
+
+| Priority | Source | Method | Coverage | Notes |
+|---|---|---|---|---|
+| 1 | **Seed data `image_url`** | Manual curation | ~37 products | Hand-verified URLs from Target, Amazon, brand sites |
+| 2 | **Open Beauty Facts API** | Search by brand + name | ~20% | Free, open data. Best for mass-market brands |
+| 3 | **UPCitemdb API** | Search by product name | ~30-40% | Free tier: 100 req/day. Good for drugstore brands |
+| 4 | **Datakick API** | UPC/name lookup | Variable | Free, no rate limits, CC-BY-SA license |
+| 5 | **Reddit image scraping** | Search r/curlyhair for product photos in posts | High for popular products | Real photos posted by community members. Search `{brand} {product}` in subreddit. Filter for image posts. Many "shelfie" and "holy grail" posts include product photos |
+| 6 | **Brand press/media pages** | Scrape brand websites | High for major brands | Most brands have press kits or product catalogs with downloadable images |
+| 7 | **User-uploaded photos** | Community contribution | Grows over time | Users can upload product photos with reviews. Incentivize with badges |
+| 8 | **Brand-colored placeholder** | Generated client-side | 100% fallback | Brand initials on brand-specific color background |
+
+### Reddit as an Image Source
+
+Reddit is uniquely valuable because the curly hair community constantly posts product photos:
+- **"Shelfie" posts** — users photograph their entire product collection (r/curlyhair, r/curlygirl)
+- **"Holy grail" threads** — often include product photos alongside reviews
+- **Routine posts** — before/after photos frequently show the products used
+- **Search strategy**: `site:reddit.com/r/curlyhair "{brand}" "{product}"` → filter for image posts
+- **Legal**: Reddit content is user-generated; we'd link to the original post and credit the user rather than re-hosting
+
+### Implementation Plan
+
+**Phase 1 (current):**
+- Seed data URLs (hand-curated)
+- Open Beauty Facts API lookup
+- Brand-colored placeholder fallback
+
+**Phase 2:**
+- Add UPCitemdb + Datakick API as additional lookup layers
+- Supabase Edge Function to orchestrate the waterfall server-side
+- Cache found images in Supabase Storage (so we don't re-fetch)
+
+**Phase 3:**
+- Reddit image mining (batch job to search subreddits for product photos)
+- Brand website scraper for press kit images
+- User photo uploads with reviews
+- AI-assisted image matching (verify the image actually shows the right product)
+
+---
+
 ## Data Sources & Content Strategy
 
 ### Initial Data Seeding
