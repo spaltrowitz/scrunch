@@ -117,7 +117,6 @@ export function Products() {
                 <ProductImage
                   brand={product.brand}
                   name={product.name}
-                  category={product.category}
                   className="w-16 h-16 shrink-0"
                 />
 

@@ -25,9 +25,10 @@ export function IngredientChecker() {
   return (
     <div className="w-full max-w-2xl mx-auto">
       <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900 mb-1">Ingredient Checker</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-1">🔍 Ingredient Checker</h2>
         <p className="text-sm text-gray-500 mb-4">
-          Paste a product's ingredient list to check if it's Curly Girl approved
+          Paste a product's ingredient list to check if it's Curly Girl approved.
+          We'll flag sulfates, silicones, drying alcohols, and waxes.
         </p>
 
         <textarea
@@ -49,7 +50,7 @@ export function IngredientChecker() {
             onClick={handleTryExample}
             className="px-4 py-2 text-sm text-violet-600 border border-violet-200 rounded-lg hover:bg-violet-50 cursor-pointer"
           >
-            Try Example
+            Try Example (has dimethicone 🔴)
           </button>
         </div>
       </div>

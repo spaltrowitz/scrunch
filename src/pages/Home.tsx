@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { ScrunchLogo } from '../components/ui/ScrunchLogo'
 import { IngredientChecker } from '../components/products/IngredientChecker'
 import { useAuth } from '../lib/auth'
 
@@ -9,8 +10,11 @@ export function Home() {
     <div className="min-h-screen">
       {/* Hero */}
       <section className="py-16 md:py-24 px-4 text-center bg-gradient-to-b from-violet-50 to-white">
+        <div className="flex justify-center mb-4">
+          <ScrunchLogo className="w-14 h-14" />
+        </div>
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-          ✊ Know your products.
+          Know your products.
           <br />
           <span className="text-violet-600">Love your curls.</span>
         </h1>

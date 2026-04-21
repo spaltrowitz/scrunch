@@ -23,7 +23,9 @@ export function useProductImage(brand: string, productName: string): string | nu
   const cacheKey = `${brand}::${productName}`
   const [imageUrl, setImageUrl] = useState<string | null>(() => {
     const cache = getCache()
-    return cache[cacheKey] || null
+    const cached = cache[cacheKey]
+    if (cached === 'none') return null
+    return cached || null
   })
 
   useEffect(() => {
@@ -61,48 +63,52 @@ export function useProductImage(brand: string, productName: string): string | nu
   return imageUrl
 }
 
-// Color palette for category-based placeholder backgrounds
-const CATEGORY_COLORS: Record<string, string> = {
-  low_poo: 'bg-blue-100 text-blue-600',
-  co_wash: 'bg-cyan-100 text-cyan-600',
-  rinse_out_conditioner: 'bg-teal-100 text-teal-600',
-  deep_conditioner: 'bg-emerald-100 text-emerald-600',
-  leave_in_conditioner: 'bg-green-100 text-green-600',
-  curl_cream: 'bg-pink-100 text-pink-600',
-  gel: 'bg-violet-100 text-violet-600',
-  mousse: 'bg-purple-100 text-purple-600',
-  custard: 'bg-amber-100 text-amber-600',
-  oil_serum: 'bg-yellow-100 text-yellow-600',
-  spray_refresher: 'bg-sky-100 text-sky-600',
-  protein_treatment: 'bg-orange-100 text-orange-600',
-  scalp_treatment: 'bg-rose-100 text-rose-600',
-  clarifying_shampoo: 'bg-indigo-100 text-indigo-600',
+// Brand colors for recognizable placeholders
+const BRAND_COLORS: Record<string, { bg: string; text: string }> = {
+  'SheaMoisture': { bg: 'bg-amber-700', text: 'text-amber-100' },
+  'Shea Moisture': { bg: 'bg-amber-700', text: 'text-amber-100' },
+  'Cantu': { bg: 'bg-red-600', text: 'text-red-100' },
+  'Giovanni': { bg: 'bg-green-700', text: 'text-green-100' },
+  'Jessicurl': { bg: 'bg-purple-600', text: 'text-purple-100' },
+  'Ouidad': { bg: 'bg-teal-600', text: 'text-teal-100' },
+  'Innersense': { bg: 'bg-lime-700', text: 'text-lime-100' },
+  'Curlsmith': { bg: 'bg-pink-600', text: 'text-pink-100' },
+  'Briogeo': { bg: 'bg-emerald-600', text: 'text-emerald-100' },
+  'Mielle': { bg: 'bg-orange-600', text: 'text-orange-100' },
+  'Olaplex': { bg: 'bg-neutral-800', text: 'text-neutral-100' },
+  'As I Am': { bg: 'bg-yellow-600', text: 'text-yellow-100' },
+  'Bounce Curl': { bg: 'bg-cyan-600', text: 'text-cyan-100' },
+  'Kinky Curly': { bg: 'bg-violet-700', text: 'text-violet-100' },
+  'Eco Styler': { bg: 'bg-green-600', text: 'text-green-100' },
+  'TRESemmé': { bg: 'bg-gray-800', text: 'text-gray-100' },
+  'Herbal Essences': { bg: 'bg-fuchsia-600', text: 'text-fuchsia-100' },
+  'Aussie': { bg: 'bg-indigo-500', text: 'text-indigo-100' },
 }
 
-export function ProductImage({ brand, name, category, className = 'w-16 h-16' }: {
+export function ProductImage({ brand, name, className = 'w-16 h-16' }: {
   brand: string
   name: string
-  category: string
   className?: string
 }) {
   const imageUrl = useProductImage(brand, name)
-  const colors = CATEGORY_COLORS[category] || 'bg-gray-100 text-gray-500'
+  const [imgError, setImgError] = useState(false)
 
-  if (imageUrl) {
+  const brandColor = BRAND_COLORS[brand] || { bg: 'bg-violet-100', text: 'text-violet-600' }
+
+  if (imageUrl && !imgError) {
     return (
       <img
         src={imageUrl}
         alt={`${brand} ${name}`}
-        className={`${className} object-cover rounded-lg`}
-        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+        className={`${className} object-cover rounded-lg bg-gray-50`}
+        onError={() => setImgError(true)}
       />
     )
   }
 
-  // Placeholder with brand initial
   return (
-    <div className={`${className} ${colors} rounded-lg flex items-center justify-center font-bold text-lg shrink-0`}>
-      {brand.charAt(0).toUpperCase()}
+    <div className={`${className} ${brandColor.bg} ${brandColor.text} rounded-lg flex items-center justify-center font-bold text-xs text-center px-1 shrink-0 leading-tight`}>
+      {brand.split(' ').map(w => w[0]).join('').slice(0, 3)}
     </div>
   )
 }
