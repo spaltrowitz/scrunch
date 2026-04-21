@@ -204,6 +204,7 @@ export function Products() {
                 <ProductImage
                   brand={product.brand}
                   name={product.name}
+                  seedImageUrl={product.image_url}
                   className="w-16 h-16 shrink-0"
                 />
                 <div className="flex-1 min-w-0">

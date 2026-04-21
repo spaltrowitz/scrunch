@@ -85,13 +85,15 @@ const BRAND_COLORS: Record<string, { bg: string; text: string }> = {
   'Aussie': { bg: 'bg-indigo-500', text: 'text-indigo-100' },
 }
 
-export function ProductImage({ brand, name, className = 'w-16 h-16' }: {
+export function ProductImage({ brand, name, seedImageUrl, className = 'w-16 h-16' }: {
   brand: string
   name: string
+  seedImageUrl?: string | null
   className?: string
 }) {
-  const imageUrl = useProductImage(brand, name)
+  const apiImageUrl = useProductImage(brand, name)
   const [imgError, setImgError] = useState(false)
+  const imageUrl = seedImageUrl || apiImageUrl
 
   const brandColor = BRAND_COLORS[brand] || { bg: 'bg-violet-100', text: 'text-violet-600' }
 
