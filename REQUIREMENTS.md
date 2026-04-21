@@ -233,6 +233,40 @@ Help users construct a complete hair care routine.
 - Browse popular routines filtered by hair type
 - Track which routine you used on which days (routine diary)
 
+### F8: Featured Content & Education Hub
+
+Curated educational content from trusted sources across the web — surfaced contextually throughout the app (not a separate "blog" section).
+
+**Content types:**
+- **Method guides** — "What is the Curly Girl Method?" explainers for beginners
+- **Technique tutorials** — Plopping, scrunching, squish to condish, diffusing, etc.
+- **Ingredient education** — What are silicones? Why avoid sulfates? Protein vs moisture balance
+- **Product comparisons** — Honest multi-product reviews and roundups
+
+**Trusted featured sources (curated, editorial-quality):**
+| Source | Strength | URL |
+|---|---|---|
+| Curl Maven | Deep CGM guides, technique tutorials, European product focus | [curlmaven.ie](https://curlmaven.ie/what-is-the-curly-girl-method/) |
+| Real Simple | Mainstream editorial reviews with expert input | [realsimple.com](https://www.realsimple.com/beauty-fashion/hair/hair-care/curly-girl-method-review) |
+| Curly World (Lorraine Massey) | Original CGM creator's site — authoritative method explanation | [curlyworld.com](https://www.curlyworld.com/cgmethod) |
+| CurlsBot | Ingredient analyzer tool — useful for cross-referencing our analysis rules | [curlsbot.com](https://www.curlsbot.com/) |
+| The Everygirl | Accessible beginner guides with real results and routine breakdowns | [theeverygirl.com](https://theeverygirl.com/curly-girl-method/) |
+| r/curlygirl + r/curlyhair | Community wisdom — holy grail threads, routine megathreads | Reddit |
+| YouTube (genuine only) | Technique demos, multi-product comparisons (no sponsored content) | Various |
+
+**How featured content appears in the app:**
+- On product pages: relevant articles about that product category (e.g., "Best gels for 3B curls" article linked on gel product pages)
+- In onboarding: "Learn more" links to educational content at each quiz step (e.g., porosity test article linked from the porosity step)
+- On the dashboard: "Featured reads" section with rotating curated content
+- In the Q&A AI assistant: AI can cite featured content sources in its answers
+- **All featured content links out to the original source** — we don't copy/republish. We curate and contextualize.
+
+**Content curation principles:**
+- No sponsored or paid content — same principle as products
+- Prefer sources with hands-on experience and real results
+- Cross-reference ingredient analysis rules with CurlsBot, CurlScan, and IsItCG for consistency
+- Prioritize diverse hair types in featured content (2A–4C representation)
+
 ---
 
 ## Non-Functional Requirements
@@ -307,9 +341,19 @@ Help users construct a complete hair care routine.
 | CG Approved Spreadsheet | ~5,000+ products with ingredients | CSV import, one-time + periodic sync |
 | CurlScan | Product database with CG status | API integration or scrape (check ToS) |
 | IsItCG | Ingredient analysis rules & product checks | **Cross-reference with CurlScan** — use both to validate CG status, flag disagreements |
+| CurlsBot | Ingredient analysis engine & CG checker | Cross-reference analysis rules with our engine for consistency |
 | r/curlygirl wiki | Beginner guides, technique explanations | Manual curation + RAG indexing |
 | r/curlyhair wiki + top threads | Holy grail product lists, routine megathreads, technique guides | Manual curation + RAG indexing. Search "curly girl method reddit" for top threads |
 | YouTube (genuine reviewers only) | Multi-product comparisons, technique tutorials | Transcript indexing for RAG. **Filter out sponsored/paid content** — only index genuine comparison reviews |
+
+### Featured Content Sources (Editorial / Educational)
+| Source | Content Type | Integration |
+|---|---|---|
+| [Curl Maven](https://curlmaven.ie/) | Deep CGM guides, technique tutorials, European products | Link-out with contextual placement. RAG indexing for AI assistant |
+| [Real Simple](https://www.realsimple.com/) | Expert-backed editorial reviews | Link-out. Curated for product pages and beginner onboarding |
+| [Curly World](https://www.curlyworld.com/) | Lorraine Massey's original CGM method guides | Authoritative method reference. Link-out from onboarding/education |
+| [The Everygirl](https://theeverygirl.com/) | Accessible beginner guides with real routine breakdowns | Link-out. Great for onboarding "learn more" links |
+| [CurlsBot](https://www.curlsbot.com/) | Ingredient analysis tool | Cross-reference our ingredient rules. Link-out as secondary checker |
 
 ### Ongoing Content
 - Community-submitted product additions (moderated)
@@ -380,6 +424,11 @@ For initial launch, focus on the core loop:
 - [IsItCG](http://www.isitcg.com/)
 - [r/curlygirl wiki](https://www.reddit.com/r/curlygirl/wiki/basics/)
 - [r/curlyhair](https://www.reddit.com/r/curlyhair/)
+- [Curl Maven](https://curlmaven.ie/what-is-the-curly-girl-method/) — deep CGM guides, European product focus
+- [Real Simple — CGM Review](https://www.realsimple.com/beauty-fashion/hair/hair-care/curly-girl-method-review) — editorial review with expert input
+- [Curly World](https://www.curlyworld.com/cgmethod) — Lorraine Massey's original CGM method site
+- [CurlsBot](https://www.curlsbot.com/) — ingredient analyzer, cross-reference for our rules engine
+- [The Everygirl — CGM Guide](https://theeverygirl.com/curly-girl-method/) — accessible beginner guide
 - [Prose](https://prose.com/) — onboarding quiz inspiration for hair profile creation
 - [Yuka](https://yuka.io/) — product scanning UX and health scoring inspiration (future integration)
 - [Boris Tane — How I Use Claude Code](https://boristane.com/blog/how-i-use-claude-code/) (development workflow reference)
