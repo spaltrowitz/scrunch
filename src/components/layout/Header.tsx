@@ -12,8 +12,8 @@ export function Header() {
     <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 no-underline">
-          <span className="text-2xl">🌀</span>
-          <span className="text-xl font-bold text-gray-900">Curly Girl</span>
+          <span className="text-2xl">✊</span>
+          <span className="text-xl font-bold text-gray-900">Scrunch</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 text-sm">

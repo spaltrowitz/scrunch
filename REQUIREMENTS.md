@@ -1,4 +1,4 @@
-# Curly Girl — Product Requirements Document
+# Scrunch — Product Requirements Document
 
 ## Problem Statement
 
@@ -9,7 +9,7 @@ The curly hair community relies on fragmented, hard-to-navigate resources: massi
 3. Get **personalized recommendations** from people with similar hair
 4. **Ask questions** and get both AI-assisted and community-driven answers
 
-Curly Girl consolidates these fragmented resources into an authenticated, personalized experience.
+Scrunch consolidates these fragmented resources into an authenticated, personalized experience.
 
 ---
 

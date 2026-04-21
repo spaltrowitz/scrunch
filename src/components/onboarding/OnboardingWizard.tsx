@@ -54,7 +54,7 @@ export function OnboardingWizard() {
       display_name: user.email?.split('@')[0] ?? 'Curly Friend',
       ...data,
       onboarding_completed: true,
-    })
+    } as never)
     setSaving(false)
     if (!error) navigate('/dashboard')
   }

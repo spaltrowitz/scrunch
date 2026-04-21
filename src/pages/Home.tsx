@@ -10,7 +10,7 @@ export function Home() {
       {/* Hero */}
       <section className="py-16 md:py-24 px-4 text-center bg-gradient-to-b from-violet-50 to-white">
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-          🌀 Know your products.
+          ✊ Know your products.
           <br />
           <span className="text-violet-600">Love your curls.</span>
         </h1>

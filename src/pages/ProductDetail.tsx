@@ -46,7 +46,7 @@ export function ProductDetail() {
       would_repurchase: repurchase,
       results_notes: notes || null,
       photo_urls: [],
-    })
+    } as never)
     setSubmitting(false)
     setShowReviewForm(false)
     loadProduct()
