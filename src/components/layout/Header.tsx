@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../lib/auth'
+import { ScrunchLogo } from '../ui/ScrunchLogo'
 
 export function Header() {
   const { user, signOut } = useAuth()
@@ -12,7 +13,7 @@ export function Header() {
     <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 no-underline">
-          <span className="text-2xl">✊</span>
+          <ScrunchLogo className="w-8 h-8" />
           <span className="text-xl font-bold text-gray-900">Scrunch</span>
         </Link>
 
