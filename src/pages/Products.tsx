@@ -2,11 +2,50 @@ import { useState } from 'react'
 import { PRODUCT_CATEGORY_LABELS, CG_STATUS_CONFIG } from '../lib/constants'
 import type { ProductCategory, CgStatus } from '../lib/database.types'
 import { SEED_PRODUCTS } from '../data/seedProducts'
+import { ProductImage } from '../hooks/useProductImage'
+
+type ProductAction = 'tried' | 'liked' | 'bookmarked'
+type ProductActions = Record<string, Set<ProductAction>>
+
+function getStoredActions(): ProductActions {
+  try {
+    const raw = JSON.parse(localStorage.getItem('scrunch_actions') || '{}')
+    const result: ProductActions = {}
+    for (const [key, vals] of Object.entries(raw)) {
+      result[key] = new Set(vals as ProductAction[])
+    }
+    return result
+  } catch { return {} }
+}
+
+function storeActions(actions: ProductActions) {
+  const serializable: Record<string, string[]> = {}
+  for (const [key, set] of Object.entries(actions)) {
+    serializable[key] = [...set]
+  }
+  localStorage.setItem('scrunch_actions', JSON.stringify(serializable))
+}
 
 export function Products() {
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<ProductCategory | ''>('')
   const [statusFilter, setStatusFilter] = useState<CgStatus | ''>('')
+  const [actions, setActions] = useState<ProductActions>(getStoredActions)
+
+  const toggleAction = (productKey: string, action: ProductAction) => {
+    setActions(prev => {
+      const next = { ...prev }
+      if (!next[productKey]) next[productKey] = new Set()
+      else next[productKey] = new Set(next[productKey])
+      if (next[productKey].has(action)) next[productKey].delete(action)
+      else next[productKey].add(action)
+      storeActions(next)
+      return next
+    })
+  }
+
+  const hasAction = (productKey: string, action: ProductAction) =>
+    actions[productKey]?.has(action) ?? false
 
   const filteredProducts = SEED_PRODUCTS.filter(p => {
     if (categoryFilter && p.category !== categoryFilter) return false
@@ -67,29 +106,71 @@ export function Products() {
         </div>
       ) : (
         <div className="grid md:grid-cols-2 gap-4">
-          {filteredProducts.map((product, i) => (
-            <div
-              key={`${product.brand}-${product.name}-${i}`}
-              className="block p-4 bg-white rounded-xl border border-gray-200 hover:border-violet-300 transition"
-            >
-              <div className="flex items-start justify-between mb-2">
-                <div>
-                  <p className="text-xs text-gray-500">{product.brand}</p>
-                  <h3 className="font-semibold text-gray-900">{product.name}</h3>
+          {filteredProducts.map((product, i) => {
+            const key = `${product.brand}::${product.name}`
+            return (
+              <div
+                key={`${key}-${i}`}
+                className="flex gap-4 p-4 bg-white rounded-xl border border-gray-200 hover:border-violet-300 transition"
+              >
+                {/* Product Image */}
+                <ProductImage
+                  brand={product.brand}
+                  name={product.name}
+                  category={product.category}
+                  className="w-16 h-16 shrink-0"
+                />
+
+                {/* Product Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <div className="min-w-0">
+                      <p className="text-xs text-gray-500">{product.brand}</p>
+                      <h3 className="font-semibold text-gray-900 text-sm leading-tight truncate">{product.name}</h3>
+                    </div>
+                    <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${CG_STATUS_CONFIG[product.cg_status].bg} ${CG_STATUS_CONFIG[product.cg_status].color}`}>
+                      {CG_STATUS_CONFIG[product.cg_status].icon}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 mb-2">{PRODUCT_CATEGORY_LABELS[product.category]}</p>
+
+                  {/* Action buttons */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => toggleAction(key, 'tried')}
+                      className={`text-xs px-2.5 py-1 rounded-full border cursor-pointer transition ${
+                        hasAction(key, 'tried')
+                          ? 'bg-violet-100 border-violet-300 text-violet-700'
+                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                      }`}
+                    >
+                      {hasAction(key, 'tried') ? '✓ Tried' : 'Tried it?'}
+                    </button>
+                    <button
+                      onClick={() => toggleAction(key, 'liked')}
+                      className={`text-xs px-2.5 py-1 rounded-full border cursor-pointer transition ${
+                        hasAction(key, 'liked')
+                          ? 'bg-green-100 border-green-300 text-green-700'
+                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                      }`}
+                    >
+                      {hasAction(key, 'liked') ? '💚 Liked' : '👍 Like?'}
+                    </button>
+                    <button
+                      onClick={() => toggleAction(key, 'bookmarked')}
+                      className={`text-xs px-2.5 py-1 rounded-full border cursor-pointer transition ${
+                        hasAction(key, 'bookmarked')
+                          ? 'bg-amber-100 border-amber-300 text-amber-700'
+                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                      }`}
+                    >
+                      {hasAction(key, 'bookmarked') ? '★ Saved' : '☆ Save'}
+                    </button>
+                  </div>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full shrink-0 ml-2 ${CG_STATUS_CONFIG[product.cg_status].bg} ${CG_STATUS_CONFIG[product.cg_status].color}`}>
-                  {CG_STATUS_CONFIG[product.cg_status].icon} {CG_STATUS_CONFIG[product.cg_status].label}
-                </span>
               </div>
-              <p className="text-xs text-gray-500">{PRODUCT_CATEGORY_LABELS[product.category]}</p>
-              {product.notes && (
-                <p className="text-xs text-gray-400 mt-1">{product.notes}</p>
-              )}
-              {product.cruelty_free === 'yes' && (
-                <span className="inline-block text-xs mt-2 px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded-full">🐰 Cruelty-free</span>
-              )}
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>
