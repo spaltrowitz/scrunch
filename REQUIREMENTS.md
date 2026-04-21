@@ -17,6 +17,26 @@ Curly Girl consolidates these fragmented resources into an authenticated, person
 
 A web app where curly-haired people can create a hair profile, log products they've used (with notes on results), discover new products recommended by people with similar hair, and participate in a community Q&A board with an AI assistant trained on the wealth of existing curly hair knowledge.
 
+### Design Inspirations
+
+- **[Yuka](https://yuka.io/)** — The gold standard for product scanning UX. Scan a barcode, get an instant color-coded health rating (green/orange/red) with clear ingredient breakdowns and healthier alternatives. We want this same "scan and understand instantly" experience for hair products. Yuka is ad-free and focused entirely on user trust — we should follow the same principle. *Future integration point: Yuka-style health scoring layered on top of CG approval (Phase 2+).*
+- **[Prose](https://prose.com/)** — Best-in-class onboarding quiz for hair profiles. Their flow asks about hair type, texture, density, porosity, scalp condition, styling habits, environment (zip code for humidity/water hardness), diet, stress, workout frequency, fragrance preference, and sensitivities — all in a guided 5–10 minute experience. Our onboarding should mirror this depth and flow. Key Prose questions to adapt:
+  - Hair type & texture (straight → coily)
+  - Strand thickness (fine, medium, coarse)
+  - Scalp condition (oily, dry, sensitive, dandruff)
+  - Styling habits (heat tools, chemical treatments)
+  - Location/zip code (for humidity, water hardness, UV)
+  - Workout frequency (affects wash frequency)
+  - Washing frequency
+  - Fragrance preference
+  - Allergies/sensitivities
+
+### Guiding Principles
+
+- **No paid advertising.** We will not run ads. Revenue model TBD but the product must stay unbiased and community-trust-first. This extends to content curation — YouTube and Reddit content must be filtered for genuine reviews, not sponsored/paid promotions.
+- **Community-driven, not brand-driven.** Product recommendations come from real people with real results, not paid influencers or brand deals.
+- **Unbiased data.** Cross-reference multiple sources (CurlScan, IsItCG, community spreadsheets) rather than relying on any single authority.
+
 ---
 
 ## User Personas
@@ -60,10 +80,27 @@ Users create a profile with their hair attributes. This is the foundation for pe
 - **Climate/environment**: Humid, Dry, Variable (affects product performance significantly)
 - **Country**: For product availability filtering
 
+**Lifestyle & environment factors (inspired by Prose onboarding):**
+- Workout/sweat frequency (affects wash frequency needs)
+- Washing frequency (current and desired)
+- Heat tool usage (never, occasionally, frequently)
+- Chemical treatments (relaxer, keratin, perm)
+- Stress level (can affect hair health)
+- Water type (hard, soft, unknown — can prompt by zip/location)
+
 **Profile should also capture:**
 - How long they've been following CGM (or if they're just starting)
 - Primary hair goals (moisture, definition, volume, frizz control, length retention)
 - Known sensitivities/allergies (fragrance, coconut, protein sensitivity)
+- Fragrance preference (love it, no preference, prefer fragrance-free)
+
+**Onboarding UX (Prose-inspired):**
+- Guided quiz format, one question per screen with visual aids
+- Progress bar showing how far along they are
+- Skip option for questions they're unsure about (can fill in later)
+- "Help me figure this out" links with explainers (e.g., how to test porosity)
+- Results summary at the end: "Here's your hair profile" with personalized first recommendations
+- Should take ~3–5 minutes (shorter than Prose since we're not formulating custom products)
 
 ### F2: Product Database
 
@@ -103,7 +140,8 @@ A comprehensive, community-maintained database of hair products with CG-approval
 
 **Data seeding strategy:**
 - Import from the existing [CG-approved spreadsheet](https://docs.google.com/spreadsheets/d/1gn6VnPsRU1H3ziElbWqNVFY5mev6GB1pwKKt_MNpoAY/) as initial dataset
-- Integrate with CurlScan's public data where available
+- **Cross-reference CurlScan AND IsItCG** for CG-approval status — don't rely on a single source. Where they disagree, flag for manual review
+- Build our own ingredient analysis engine using the rules/logic from both CurlScan and IsItCG as reference
 - Allow community submissions with moderation
 - Ingredient analysis engine that can auto-classify CG approval based on ingredient lists
 
@@ -160,11 +198,13 @@ A place where users can ask questions and get answers.
 5. AI can also suggest relevant existing threads before the user posts
 
 **AI Knowledge Sources:**
-- Scraped/indexed content from r/curlygirl wiki and top posts
-- Scraped/indexed content from r/curlyhair wiki and top posts
-- Popular YouTube creator content (transcripts from known curly hair educators)
+- Scraped/indexed content from r/curlygirl wiki and top posts (search "curly girl method reddit" for best threads — holy grail product threads, routine megathreads, weekly wash day results)
+- Scraped/indexed content from r/curlyhair wiki and top posts (339K weekly visitors — massive knowledge base)
+- Key Reddit thread types to prioritize: "holy grail products," "routine help," "product recommendations by hair type," weekly results threads with before/after photos
+- YouTube creator content — **only genuine comparison/review content, NOT sponsored or paid promotions**. Prioritize creators doing multi-product comparisons with honest results over single-product "reviews" that are likely paid
 - The app's own product database and user reviews
 - General CGM principles and ingredient science
+- Cross-referenced data from CurlScan and IsItCG
 
 **Q&A Features:**
 - Tag questions by topic (products, techniques, troubleshooting, beginner, etc.)
@@ -266,16 +306,17 @@ Help users construct a complete hair care routine.
 |---|---|---|
 | CG Approved Spreadsheet | ~5,000+ products with ingredients | CSV import, one-time + periodic sync |
 | CurlScan | Product database with CG status | API integration or scrape (check ToS) |
-| IsItCG | Ingredient analysis rules | Reference for building our own ingredient analyzer |
+| IsItCG | Ingredient analysis rules & product checks | **Cross-reference with CurlScan** — use both to validate CG status, flag disagreements |
 | r/curlygirl wiki | Beginner guides, technique explanations | Manual curation + RAG indexing |
-| r/curlyhair wiki | Holy grail product lists, technique guides | Manual curation + RAG indexing |
-| YouTube (popular creators) | Technique tutorials, product reviews | Transcript indexing for RAG |
+| r/curlyhair wiki + top threads | Holy grail product lists, routine megathreads, technique guides | Manual curation + RAG indexing. Search "curly girl method reddit" for top threads |
+| YouTube (genuine reviewers only) | Multi-product comparisons, technique tutorials | Transcript indexing for RAG. **Filter out sponsored/paid content** — only index genuine comparison reviews |
 
 ### Ongoing Content
 - Community-submitted product additions (moderated)
 - User reviews and ratings (organic growth)
 - Community Q&A threads
 - AI-generated summaries of trending discussions from Reddit
+- **No paid/sponsored content** — all data sources must be filtered for authenticity
 
 ---
 
@@ -315,18 +356,20 @@ For initial launch, focus on the core loop:
 - Internationalization
 - Expert badges / reputation system
 - Trending discussions from Reddit integration
-- YouTube content integration
+- YouTube content integration (genuine reviews only, no sponsored)
+- **Yuka-style product health scoring** — layer a Yuka-inspired health/ingredient score on top of CG approval. Color-coded rating (green/orange/red) with clear explanations. Potential future Yuka API integration for cross-referencing general product health data alongside CG-specific analysis
 
 ---
 
 ## Open Questions
 
-1. **Monetization**: Ad-supported? Freemium with premium features? Affiliate links to product purchase pages?
-2. **Product data licensing**: What are the ToS for CurlScan and the Google Spreadsheet data? Can we legally import/reference it?
+1. **Monetization**: ~~Ad-supported?~~ **No ads.** Freemium with premium features? Affiliate links (if transparent and non-biasing)? Subscription model?
+2. **Product data licensing**: What are the ToS for CurlScan and the Google Spreadsheet data? Can we legally import/reference it? Same question for IsItCG.
 3. **AI assistant model**: Claude vs GPT vs open-source for the Q&A assistant? Cost implications at scale?
 4. **Moderation**: How do we handle product data disputes? (e.g., "this product changed its formula")
 5. **Community guidelines**: What moderation is needed for the Q&A board?
-6. **Brand partnerships**: Should brands be able to claim their product pages or respond to reviews?
+6. **Brand partnerships**: Should brands be able to claim their product pages or respond to reviews? (Must not compromise unbiased positioning)
+7. **Sponsored content detection**: How do we reliably filter out paid YouTube reviews and Reddit astroturfing from our knowledge base?
 
 ---
 
@@ -337,4 +380,6 @@ For initial launch, focus on the core loop:
 - [IsItCG](http://www.isitcg.com/)
 - [r/curlygirl wiki](https://www.reddit.com/r/curlygirl/wiki/basics/)
 - [r/curlyhair](https://www.reddit.com/r/curlyhair/)
+- [Prose](https://prose.com/) — onboarding quiz inspiration for hair profile creation
+- [Yuka](https://yuka.io/) — product scanning UX and health scoring inspiration (future integration)
 - [Boris Tane — How I Use Claude Code](https://boristane.com/blog/how-i-use-claude-code/) (development workflow reference)
