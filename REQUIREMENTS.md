@@ -176,14 +176,72 @@ Users should be able to request products that aren't in the database yet.
 - No auth required for submitting a request (lowers friction), but logged-in users get notified when their request is fulfilled
 - Requests go into a moderation queue
 - Community can upvote existing requests ("I want this too") to help prioritize
-- Moderators/admins can approve and add the product to the database
-- Automated ingredient analysis runs on newly added products
 
 **Request lifecycle:**
 1. User submits request → status: `pending`
 2. Community upvotes → surfaces popular requests
-3. Moderator reviews → adds product with ingredients → status: `approved`
-4. Requester notified (if logged in) → status: `fulfilled`
+3. AI auto-processing (see below) → status: `auto_reviewed`
+4. Admin spot-checks AI work → status: `approved` or `rejected`
+5. Requester notified (if logged in) → status: `fulfilled`
+
+### F3.6: AI-Powered Product Ingestion Pipeline
+
+When a product request comes in, an automated pipeline should handle most of the work without human intervention.
+
+**AI auto-processing (triggered on new request or scheduled batch):**
+1. **Product lookup** — AI searches for the product by brand + name across:
+   - Brand's official website (ingredients, description, product image)
+   - Retail sites (Target, Ulta, Amazon) for product image and pricing
+   - Open Beauty Facts API for existing data
+2. **Ingredient extraction** — AI pulls the full ingredient list from the product page or retail listing
+3. **CG analysis** — Run the ingredient list through our analyzer engine, cross-reference with CurlScan/IsItCG rules
+4. **Image selection** — Pull the best available product image (brand site > retail site > Open Beauty Facts)
+5. **Auto-populate fields** — Brand, name, category, ingredients, CG status, flagged ingredients, image URL, price range, country availability, protein-free/fragrance-free flags
+6. **Confidence score** — AI assigns a confidence level to its work:
+   - `high`: found on brand site with full ingredients → auto-approve
+   - `medium`: found on retail site, ingredients may be outdated → flag for review
+   - `low`: couldn't find reliable ingredient list → hold for manual review
+
+**Product record created with:**
+```
+status: 'auto_reviewed'
+ai_confidence: 'high' | 'medium' | 'low'
+source_urls: ['https://brand.com/...', 'https://target.com/...']
+auto_reviewed_at: timestamp
+```
+
+**Admin dashboard actions:**
+- View AI-processed products sorted by confidence (low first)
+- One-click approve for high-confidence items
+- Edit ingredients/status before approving for medium/low
+- Reject with reason
+
+### F3.7: Product Removal & Data Quality
+
+Products should be removable or flagged under certain criteria.
+
+**Automatic flagging (AI-monitored):**
+- **Formula change detected** — If a user reports "this product's ingredients changed" or a re-scan of retail sites shows different ingredients, flag the product for review
+- **Discontinued product** — If the product is no longer available on major retail sites, mark as `discontinued` (keep in DB but de-prioritize in search/recommendations)
+- **Duplicate product** — AI detects near-duplicate entries (same brand, similar name) and flags for merge
+
+**Manual removal criteria (admin action):**
+- Product confirmed discontinued by brand
+- Product recalled or safety concern
+- Persistent incorrect data that can't be verified
+- DMCA or legal request from brand (unlikely but documented)
+- Spam/fake product submissions
+
+**Removal behavior:**
+- Products are **soft-deleted** (marked `status: 'removed'`), never hard-deleted
+- Removed products don't appear in search or recommendations
+- Users who reviewed the product see a "This product has been removed" notice
+- Removal reason is logged for transparency
+
+**Product staleness policy:**
+- Products not reviewed or updated in 18+ months get flagged for ingredient re-verification
+- AI periodically re-checks top products against retail sites for formula changes
+- Community can report outdated products via a "Report an issue" button on product pages
 
 ### F4: Personalized Recommendations Engine
 
