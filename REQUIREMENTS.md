@@ -94,16 +94,17 @@ Users create a profile with their hair attributes. This is the foundation for pe
 - Known sensitivities/allergies (fragrance, coconut, protein sensitivity)
 - Fragrance preference (love it, no preference, prefer fragrance-free)
 
-**Onboarding UX (Prose-inspired):**
-- Guided quiz format, one question per screen with visual aids
+**Onboarding UX:**
+- Guided quiz format, one question per screen with visual aids — a common UX pattern used across many apps (Prose, Curology, Hims, Function of Beauty, etc.)
 - Progress bar showing how far along they are
 - Skip option for questions they're unsure about (can fill in later)
 - "Help me figure this out" links with explainers (e.g., how to test porosity)
 - Results summary at the end: "Here's your hair profile" with personalized first recommendations
+- **Note on originality:** The hair quiz concept and the hair typing system (2A-4C, porosity, density) are industry-standard concepts from trichology and the Andre Walker system, used by NaturallyCurly, CurlScan, Prose, Function of Beauty, and hundreds of other brands. Our quiz is inspired by best practices across the industry but uses our own question wording, flow, design, and logic. We do NOT copy any proprietary algorithms, formulations, visual designs, or exact copy from any specific brand.
 - Should take ~3–5 minutes (shorter than Prose since we're not formulating custom products)
 - **Re-entering the quiz pre-loads existing selections** (edit mode, not start-from-scratch)
 
-**Quiz sections (Prose-style grouping):**
+**Quiz sections (grouped by topic):**
 
 | Section | Questions | Notes |
 |---|---|---|
@@ -113,7 +114,7 @@ Users create a profile with their hair attributes. This is the foundation for pe
 | **Lifestyle** | Climate/location (zip code), workout frequency, water type | Environmental factors |
 | **Preferences & Goals** | CGM experience level, hair goals (multi-select), sensitivities/allergies (multi-select), fragrance preference | Drives personalized recommendations |
 
-**Full question set (from Prose reference + CGM-specific):**
+**Full question set (industry-standard hair science + CGM-specific):**
 
 *Hair & Scalp:*
 1. **Curl pattern** — "What's your natural, untreated, air-dried hair texture?" with SVG illustrations. "More of a visual learner? Tap for pics"
@@ -139,14 +140,14 @@ Users create a profile with their hair attributes. This is the foundation for pe
 17. **Textural treatments** — "Has your hair undergone any textural treatments? Select all that apply, even if you're growing one out." — with "Not sure what you got?" expandable. Options: Curly hair became straight(er) [relaxer/keratin] / Straight hair became curly [perm] / Hair was smoothed & straightened for 3-5 months [keratin treatment] / None
 18. **Heat tool usage** — Never / Occasionally / Frequently
 
-*Styling Habits (from Prose — helps with product recommendations):*
+*Styling Habits (helps with product recommendations):*
 19. **Current products & tools** — "What products and styling tools do you use? Select all that apply, even ones you use infrequently." — Grouped into: CLEANSE + CONDITION (shampoo, co-wash, conditioner, deep conditioner, leave-in) / STYLING PRODUCTS + TOOLS (gel, mousse, cream, custard, oil, diffuser, plopping, denman brush) / TREATMENTS (protein, bond builder, scalp treatment) — with "Why we ask" tooltip
 20. **Styles worn** — "Do you wear any of these styles? Select all that apply." — Beachy or defined natural waves and curls / Buns, braids, ponytails, updos / Protective styles (twists, locs, braids) / Heat-styled (blowouts, straightening) / Extensions or wigs / Head wraps, turbans, scarves — with "Why we ask" tooltip
 21. **Hold preference** — "What level of hold do you prefer when styling?" — No hold / Light hold / Medium hold / Strong hold / Not sure (we'll suggest based on your hair) — with "Why we ask" tooltip
 22. **Routine preference** — "What describes your ideal hair routine?" — Quick & minimal (fewest steps) / Balanced (some effort, good results) / Full routine (I enjoy the process) / Varies by day
 
 *Lifestyle & Environment:*
-23. **Location** — Zip code input. Triggers a **personalized environmental stressor dashboard** (Prose-inspired): "Here's what affects your hair in [City]" showing scores out of 100 for: UV Rays / Pollution / Water Hardness / Humidity / Wind. Data sourced from public APIs (EPA air quality, USGS water hardness, weather APIs). This is a WOW moment in the quiz.
+23. **Location** — Zip code input. Triggers a **personalized environmental stressor dashboard**: "Here's what affects your hair in [City]" showing scores out of 100 for: UV Rays / Pollution / Water Hardness / Humidity / Wind. Data sourced from public APIs (EPA air quality, USGS water hardness, weather APIs). This is a WOW moment in the quiz.
 24. **Odor retention** — "Does your hair retain noticeable odors from food or smoke?" — Yes / No — with "Why we ask" tooltip. (Affects porosity assessment and product recommendations)
 25. **Workout frequency** — Rarely / A few times/week / Daily
 26. **Life stage** — "This helps us give the right support, at every stage." — with "Why we ask". Options relevant to hair changes: Teen / Adult / Pregnancy or postpartum / Menopause / None of these apply
