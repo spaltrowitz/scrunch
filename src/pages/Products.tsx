@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { PRODUCT_CATEGORY_LABELS, CG_STATUS_CONFIG, SCRUNCH_SCORE_CONFIG } from '../lib/constants'
+import { PRODUCT_CATEGORY_LABELS, SCRUNCH_SCORE_CONFIG } from '../lib/constants'
 import type { ProductCategory } from '../lib/database.types'
 import { SEED_PRODUCTS, computeScrunchScore } from '../data/seedProducts'
 import type { SeedProduct } from '../data/seedProducts'
@@ -8,8 +8,10 @@ import { RequestProductForm } from '../components/products/RequestProductForm'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth'
 
-type ProductAction = 'tried' | 'liked' | 'bookmarked'
+type TriedRating = 'loved' | 'ok' | 'disliked'
+type ProductAction = 'tried' | 'bookmarked'
 type ProductActions = Record<string, Set<ProductAction>>
+type ProductRatings = Record<string, TriedRating>
 type ProductNotes = Record<string, string>
 
 type DisplayProduct = SeedProduct & { id?: string }
@@ -61,6 +63,10 @@ export function Products() {
   const [showApprovedOnly, setShowApprovedOnly] = useState(false)
   const [showGoodPlus, setShowGoodPlus] = useState(false)
   const [actions, setActions] = useState<ProductActions>(getStoredActions)
+  const [ratings, setRatings] = useState<ProductRatings>(() => {
+    try { return JSON.parse(localStorage.getItem('scrunch_ratings') || '{}') } catch { return {} }
+  })
+  const [ratingPopup, setRatingPopup] = useState<string | null>(null)
   const [notes, setNotes] = useState<ProductNotes>(getStoredNotes)
   const [editingNote, setEditingNote] = useState<string | null>(null)
   const [showRequestForm, setShowRequestForm] = useState(false)
@@ -83,7 +89,10 @@ export function Products() {
               cruelty_free: p.cruelty_free,
               notes: p.notes,
               image_url: p.image_url,
-            })))
+            })).filter((p, i, arr) =>
+              // Dedup by brand+name (case-insensitive)
+              arr.findIndex(x => x.brand.toLowerCase() === p.brand.toLowerCase() && x.name.toLowerCase() === p.name.toLowerCase()) === i
+            ))
           } else {
             setProducts(SEED_PRODUCTS)
           }
@@ -167,7 +176,34 @@ export function Products() {
   }
 
   const toggleAction = (key: string, action: ProductAction) => {
-    const wasActive = actions[key]?.has(action) ?? false
+    if (action === 'tried') {
+      // Show rating popup instead of toggling directly
+      if (actions[key]?.has('tried')) {
+        // Un-try: remove tried + rating
+        setActions(prev => {
+          const next = { ...prev }
+          next[key] = new Set(next[key])
+          next[key].delete('tried')
+          storeActions(next)
+          return next
+        })
+        setRatings(prev => {
+          const next = { ...prev }
+          delete next[key]
+          localStorage.setItem('scrunch_ratings', JSON.stringify(next))
+          return next
+        })
+        if (user && isUuid(key)) {
+          supabase.from('product_reviews').delete().eq('user_id', user.id).eq('product_id', key)
+            .then(({ error }) => { if (error) console.error('Delete review failed:', error) })
+        }
+      } else {
+        setRatingPopup(key)
+      }
+      return
+    }
+
+    // Bookmark toggle (localStorage only)
     setActions(prev => {
       const next = { ...prev }
       if (!next[key]) next[key] = new Set()
@@ -177,22 +213,35 @@ export function Products() {
       storeActions(next)
       return next
     })
+  }
 
-    // Persist to Supabase for logged-in users (bookmarks stay localStorage-only)
-    if (user && action !== 'bookmarked' && isUuid(key)) {
-      const upsertData: Record<string, unknown> = {
+  const submitRating = (key: string, rating: TriedRating) => {
+    setRatingPopup(null)
+    setActions(prev => {
+      const next = { ...prev }
+      if (!next[key]) next[key] = new Set()
+      else next[key] = new Set(next[key])
+      next[key].add('tried')
+      storeActions(next)
+      return next
+    })
+    setRatings(prev => {
+      const next = { ...prev, [key]: rating }
+      localStorage.setItem('scrunch_ratings', JSON.stringify(next))
+      return next
+    })
+
+    // Persist to Supabase
+    if (user && isUuid(key)) {
+      const ratingMap: Record<TriedRating, number> = { loved: 5, ok: 3, disliked: 1 }
+      const repurchaseMap: Record<TriedRating, string> = { loved: 'yes', ok: 'maybe', disliked: 'no' }
+      supabase.from('product_reviews').upsert({
         user_id: user.id,
         product_id: key,
-      }
-      if (action === 'tried') {
-        upsertData.status = wasActive ? null : 'tried_once'
-      } else if (action === 'liked') {
-        upsertData.rating = wasActive ? null : 5
-        upsertData.would_repurchase = wasActive ? null : 'yes'
-      }
-      supabase
-        .from('product_reviews')
-        .upsert(upsertData as never, { onConflict: 'user_id,product_id' })
+        status: 'tried_once',
+        rating: ratingMap[rating],
+        would_repurchase: repurchaseMap[rating],
+      } as never, { onConflict: 'user_id,product_id' })
         .then(({ error }) => { if (error) console.error('Review upsert failed:', error) })
     }
   }
@@ -357,7 +406,7 @@ export function Products() {
         <div className="grid md:grid-cols-2 gap-4">
           {filteredProducts.map((product, i) => {
             const key = productKey(product)
-            const { score, grade } = computeScrunchScore(product)
+            const { score, grade, reasons } = computeScrunchScore(product)
             const scoreConfig = SCRUNCH_SCORE_CONFIG[grade]
             return (
               <div
@@ -376,48 +425,61 @@ export function Products() {
                       <p className="text-xs text-gray-500">{product.brand}</p>
                       <h3 className="font-semibold text-gray-900 text-sm leading-tight truncate">{product.name}</h3>
                     </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${CG_STATUS_CONFIG[product.cg_status].bg} ${CG_STATUS_CONFIG[product.cg_status].color}`}>
-                        {CG_STATUS_CONFIG[product.cg_status].icon}
-                      </span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${scoreConfig.bg} ${scoreConfig.color}`} title={`Scrunch Score: ${score}/100 — ${scoreConfig.description}`}>
-                        {score}
-                      </span>
-                    </div>
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 cursor-help ${scoreConfig.bg} ${scoreConfig.color}`}
+                      title={`Scrunch Score: ${score}/100 (${scoreConfig.label})\n\n${reasons.join('\n')}`}
+                    >
+                      {score}
+                    </span>
                   </div>
                   <p className="text-xs text-gray-500 mb-2">{PRODUCT_CATEGORY_LABELS[product.category]}</p>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 items-center">
                     <button
                       onClick={() => toggleAction(key, 'tried')}
                       className={`text-xs px-2.5 py-1 rounded-full border cursor-pointer transition ${
                         hasAction(key, 'tried')
-                          ? 'bg-violet-100 border-violet-300 text-violet-700'
+                          ? ratings[key] === 'loved' ? 'bg-green-100 border-green-300 text-green-700'
+                            : ratings[key] === 'disliked' ? 'bg-red-100 border-red-300 text-red-700'
+                            : 'bg-amber-100 border-amber-300 text-amber-700'
                           : 'border-gray-200 text-gray-500 hover:border-gray-300'
                       }`}
                     >
-                      {hasAction(key, 'tried') ? '✓ Tried' : 'Tried it?'}
-                    </button>
-                    <button
-                      onClick={() => toggleAction(key, 'liked')}
-                      className={`text-xs px-2.5 py-1 rounded-full border cursor-pointer transition ${
-                        hasAction(key, 'liked')
-                          ? 'bg-green-100 border-green-300 text-green-700'
-                          : 'border-gray-200 text-gray-500 hover:border-gray-300'
-                      }`}
-                    >
-                      {hasAction(key, 'liked') ? '💚 Liked' : '👍 Like?'}
+                      {hasAction(key, 'tried')
+                        ? ratings[key] === 'loved' ? '👍 Loved it'
+                          : ratings[key] === 'disliked' ? '👎 Didn\'t work'
+                          : '😐 It was ok'
+                        : 'Tried it?'}
                     </button>
                     <button
                       onClick={() => toggleAction(key, 'bookmarked')}
                       className={`text-xs px-2.5 py-1 rounded-full border cursor-pointer transition ${
                         hasAction(key, 'bookmarked')
-                          ? 'bg-amber-100 border-amber-300 text-amber-700'
+                          ? 'bg-violet-100 border-violet-300 text-violet-700'
                           : 'border-gray-200 text-gray-500 hover:border-gray-300'
                       }`}
                     >
                       {hasAction(key, 'bookmarked') ? '★ Saved' : '☆ Save'}
                     </button>
                   </div>
+
+                  {/* Rating popup */}
+                  {ratingPopup === key && (
+                    <div className="mt-2 p-3 bg-violet-50 border border-violet-200 rounded-lg">
+                      <p className="text-xs font-medium text-gray-700 mb-2">How was it for your hair?</p>
+                      <div className="flex gap-2">
+                        <button onClick={() => submitRating(key, 'loved')} className="flex-1 text-xs py-2 bg-green-100 text-green-700 rounded-lg border border-green-200 hover:bg-green-200 cursor-pointer font-medium">
+                          👍 Loved it
+                        </button>
+                        <button onClick={() => submitRating(key, 'ok')} className="flex-1 text-xs py-2 bg-amber-100 text-amber-700 rounded-lg border border-amber-200 hover:bg-amber-200 cursor-pointer font-medium">
+                          😐 It was ok
+                        </button>
+                        <button onClick={() => submitRating(key, 'disliked')} className="flex-1 text-xs py-2 bg-red-100 text-red-700 rounded-lg border border-red-200 hover:bg-red-200 cursor-pointer font-medium">
+                          👎 Nope
+                        </button>
+                      </div>
+                      <button onClick={() => setRatingPopup(null)} className="text-xs text-gray-400 mt-2 hover:text-gray-600 cursor-pointer">Cancel</button>
+                    </div>
+                  )}
 
                   {/* Personal note */}
                   {notes[key] && editingNote !== key && (

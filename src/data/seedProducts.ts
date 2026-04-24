@@ -12,30 +12,28 @@ export interface SeedProduct {
 }
 
 // Compute Scrunch Score from product data
-export function computeScrunchScore(product: Pick<SeedProduct, 'cg_status' | 'cruelty_free' | 'notes' | 'category'>): { score: number; grade: ScrunchScore } {
+export function computeScrunchScore(product: Pick<SeedProduct, 'cg_status' | 'cruelty_free' | 'notes' | 'category'>): { score: number; grade: ScrunchScore; reasons: string[] } {
   let score = 100
+  const reasons: string[] = []
 
-  // CG status
-  if (product.cg_status === 'not_approved') score -= 40
-  else if (product.cg_status === 'caution') score -= 15
+  if (product.cg_status === 'not_approved') { score -= 40; reasons.push('Not CG-approved (−40)') }
+  else if (product.cg_status === 'caution') { score -= 15; reasons.push('CG caution (−15)') }
+  else { reasons.push('CG-approved ✓') }
 
-  // Check notes for known concerns
   const n = (product.notes || '').toLowerCase()
-  if (n.includes('drying alcohol')) score -= 15
-  if (n.includes('silicone')) score -= 20
-  if (n.includes('sulfate') && product.category !== 'clarifying_shampoo') score -= 20
-  if (n.includes('mineral oil')) score -= 15
-  if (n.includes('wax')) score -= 10
+  if (n.includes('drying alcohol')) { score -= 15; reasons.push('Contains drying alcohol (−15)') }
+  if (n.includes('silicone')) { score -= 20; reasons.push('Contains silicone (−20)') }
+  if (n.includes('sulfate') && product.category !== 'clarifying_shampoo') { score -= 20; reasons.push('Contains sulfate (−20)') }
+  if (n.includes('mineral oil')) { score -= 15; reasons.push('Contains mineral oil (−15)') }
+  if (n.includes('wax')) { score -= 10; reasons.push('Contains wax (−10)') }
 
-  // Bonuses
-  if (product.cruelty_free === 'yes') score += 5
-  if (n.includes('fragrance-free') || n.includes('fragrance free')) score += 3
-  if (n.includes('sample sizes')) score += 2
+  if (product.cruelty_free === 'yes') { score += 5; reasons.push('Cruelty-free (+5)') }
+  if (n.includes('fragrance-free') || n.includes('fragrance free')) { score += 3; reasons.push('Fragrance-free (+3)') }
+  if (n.includes('sample sizes')) { score += 2; reasons.push('Sample sizes available (+2)') }
 
   score = Math.max(0, Math.min(100, score))
-
   const grade: ScrunchScore = score >= 80 ? 'excellent' : score >= 60 ? 'good' : score >= 40 ? 'fair' : 'poor'
-  return { score, grade }
+  return { score, grade, reasons }
 }
 
 export const SEED_PRODUCTS: SeedProduct[] = [
