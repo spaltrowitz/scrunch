@@ -288,7 +288,7 @@ export function Recommendations() {
                         onClick={() => handleBookmark(product.id)}
                         className="text-xs px-3 py-1.5 rounded-lg bg-violet-50 text-violet-600 hover:bg-violet-100 transition cursor-pointer border-0"
                       >
-                        📌 Try it
+                        ☆ Save
                       </button>
                       <Link
                         to={`/products/${product.id}`}
@@ -314,7 +314,7 @@ export function Recommendations() {
           if (bookmarkedKeys.length === 0) return null
           return (
             <section className="mb-12">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">☆ Want to Try ({bookmarkedKeys.length})</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">☆ Saved ({bookmarkedKeys.length})</h2>
               <p className="text-sm text-gray-500 mb-3">Products you've saved to try later</p>
               <div className="space-y-2">
                 {bookmarkedKeys.map(key => {
