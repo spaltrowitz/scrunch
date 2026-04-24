@@ -160,12 +160,12 @@ export function OnboardingWizard() {
             <h2 className="text-xl font-bold text-gray-900 mb-2">What's your natural, air-dried hair texture?</h2>
             <p className="text-sm text-gray-500 mb-3">If your hair is treated, think back to its natural state. Select the closest match.</p>
             <a
-              href="https://www.wikihow.com/Curl-Types"
+              href="https://www.reddit.com/r/curlyhair/wiki/index/#wiki_hair_typing"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-sm text-violet-600 hover:text-violet-700 mb-5 font-medium"
             >
-              📸 Not sure? See real photos of each curl type →
+              📸 Not sure? See the r/curlyhair visual guide with real photos →
             </a>
             <div className="space-y-2">
               <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Wavy (Type 2)</p>
