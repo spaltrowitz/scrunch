@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../lib/auth'
 import { supabase } from '../../lib/supabase'
 import { CURL_PATTERNS, POROSITY_OPTIONS, HAIR_GOALS, HAIR_GOAL_LABELS, INGREDIENT_PREFERENCES, INGREDIENT_PREFERENCE_LABELS } from '../../lib/constants'
-import { CurlPatternIcon } from '../ui/CurlPatternIcon'
 import type { CurlPattern, Porosity, HairDensity, HairWidth, ScalpType, HairLength, ColorTreatment, Climate, HeatToolUsage, WorkoutFrequency, CgmExperience, FragrancePreference } from '../../lib/database.types'
 
 interface OnboardingData {
@@ -129,26 +128,53 @@ export function OnboardingWizard() {
         {/* Step 1: Curl Pattern */}
         {step === 1 && (
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">What's your curl pattern?</h2>
-            <p className="text-sm text-gray-500 mb-4">Select the closest match. You can always change this later.</p>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">What's your natural, air-dried hair texture?</h2>
+            <p className="text-sm text-gray-500 mb-3">If your hair is treated, think back to its natural state. Select the closest match.</p>
             <a
               href="https://www.naturallycurly.com/hair-types"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs text-violet-600 hover:text-violet-700 mb-6"
+              className="inline-flex items-center gap-1.5 text-sm text-violet-600 hover:text-violet-700 mb-5 font-medium"
             >
-              🤔 Not sure? See the visual curl type guide →
+              📸 Not sure? See real photos of each curl type →
             </a>
-            <div className="grid grid-cols-3 gap-3">
-              {CURL_PATTERNS.map(cp => (
-                <OptionButton key={cp.value} selected={data.curl_pattern === cp.value} onClick={() => update('curl_pattern', cp.value)}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <CurlPatternIcon pattern={cp.value} className="w-10 h-10 shrink-0" />
-                    <span className="font-semibold text-base">{cp.label}</span>
-                  </div>
-                  <div className="text-xs text-gray-500">{cp.description}</div>
-                </OptionButton>
-              ))}
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Wavy (Type 2)</p>
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                {CURL_PATTERNS.filter(cp => cp.value.startsWith('2')).map(cp => (
+                  <OptionButton key={cp.value} selected={data.curl_pattern === cp.value} onClick={() => update('curl_pattern', cp.value)}>
+                    <div className="text-center">
+                      <span className="text-2xl block mb-1">〰️</span>
+                      <span className="font-bold text-sm">{cp.label}</span>
+                      <div className="text-xs text-gray-500 mt-0.5">{cp.description}</div>
+                    </div>
+                  </OptionButton>
+                ))}
+              </div>
+              <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Curly (Type 3)</p>
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                {CURL_PATTERNS.filter(cp => cp.value.startsWith('3')).map(cp => (
+                  <OptionButton key={cp.value} selected={data.curl_pattern === cp.value} onClick={() => update('curl_pattern', cp.value)}>
+                    <div className="text-center">
+                      <span className="text-2xl block mb-1">🌀</span>
+                      <span className="font-bold text-sm">{cp.label}</span>
+                      <div className="text-xs text-gray-500 mt-0.5">{cp.description}</div>
+                    </div>
+                  </OptionButton>
+                ))}
+              </div>
+              <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Coily (Type 4)</p>
+              <div className="grid grid-cols-3 gap-3">
+                {CURL_PATTERNS.filter(cp => cp.value.startsWith('4')).map(cp => (
+                  <OptionButton key={cp.value} selected={data.curl_pattern === cp.value} onClick={() => update('curl_pattern', cp.value)}>
+                    <div className="text-center">
+                      <span className="text-2xl block mb-1">💫</span>
+                      <span className="font-bold text-sm">{cp.label}</span>
+                      <div className="text-xs text-gray-500 mt-0.5">{cp.description}</div>
+                    </div>
+                  </OptionButton>
+                ))}
+              </div>
             </div>
           </div>
         )}
