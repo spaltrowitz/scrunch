@@ -265,4 +265,69 @@ export const SEED_PRODUCTS: SeedProduct[] = [
   { brand: 'Innersense', name: 'I Create Finish Hairspray', category: 'spray_refresher', cg_status: 'not_approved', cruelty_free: 'yes', notes: 'CFK. Contains drying alcohol', image_url: 'https://media.ulta.com/i/ulta/2572254' },
   { brand: 'Pantene Pro-V', name: 'Lightweight Finish Level 2 Hairspray', category: 'spray_refresher', cg_status: 'not_approved', cruelty_free: null, notes: 'Contains drying alcohol and silicone', image_url: 'https://i5.walmartimages.com/seo/Pantene-Hairspray-Non-Aerosol-Lightweight-Finish-Level-2-Hold-Anti-Frizz-Color-Safe-8-5-oz_c0dd2a31-1db7-4a73-a0bf-495737e787f7.dbd8a3578a48e9849821271263b347ed.jpeg' },
   { brand: 'Rizos Curls', name: 'Volumizing Hairspray', category: 'spray_refresher', cg_status: 'approved', cruelty_free: null, notes: null, image_url: 'https://media.ulta.com/i/ulta/2599709' },
+
+  // ══════════════════════════════════════════════════════════════════════
+  // REDDIT-SOURCED PRODUCTS (r/curlyhair & r/curlygirl community picks)
+  // ══════════════════════════════════════════════════════════════════════
+
+  // ── CLARIFYING SHAMPOO (Reddit) ─────────────────────────────────────
+  { brand: 'Acure', name: 'Curiously Clarifying Shampoo', category: 'clarifying_shampoo', cg_status: 'approved', cruelty_free: 'yes', notes: 'LB/PETA. Contains sodium coco-sulfate (gentle sulfate, suitable for clarifying use)', image_url: 'https://target.scene7.com/is/image/Target/GUEST_bb389b7c-b2c1-4c1e-b53d-f2c13bd3b4b4' },
+
+  // ── LOW POO (Reddit) ────────────────────────────────────────────────
+  { brand: 'Inahsi Naturals', name: 'Soothing Mint Gentle Cleansing Shampoo', category: 'low_poo', cg_status: 'approved', cruelty_free: 'yes', notes: 'Black-owned. Sulfate-free, vegan', image_url: null },
+  { brand: 'Curlsmith', name: 'Essential Moisture Cleanser', category: 'low_poo', cg_status: 'approved', cruelty_free: 'yes', notes: 'CFK. Deep hydration without stripping', image_url: 'https://target.scene7.com/is/image/Target/GUEST_e893c2d1-5779-4eb9-b784-c69c6e6f0d97' },
+  { brand: 'Only Curls', name: 'All Curl Cleanser', category: 'low_poo', cg_status: 'approved', cruelty_free: 'yes', notes: 'UK brand. Vegan, sulfate-free', image_url: null },
+  { brand: 'SheaMoisture', name: 'Raw Shea Butter Moisture Retention Shampoo', category: 'low_poo', cg_status: 'approved', cruelty_free: 'yes', notes: 'CFK/PETA. Popular for 4C hair', image_url: 'https://target.scene7.com/is/image/Target/GUEST_d8f55f9e-3e4e-4e80-b7bc-bbcee3de4fde' },
+
+  // ── CO-WASH (Reddit) ────────────────────────────────────────────────
+  { brand: 'DevaCurl', name: 'No-Poo Original', category: 'co_wash', cg_status: 'not_approved', cruelty_free: 'yes', notes: 'PETA. Zero-lather conditioning cleanser. Some formulation concerns per CurlScan', image_url: 'https://media.ulta.com/i/ulta/2240498' },
+
+  // ── RINSE-OUT CONDITIONER (Reddit) ──────────────────────────────────
+  { brand: 'DevaCurl', name: 'One Condition Original', category: 'rinse_out_conditioner', cg_status: 'approved', cruelty_free: 'yes', notes: 'PETA. For medium to coarse curls', image_url: 'https://media.ulta.com/i/ulta/2240500' },
+  { brand: 'Aussie', name: 'Miracle Curls Conditioner', category: 'rinse_out_conditioner', cg_status: 'not_approved', cruelty_free: 'yes', notes: 'PETA. Contains dimethicone. Great slip for detangling', image_url: 'https://i5.walmartimages.com/seo/Aussie-Miracle-Curls-Conditioner-with-Coconut-Jojoba-Oil-26-2-fl-oz_3e73df2a-d44f-40b2-bb1f-e93cc39e0c4a.a1c3e6a0b5c78f89e1d29e4c54c7c090.jpeg' },
+  { brand: 'Redken', name: 'All Soft Conditioner', category: 'rinse_out_conditioner', cg_status: 'not_approved', cruelty_free: 'no', notes: 'Contains PEG-modified silicone. Salon favorite for dry hair', image_url: 'https://media.ulta.com/i/ulta/2580408' },
+  { brand: 'Alberto VO5', name: 'Moisture Milks Conditioner', category: 'rinse_out_conditioner', cg_status: 'approved', cruelty_free: 'no', notes: 'Ultra-budget CG staple. Sold in China (parent Henkel)', image_url: 'https://i5.walmartimages.com/seo/Alberto-VO5-Moisture-Milks-Moisturizing-Conditioner-Passion-Fruit-Smoothie-12-5-oz_01c2a63a-b143-44f8-981c-ffee56d82cdf.9d8e7e8a1a8af89f32a5e2e63ac1fda4.jpeg' },
+
+  // ── DEEP CONDITIONER (Reddit) ───────────────────────────────────────
+  { brand: 'Ecoslay', name: 'Banana Cream Deep Conditioner', category: 'deep_conditioner', cg_status: 'approved', cruelty_free: 'yes', notes: 'Vegan. Black-owned indie brand. Rich banana-based formula', image_url: null },
+
+  // ── LEAVE-IN CONDITIONER (Reddit) ───────────────────────────────────
+  { brand: 'Mielle', name: 'Pomegranate & Honey Leave-In Conditioner', category: 'leave_in_conditioner', cg_status: 'approved', cruelty_free: 'unclear', notes: 'Site claims no animal testing. Popular for Type 4 hair, excellent slip', image_url: 'https://target.scene7.com/is/image/Target/GUEST_7af61da2-4629-463a-a8a6-9dba1c5ddced' },
+  { brand: 'Bread Beauty Supply', name: 'Elastic Bounce Leave-In Conditioning Styler', category: 'leave_in_conditioner', cg_status: 'approved', cruelty_free: 'yes', notes: 'Vegan. Lightweight hydration for all curl types', image_url: 'https://media.ulta.com/i/ulta/2587400' },
+  { brand: 'Inahsi Naturals', name: 'Aloe Hibiscus Leave-In Conditioner', category: 'leave_in_conditioner', cg_status: 'approved', cruelty_free: 'yes', notes: 'Black-owned. Lightweight moisture and protein balance', image_url: null },
+  { brand: 'Oyin Handmade', name: 'Hair Dew', category: 'leave_in_conditioner', cg_status: 'approved', cruelty_free: 'yes', notes: 'Black-owned indie brand. Vegan. Great for coils and kinks', image_url: null },
+  { brand: 'Cantu', name: 'Shea Butter Leave-In Conditioning Repair Cream', category: 'leave_in_conditioner', cg_status: 'approved', cruelty_free: 'yes', notes: 'PETA. Drugstore staple, rich moisture', image_url: 'https://i5.walmartimages.com/seo/Cantu-Shea-Butter-Leave-In-Conditioning-Repair-Cream-16-oz_a2f2abfd-1428-4d52-a832-0a77d95e2b49.f15df7cbab6f8e86fcce9d1ff7e3e389.jpeg' },
+  { brand: 'Garnier Fructis', name: 'Curl Nourish Butter Cream Leave-In', category: 'leave_in_conditioner', cg_status: 'approved', cruelty_free: 'no', notes: 'Silicone-free formula. Parent company L\'Oréal sells in China', image_url: 'https://i5.walmartimages.com/seo/Garnier-Fructis-Curl-Nourish-Butter-Cream-Leave-In-Conditioner-10-2-fl-oz_8f23d03d-fcfa-4a8e-b59a-dae6b39d1a57.b5afd66f0a68fa47127e88cf4adcc3a9.jpeg' },
+  { brand: "Aunt Jackie's", name: 'Quench Moisture Intensive Leave-In Conditioner', category: 'leave_in_conditioner', cg_status: 'approved', cruelty_free: null, notes: 'Budget-friendly. Silicone-free. Popular for Type 3/4 hair', image_url: 'https://i5.walmartimages.com/seo/Aunt-Jackie-s-Quench-Moisture-Intensive-Leave-In-Conditioner-12-oz_3a5fe8c8-b62b-441c-812f-2dea5a8e6ec3.d0e22f20f3daeb3db0c88a5e0d76d22c.jpeg' },
+  { brand: 'Ouidad', name: 'Moisture Lock Leave-In Conditioner', category: 'leave_in_conditioner', cg_status: 'approved', cruelty_free: null, notes: 'Lightweight hydration prep before styling', image_url: null },
+  { brand: 'Pattern', name: 'Leave-In Conditioner', category: 'leave_in_conditioner', cg_status: 'approved', cruelty_free: 'yes', notes: 'By Tracee Ellis Ross. Great for coily and tightly curled hair', image_url: 'https://media.ulta.com/i/ulta/2571726' },
+  { brand: 'Camille Rose', name: 'Coconut Water Leave-In Detangling Hair Treatment', category: 'leave_in_conditioner', cg_status: 'approved', cruelty_free: 'unclear', notes: 'Lightweight moisture with coconut water base', image_url: 'https://target.scene7.com/is/image/Target/GUEST_71b94cbe-9c09-4ab1-ab13-4c32d53c0878' },
+  { brand: 'Alikay Naturals', name: 'Lemongrass Leave-In Conditioner', category: 'leave_in_conditioner', cg_status: 'approved', cruelty_free: 'yes', notes: 'Black-owned. Botanical, natural ingredients', image_url: 'https://target.scene7.com/is/image/Target/GUEST_5c1a84e5-0f23-4e4d-9a74-25f0e2df3d25' },
+  { brand: 'Redken', name: 'Acidic Bonding Concentrate Leave-In Treatment', category: 'leave_in_conditioner', cg_status: 'not_approved', cruelty_free: 'no', notes: 'Contains silicone. Bond repair for fragile curls. Parent L\'Oréal', image_url: 'https://media.ulta.com/i/ulta/2586846' },
+
+  // ── CURL CREAM (Reddit) ─────────────────────────────────────────────
+  { brand: 'DevaCurl', name: 'SuperCream Coconut Curl Styler', category: 'curl_cream', cg_status: 'approved', cruelty_free: 'yes', notes: 'PETA. Rich definition for medium to coarse curls', image_url: 'https://media.ulta.com/i/ulta/2240504' },
+  { brand: 'TGIN', name: 'Butter Cream Daily Moisturizer', category: 'curl_cream', cg_status: 'approved', cruelty_free: 'yes', notes: 'Black-owned. Intense moisture for thick/high-porosity curls', image_url: 'https://target.scene7.com/is/image/Target/GUEST_d70b4da5-bb08-4e7e-a5e1-5e0b4cb6c6c5' },
+  { brand: 'Curls', name: 'Blueberry Bliss Twist-N-Shout Cream', category: 'curl_cream', cg_status: 'approved', cruelty_free: 'yes', notes: 'Black-owned. Great for twist-outs and braid-outs', image_url: 'https://target.scene7.com/is/image/Target/GUEST_e18be4be-a4b2-4b7a-b8b3-4e3b3e0d5d4f' },
+  { brand: 'AG Hair', name: 'Curl Fresh Definer Soft Hold Styling Cream', category: 'curl_cream', cg_status: 'approved', cruelty_free: 'unclear', notes: 'Lightweight for fine/low-density curls. Good for arid climates', image_url: null },
+  { brand: 'Marc Anthony', name: 'Strictly Curls Curl Defining Lotion', category: 'curl_cream', cg_status: 'not_approved', cruelty_free: 'no', notes: 'Contains silicone. Drugstore option, not CGM-friendly', image_url: 'https://i5.walmartimages.com/seo/Marc-Anthony-Strictly-Curls-Curl-Defining-Lotion-8-3-oz_a23a2d20-43b2-40de-b6b8-bfb6cfc2a7e2.cee6c8e9e1e7be8c2faf9e2ac5cbfb07.jpeg' },
+
+  // ── GEL (Reddit) ────────────────────────────────────────────────────
+  { brand: 'Ecoslay', name: 'Jello Shot Flaxseed Gel', category: 'gel', cg_status: 'approved', cruelty_free: 'yes', notes: 'Vegan. Black-owned indie brand. Flaxseed + okra + agave based', image_url: null },
+  { brand: 'Curls', name: 'Blueberry Bliss Curl Control Jelly', category: 'gel', cg_status: 'approved', cruelty_free: 'yes', notes: 'Black-owned. Medium hold, great for Type 3/4 hair', image_url: 'https://target.scene7.com/is/image/Target/GUEST_e68e32f1-9d7c-4d99-82ab-0d8f31e3d908' },
+  { brand: 'DevaCurl', name: 'Ultra Defining Gel', category: 'gel', cg_status: 'approved', cruelty_free: 'yes', notes: 'PETA. Strong hold for very curly and coily hair', image_url: 'https://media.ulta.com/i/ulta/2240506' },
+
+  // ── MOUSSE (Reddit) ─────────────────────────────────────────────────
+  { brand: 'John Frieda', name: 'Frizz Ease Dream Curls Mousse', category: 'mousse', cg_status: 'not_approved', cruelty_free: 'no', notes: 'Contains silicone. Parent company Kao sells in China', image_url: 'https://target.scene7.com/is/image/Target/GUEST_8e989a82-7d69-45c3-8e54-92d0a7f3f5a5' },
+  { brand: 'Ouidad', name: 'VitalCurl+ Soft Defining Mousse', category: 'mousse', cg_status: 'approved', cruelty_free: null, notes: 'Lightweight volume for fine/mixed-texture curls', image_url: null },
+  { brand: 'OGX', name: 'Quenching Coconut Curls Mousse', category: 'mousse', cg_status: 'approved', cruelty_free: 'no', notes: 'Silicone-free mousse formula. Parent J&J sells in China', image_url: 'https://i5.walmartimages.com/seo/OGX-Quenching-Coconut-Curls-Frizz-Defying-Moisture-Mousse-8-oz_7f2e5c82-f3aa-4d9a-8eb4-cee5f1c3ae70.e3e0f1d6d2e5e7e1f3d5e2c4b8e1f5d3.jpeg' },
+
+  // ── CUSTARD (Reddit) ────────────────────────────────────────────────
+  { brand: 'Mielle', name: 'Pomegranate & Honey Twisting Soufflé', category: 'custard', cg_status: 'approved', cruelty_free: 'unclear', notes: 'Site claims no animal testing. Popular for Type 4 twist-outs', image_url: 'https://target.scene7.com/is/image/Target/GUEST_31b2d09b-cf97-4f7a-b36e-67a12aaabb58' },
+
+  // ── OIL / SERUM (Reddit) ────────────────────────────────────────────
+  { brand: 'Noughty', name: 'To The Rescue Anti-Frizz Serum', category: 'oil_serum', cg_status: 'approved', cruelty_free: 'yes', notes: 'LB/PETA. UK brand. Kukui, argan & coconut oils. Silicone-free', image_url: null },
+
+  // ── SPRAY REFRESHER (Reddit) ────────────────────────────────────────
+  { brand: 'DevaCurl', name: 'Mist of Wonders Multi-Benefit Spray', category: 'spray_refresher', cg_status: 'approved', cruelty_free: 'yes', notes: 'PETA. Multi-benefit hydration and refresh spray', image_url: 'https://media.ulta.com/i/ulta/2240512' },
 ]
