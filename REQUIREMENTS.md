@@ -107,21 +107,63 @@ Users create a profile with their hair attributes. This is the foundation for pe
 
 | Section | Questions | Notes |
 |---|---|---|
-| **Hair & Scalp** | Curl pattern (with visual illustrations), porosity, hair density, strand width, hair length (with "pull the curl down" tip), scalp oily/dry spectrum, split ends | Each question has a "Why we ask" tooltip and "More of a visual learner? Tap for pics" expandable panel with reference photos |
-| **Treatments** | Color treatment, chemical treatments (relaxer, keratin, perm), heat tool usage | Helps us understand damage level and product compatibility |
-| **Lifestyle** | Climate/location (zip code for humidity/water hardness), workout frequency, washing frequency, water type | Environmental factors that affect product performance |
+| **Hair & Scalp** | Curl pattern, porosity, strand width (feel test), hair density (scalp visibility), hair length, oily/dry spectrum, split ends, shedding, genetic hair loss | Core hair characteristics. Each has "Why we ask" + "Tap for pics" |
+| **Scalp Health** | Wash frequency, days until oily after wash, between-wash scalp oily/dry, flakiness, scalp sensitivity | Drives cleanser recommendations |
+| **Treatments & History** | Color treatment, gray percentage, chemical treatments, heat tool usage | Damage assessment + product compatibility |
+| **Lifestyle** | Climate/location (zip code), workout frequency, water type | Environmental factors |
 | **Preferences & Goals** | CGM experience level, hair goals (multi-select), sensitivities/allergies (multi-select), fragrance preference | Drives personalized recommendations |
 
-**Additional questions to add (from Prose):**
-- Oily/dry spectrum: "Where would you put your hair on the oily/dry spectrum?" — 4 options from roots-oily-lengths-balanced to roots-dry-lengths-dry
-- Split ends: "Do you get split ends? Check your ends right now" — Yes/No with educational "Did you know there are 6 types of splits?" expandable
-- Hair length with visual guide: "If you have curly hair, pull the curl all the way down to find your true length" — with descriptive labels like "Buzz-cut to early-Beatles", "Doesn't touch shoulders", etc.
+**Full question set (from Prose reference + CGM-specific):**
+
+*Hair & Scalp:*
+1. **Curl pattern** — "What's your natural, untreated, air-dried hair texture?" with SVG illustrations. "More of a visual learner? Tap for pics"
+2. **Strand width** — "What does a single strand of hair feel like? Roll a single hair between your fingers." (Fine / Medium / Coarse) — with "Why we ask" tooltip
+3. **Hair density** — "How dense is your hair? Part your hair and check the mirror — the more scalp you see, the less dense your hair is." (I see very little to no scalp / I can see a little skin / I can see a lot of scalp)
+4. **Hair length** — "How long is your hair? If you have curly hair, pull the curl all the way down to find your true length." — Descriptive labels: "Buzz-cut to early-Beatles" / "Doesn't touch shoulders" / "Sits on shoulders" / "Below shoulder blades" / "Mid-back and beyond"
+5. **Porosity** — with float test explainer link
+6. **Oily/dry spectrum** — "Where would you put your hair on the oily/dry spectrum?" — Roots oily + lengths balanced / Roots not oily + lengths not dry / Roots oily + lengths dry or frizzy / Roots not oily + lengths always dry
+7. **Split ends** — "Do you get split ends? Check your ends right now." — with "Did you know there are 6 types of splits?" expandable
+8. **Shedding** — "Do you feel like you're shedding more than usual lately?" — with "What's normal? Check the tip!" expandable
+9. **Genetic hair loss** — "Is hair loss a genetic issue in your family?" — with "Why we ask" tooltip
+
+*Scalp Health:*
+10. **Wash frequency** — "How often do you wash your hair? This includes shampooing and co-washing." — with fun fact tooltip
+11. **Days until oily** — "After a wash, how long until hair gets oily again? If stuck between answers, choose the greater number of days." — with "Why we ask"
+12. **Between-wash scalp** — "In between washes, where is your scalp on the oily/dry spectrum?" — with "Did you know..."
+13. **Flakiness** — "Are you prone to flakiness?" — with "Did you know..." expandable
+14. **Scalp sensitivity** — "Do you have a sensitive scalp? If you experience tightness, dryness, burning, tingling, pain, itching, or redness, all that counts as sensitivity."
+
+*Treatments & History:*
+15. **Color treatment** — Virgin / Color-treated / Bleached / Highlighted
+16. **Gray percentage** — "How much of your hair is gray? If color-treated, answer with your natural gray percentage." — None / A few grays / About half gray / All or nearly-all gray — with "Tap for pics"
+17. **Chemical treatments** — Relaxer / Keratin / Perm / None
+18. **Heat tool usage** — Never / Occasionally / Frequently
+
+*Lifestyle:*
+19. **Climate** — Humid / Dry / Variable / Tropical
+20. **Location** — Zip code (for humidity, water hardness, UV)
+21. **Workout frequency** — Rarely / A few times/week / Daily
+22. **Water type** — Hard / Soft / Don't know
+
+*Preferences & Goals:*
+23. **CGM experience** — Just starting / Under 1 year / 1-3 years / 3+ years
+24. **Hair goals** — Multi-select: moisture, definition, volume, frizz control, length retention, repair, shine, scalp health
+25. **Sensitivities** — Multi-select: fragrance, coconut, protein, sulfate, silicone, aloe
+26. **Fragrance preference** — Love it / No preference / Fragrance-free
+
+**UX patterns per question:**
+- **"Why we ask"** — collapsible tooltip explaining how this affects recommendations
+- **"More of a visual learner? Tap for pics"** — expandable panel with reference photos
+- **"Did you know..."** / **"Fun fact"** — educational content that builds trust and engagement
+- **"Check the tip!"** — contextual guidance (e.g., what's normal shedding)
 
 **Visual aids per question:**
 - Curl pattern: SVG illustrations of each wave/curl/coil pattern (currently implemented)
+- Strand width: "Roll a single hair between your fingers" with thread comparison visual
+- Hair density: Mirror/scalp visibility comparison images
+- Hair length: Body-reference silhouette showing each length
+- Gray percentage: Hair swatch photos from "a few grays" to "nearly all gray"
 - Porosity: Float test diagram or spray test animation
-- Hair density: Side-by-side scalp comparison images
-- Strand width: Thread comparison visual (compare strand to sewing thread)
 - Each with "Tap for pics" expandable photo reference panel
 
 ### F2: Product Database
