@@ -23,7 +23,7 @@ interface OnboardingData {
   sensitivities: string[]
 }
 
-const TOTAL_STEPS = 11
+const TOTAL_STEPS = 6
 
 export function OnboardingWizard() {
   const { user } = useAuth()
@@ -177,54 +177,40 @@ export function OnboardingWizard() {
           </div>
         )}
 
-        {/* Step 3: Strand Width */}
+        {/* Step 3: Hair Density + Strand Width */}
         {step === 3 && (
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">What's your strand width?</h2>
-            <p className="text-sm text-gray-500 mb-4">Roll a single strand between your fingers — can you feel it?</p>
-            <a
-              href="https://www.naturallycurly.com/hair-types"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs text-violet-600 hover:text-violet-700 mb-6"
-            >
-              🤔 Not sure? Learn how to tell →
-            </a>
-            <div className="grid grid-cols-3 gap-3">
-              {(['fine', 'medium', 'coarse'] as const).map(v => (
-                <OptionButton key={v} selected={data.hair_width === v} onClick={() => update('hair_width', v)}>
-                  {v.charAt(0).toUpperCase() + v.slice(1)}
-                </OptionButton>
-              ))}
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Hair density & strand width</h2>
+            <p className="text-sm text-gray-500 mb-6">Two quick checks to understand your hair structure.</p>
+
+            <div className="mb-6">
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">Density</h3>
+              <p className="text-xs text-gray-500 mb-3">Part your hair and check the mirror — the more scalp you see, the less dense.</p>
+              <div className="grid grid-cols-3 gap-3">
+                {(['thin', 'medium', 'thick'] as const).map(v => (
+                  <OptionButton key={v} selected={data.hair_density === v} onClick={() => update('hair_density', v)}>
+                    {v.charAt(0).toUpperCase() + v.slice(1)}
+                  </OptionButton>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">Strand Width</h3>
+              <p className="text-xs text-gray-500 mb-3">Roll a single strand between your fingers — can you feel it?</p>
+              <div className="grid grid-cols-3 gap-3">
+                {(['fine', 'medium', 'coarse'] as const).map(v => (
+                  <OptionButton key={v} selected={data.hair_width === v} onClick={() => update('hair_width', v)}>
+                    {v.charAt(0).toUpperCase() + v.slice(1)}
+                  </OptionButton>
+                ))}
+              </div>
             </div>
           </div>
         )}
 
-        {/* Step 4: Hair Density */}
+        {/* Step 4: Hair Length */}
         {step === 4 && (
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">How dense is your hair?</h2>
-            <p className="text-sm text-gray-500 mb-4">Part your hair and check the mirror — the more scalp you see, the less dense.</p>
-            <a
-              href="https://www.naturallycurly.com/hair-types"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs text-violet-600 hover:text-violet-700 mb-6"
-            >
-              🤔 Not sure? See the visual guide →
-            </a>
-            <div className="grid grid-cols-3 gap-3">
-              {(['thin', 'medium', 'thick'] as const).map(v => (
-                <OptionButton key={v} selected={data.hair_density === v} onClick={() => update('hair_density', v)}>
-                  {v.charAt(0).toUpperCase() + v.slice(1)}
-                </OptionButton>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Step 5: Hair Length */}
-        {step === 5 && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">How long is your hair?</h2>
             <p className="text-sm text-gray-500 mb-6">If curly, pull the curl all the way down to measure.</p>
@@ -238,68 +224,8 @@ export function OnboardingWizard() {
           </div>
         )}
 
-        {/* Step 6: Scalp Type */}
-        {step === 6 && (
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">What's your scalp type?</h2>
-            <p className="text-sm text-gray-500 mb-6">Where would you put your scalp on the oily/dry spectrum?</p>
-            <div className="grid grid-cols-3 gap-3">
-              {(['dry', 'normal', 'oily'] as const).map(v => (
-                <OptionButton key={v} selected={data.scalp_type === v} onClick={() => update('scalp_type', v)}>
-                  {v.charAt(0).toUpperCase() + v.slice(1)}
-                </OptionButton>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Step 7: Color Treatment */}
-        {step === 7 && (
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Any color treatment?</h2>
-            <p className="text-sm text-gray-500 mb-6">Color-treated hair has different moisture and protein needs.</p>
-            <div className="grid grid-cols-2 gap-3">
-              {([['virgin', 'Virgin (no color)'], ['color_treated', 'Color Treated'], ['bleached', 'Bleached'], ['highlighted', 'Highlighted']] as const).map(([v, label]) => (
-                <OptionButton key={v} selected={data.color_treatment === v} onClick={() => update('color_treatment', v)}>
-                  {label}
-                </OptionButton>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Step 8: Climate */}
-        {step === 8 && (
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">What's your climate like?</h2>
-            <p className="text-sm text-gray-500 mb-6">Humidity and dryness affect which products work best for you.</p>
-            <div className="grid grid-cols-2 gap-3">
-              {([['humid', '💧 Humid'], ['dry', '🏜️ Dry'], ['variable', '🌤️ Variable'], ['tropical', '🌴 Tropical']] as const).map(([v, label]) => (
-                <OptionButton key={v} selected={data.climate === v} onClick={() => update('climate', v)}>
-                  {label}
-                </OptionButton>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Step 9: CGM Experience */}
-        {step === 9 && (
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">How long have you been following the Curly Girl Method?</h2>
-            <p className="text-sm text-gray-500 mb-6">This helps us tailor recommendations to your experience level.</p>
-            <div className="grid grid-cols-2 gap-3">
-              {([['just_starting', '🌱 Just starting'], ['under_1_year', '< 1 year'], ['1_to_3_years', '1–3 years'], ['3_plus_years', '3+ years']] as const).map(([v, label]) => (
-                <OptionButton key={v} selected={data.cgm_experience === v} onClick={() => update('cgm_experience', v)}>
-                  {label}
-                </OptionButton>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Step 10: Hair Goals */}
-        {step === 10 && (
+        {/* Step 5: Hair Goals */}
+        {step === 5 && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">What are your hair goals?</h2>
             <p className="text-sm text-gray-500 mb-6">Select all that apply.</p>
@@ -313,8 +239,8 @@ export function OnboardingWizard() {
           </div>
         )}
 
-        {/* Step 11: Ingredient Preferences */}
-        {step === 11 && (
+        {/* Step 6: Ingredient Preferences */}
+        {step === 6 && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Any ingredient preferences?</h2>
             <p className="text-sm text-gray-500 mb-6">We'll flag products with these ingredients. Select all that apply, or skip.</p>
