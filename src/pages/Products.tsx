@@ -272,12 +272,19 @@ export function Products() {
     }
   }
 
+  const isNarrowView = selectedCategories.size > 0 || !!brandFilter || !!search
+
   const filteredProducts = products.filter(p => {
     if (selectedCategories.size > 0 && !selectedCategories.has(p.category)) return false
     if (brandFilter && p.brand !== brandFilter) return false
     if (showApprovedOnly && p.cg_status !== 'approved') return false
     if (showGoodPlus && p.cruelty_free !== 'yes') return false
     if (search && !`${p.brand} ${p.name}`.toLowerCase().includes(search.toLowerCase())) return false
+    // In default browse view, hide products you've already rated
+    if (!isNarrowView && user) {
+      const key = productKey(p)
+      if (actions[key]?.has('tried')) return false
+    }
     return true
   })
 
