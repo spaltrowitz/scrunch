@@ -461,10 +461,11 @@ export function Products() {
             return (
               <div
                 key={`${key}-${i}`}
-                className="flex gap-4 p-4 bg-white rounded-xl border border-gray-200 hover:border-violet-300 transition"
+                className="flex flex-col p-4 bg-white rounded-xl border border-gray-200 hover:border-violet-300 transition"
               >
+                {/* Clickable product info area */}
                 {isUuid(key) ? (
-                  <Link to={`/products/${product.id}`} className="flex gap-4 min-w-0 flex-1">
+                  <Link to={`/products/${product.id}`} className="flex gap-4 min-w-0 mb-2">
                     <ProductImage
                       brand={product.brand}
                       name={product.name}
@@ -489,7 +490,7 @@ export function Products() {
                     </div>
                   </Link>
                 ) : (
-                  <>
+                  <div className="flex gap-4 min-w-0 mb-2">
                     <ProductImage
                       brand={product.brand}
                       name={product.name}
@@ -512,10 +513,11 @@ export function Products() {
                       </div>
                       <p className="text-xs text-gray-500">{PRODUCT_CATEGORY_LABELS[product.category]}</p>
                     </div>
-                  </>
+                  </div>
                 )}
-                <div className="flex flex-col justify-end min-w-0">
-                  <p className="text-xs text-gray-500 mb-2">{PRODUCT_CATEGORY_LABELS[product.category]}</p>
+
+                {/* Action buttons — outside the link */}
+                <div className="pl-20">
                   <div className="flex gap-2 items-center">
                     <button
                       onClick={() => toggleAction(key, 'tried')}
