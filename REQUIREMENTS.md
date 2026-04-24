@@ -145,16 +145,16 @@ Users create a profile with their hair attributes. This is the foundation for pe
 21. **Hold preference** — "What level of hold do you prefer when styling?" — No hold / Light hold / Medium hold / Strong hold / Not sure (we'll suggest based on your hair) — with "Why we ask" tooltip
 22. **Routine preference** — "What describes your ideal hair routine?" — Quick & minimal (fewest steps) / Balanced (some effort, good results) / Full routine (I enjoy the process) / Varies by day
 
-*Lifestyle:*
-23. **Climate** — Humid / Dry / Variable / Tropical
-24. **Location** — Zip code (for humidity, water hardness, UV)
+*Lifestyle & Environment:*
+23. **Location** — Zip code input. Triggers a **personalized environmental stressor dashboard** (Prose-inspired): "Here's what affects your hair in [City]" showing scores out of 100 for: UV Rays / Pollution / Water Hardness / Humidity / Wind. Data sourced from public APIs (EPA air quality, USGS water hardness, weather APIs). This is a WOW moment in the quiz.
+24. **Odor retention** — "Does your hair retain noticeable odors from food or smoke?" — Yes / No — with "Why we ask" tooltip. (Affects porosity assessment and product recommendations)
 25. **Workout frequency** — Rarely / A few times/week / Daily
-26. **Water type** — Hard / Soft / Don't know
+26. **Life stage** — "This helps us give the right support, at every stage." — with "Why we ask". Options relevant to hair changes: Teen / Adult / Pregnancy or postpartum / Menopause / None of these apply
 
 *Preferences & Goals:*
 27. **CGM experience** — Just starting / Under 1 year / 1-3 years / 3+ years
-28. **Hair goals** — Multi-select: moisture, definition, volume, frizz control, length retention, repair, shine, scalp health
-29. **Sensitivities** — Multi-select: fragrance, coconut, protein, sulfate, silicone, aloe
+28. **Ingredient preferences** — "Any specific haircare ingredient preferences? All Scrunch-recommended products are already free of parabens, mineral oils, and animal cruelty. Select all that apply." — Silicone-free (with "What is silicone again?" expandable) / Sulfate-free / Fragrance-free / Vegan / Protein-free / Alcohol-free / Coconut-free / Aloe-free. Multi-select with educational expandables per ingredient.
+29. **Hair goals** — "What are your hair goals?" — with "Not sure? Tap for a tip" expandable. Multi-select: moisture, definition, volume, frizz control, length retention, repair/strengthen, shine, scalp health, reduce breakage, color protection, heat protection
 30. **Fragrance preference** — Love it / No preference / Fragrance-free
 
 **UX patterns per question:**
