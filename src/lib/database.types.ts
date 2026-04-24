@@ -70,6 +70,9 @@ export interface Product {
   review_count: number
   verified: boolean
   submitted_by: string | null
+  image_url: string | null
+  notes: string | null
+  cruelty_free: 'yes' | 'no' | 'unclear' | null
   created_at: string
   updated_at: string
 }
@@ -84,9 +87,9 @@ export interface ProductReview {
   id: string
   user_id: string
   product_id: string
-  rating: number
-  status: ReviewStatus
-  would_repurchase: RepurchaseIntent
+  rating: number | null
+  status: ReviewStatus | null
+  would_repurchase: RepurchaseIntent | null
   application_method: string | null
   results_notes: string | null
   routine_context: RoutineContext | null

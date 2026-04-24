@@ -12,7 +12,7 @@ export interface SeedProduct {
 }
 
 // Compute Scrunch Score from product data
-export function computeScrunchScore(product: SeedProduct): { score: number; grade: ScrunchScore } {
+export function computeScrunchScore(product: Pick<SeedProduct, 'cg_status' | 'cruelty_free' | 'notes' | 'category'>): { score: number; grade: ScrunchScore } {
   let score = 100
 
   // CG status
