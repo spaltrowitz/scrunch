@@ -443,10 +443,10 @@ export function Recommendations() {
           <p className="text-sm text-gray-500 mb-4">
             The more you rate, the better your recommendations get
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {popularProducts
               .filter(p => !ratedProductIds.has(p.id))
-              .slice(0, 12)
+              .slice(0, 3)
               .map(product => (
                 <QuickRateCard key={product.id} product={product} onRate={handleRate} />
               ))}
@@ -468,22 +468,24 @@ export function Recommendations() {
           return (
             <section className="mb-12">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                ☆ Want to Try ({bookmarkedKeys.length})
+                ☆ Saved ({bookmarkedKeys.length})
               </h2>
               <p className="text-sm text-gray-500 mb-3">
                 Products you've saved to try later
               </p>
               <div className="space-y-2">
                 {bookmarkedKeys.map(key => {
-                  const [brand, name] = key.split('::')
+                  const product = popularProducts.find(p => p.id === key)
+                  const brand = product?.brand || (key.includes('::') ? key.split('::')[0] : null)
+                  const name = product?.name || (key.includes('::') ? key.split('::')[1] : null)
                   if (!brand || !name) return null
                   return (
                     <Link
                       key={key}
-                      to="/products"
+                      to={product ? `/products/${product.id}` : '/products'}
                       className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-violet-300 transition no-underline"
                     >
-                      <ProductImage brand={brand} name={name} className="w-10 h-10" />
+                      <ProductImage brand={brand} name={name} seedImageUrl={product?.image_url} className="w-10 h-10" />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-gray-500">{brand}</p>
                         <p className="text-sm font-semibold text-gray-900 truncate">{name}</p>

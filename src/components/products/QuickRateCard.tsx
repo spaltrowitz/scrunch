@@ -29,12 +29,12 @@ export function QuickRateCard({ product, onRate, currentRating }: QuickRateCardP
   const ratingLabel = rated === 5 ? '👍 Loved' : rated === 3 ? '😐 Ok' : rated === 1 ? '👎 Nope' : null
 
   return (
-    <div className={`p-3 bg-white rounded-xl border transition ${rated != null ? 'border-violet-200 bg-violet-50/30' : 'border-gray-200'}`}>
-      <div className="flex items-center gap-3 mb-2">
-        <ProductImage brand={product.brand} name={product.name} seedImageUrl={product.image_url} className="w-12 h-12" />
-        <div className="min-w-0 flex-1">
-          <p className="text-xs text-gray-500 truncate">{product.brand}</p>
-          <p className="text-sm font-semibold text-gray-900 truncate">{product.name}</p>
+    <div className={`p-4 bg-white rounded-xl border transition ${rated != null ? 'border-violet-200 bg-violet-50/30' : 'border-gray-200'}`}>
+      <div className="flex flex-col items-center text-center gap-3 mb-3">
+        <ProductImage brand={product.brand} name={product.name} seedImageUrl={product.image_url} className="w-20 h-20" />
+        <div className="min-w-0">
+          <p className="text-xs text-gray-500">{product.brand}</p>
+          <p className="text-sm font-semibold text-gray-900">{product.name}</p>
         </div>
       </div>
 
