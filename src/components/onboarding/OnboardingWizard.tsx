@@ -198,15 +198,35 @@ export function OnboardingWizard() {
         {step === 2 && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">What's your hair porosity?</h2>
-            <p className="text-sm text-gray-500 mb-4">Porosity affects how your hair absorbs products.</p>
-            <a
-              href="https://curlmaven.ie/porosity-quiz/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs text-violet-600 hover:text-violet-700 mb-6"
-            >
-              🤔 Not sure? Learn how to test your porosity →
-            </a>
+            <p className="text-sm text-gray-500 mb-3">Porosity is how well your hair absorbs and holds moisture. It's the most important factor for choosing products.</p>
+
+            <details className="mb-5 bg-violet-50 border border-violet-200 rounded-lg">
+              <summary className="px-4 py-2.5 text-sm text-violet-700 font-medium cursor-pointer">
+                🤔 Not sure? Try these quick tests at home
+              </summary>
+              <div className="px-4 pb-4 text-xs text-gray-700 space-y-3">
+                <div>
+                  <p className="font-semibold text-gray-900 mb-1">🥤 Float Test</p>
+                  <p>Drop a clean, dry hair strand into a glass of room-temperature water. Wait 2–4 minutes.</p>
+                  <ul className="mt-1 space-y-0.5 ml-4 list-disc">
+                    <li><strong>Floats at the top</strong> → Low porosity</li>
+                    <li><strong>Sinks to the middle</strong> → Medium porosity</li>
+                    <li><strong>Sinks to the bottom</strong> → High porosity</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900 mb-1">💧 Spray Test</p>
+                  <p>Mist a small section of clean, dry hair with water.</p>
+                  <ul className="mt-1 space-y-0.5 ml-4 list-disc">
+                    <li><strong>Water beads up</strong> → Low porosity</li>
+                    <li><strong>Slowly absorbs</strong> → Medium porosity</li>
+                    <li><strong>Soaks in immediately</strong> → High porosity</li>
+                  </ul>
+                </div>
+                <p className="text-gray-500 italic">Tip: Use clean, product-free hair for the most accurate results.</p>
+              </div>
+            </details>
+
             <div className="space-y-3">
               {POROSITY_OPTIONS.map(p => (
                 <OptionButton key={p.value} selected={data.porosity === p.value} onClick={() => update('porosity', p.value)}>
