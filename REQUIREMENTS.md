@@ -101,6 +101,28 @@ Users create a profile with their hair attributes. This is the foundation for pe
 - "Help me figure this out" links with explainers (e.g., how to test porosity)
 - Results summary at the end: "Here's your hair profile" with personalized first recommendations
 - Should take ~3–5 minutes (shorter than Prose since we're not formulating custom products)
+- **Re-entering the quiz pre-loads existing selections** (edit mode, not start-from-scratch)
+
+**Quiz sections (Prose-style grouping):**
+
+| Section | Questions | Notes |
+|---|---|---|
+| **Hair & Scalp** | Curl pattern (with visual illustrations), porosity, hair density, strand width, hair length (with "pull the curl down" tip), scalp oily/dry spectrum, split ends | Each question has a "Why we ask" tooltip and "More of a visual learner? Tap for pics" expandable panel with reference photos |
+| **Treatments** | Color treatment, chemical treatments (relaxer, keratin, perm), heat tool usage | Helps us understand damage level and product compatibility |
+| **Lifestyle** | Climate/location (zip code for humidity/water hardness), workout frequency, washing frequency, water type | Environmental factors that affect product performance |
+| **Preferences & Goals** | CGM experience level, hair goals (multi-select), sensitivities/allergies (multi-select), fragrance preference | Drives personalized recommendations |
+
+**Additional questions to add (from Prose):**
+- Oily/dry spectrum: "Where would you put your hair on the oily/dry spectrum?" — 4 options from roots-oily-lengths-balanced to roots-dry-lengths-dry
+- Split ends: "Do you get split ends? Check your ends right now" — Yes/No with educational "Did you know there are 6 types of splits?" expandable
+- Hair length with visual guide: "If you have curly hair, pull the curl all the way down to find your true length" — with descriptive labels like "Buzz-cut to early-Beatles", "Doesn't touch shoulders", etc.
+
+**Visual aids per question:**
+- Curl pattern: SVG illustrations of each wave/curl/coil pattern (currently implemented)
+- Porosity: Float test diagram or spray test animation
+- Hair density: Side-by-side scalp comparison images
+- Strand width: Thread comparison visual (compare strand to sewing thread)
+- Each with "Tap for pics" expandable photo reference panel
 
 ### F2: Product Database
 
