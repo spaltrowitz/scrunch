@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { PRODUCT_CATEGORY_LABELS, PRODUCT_CATEGORY_DESCRIPTIONS, SCRUNCH_SCORE_CONFIG } from '../lib/constants'
+import { PRODUCT_CATEGORY_LABELS, PRODUCT_CATEGORY_DESCRIPTIONS } from '../lib/constants'
 import type { ProductCategory } from '../lib/database.types'
-import { SEED_PRODUCTS, computeScrunchScore } from '../data/seedProducts'
+import { SEED_PRODUCTS } from '../data/seedProducts'
 import type { SeedProduct } from '../data/seedProducts'
 import { ProductImage } from '../hooks/useProductImage'
 import { RequestProductForm } from '../components/products/RequestProductForm'
@@ -62,7 +62,6 @@ export function Products() {
   const [selectedCategories, setSelectedCategories] = useState<Set<ProductCategory>>(new Set())
   const [showApprovedOnly, setShowApprovedOnly] = useState(false)
   const [showGoodPlus, setShowGoodPlus] = useState(false)
-  const [showScoreInfo, setShowScoreInfo] = useState(false)
   const [brandFilter, setBrandFilter] = useState('')
   const [actions, setActions] = useState<ProductActions>(getStoredActions)
   const [ratings, setRatings] = useState<ProductRatings>(() => {
@@ -278,7 +277,7 @@ export function Products() {
     if (selectedCategories.size > 0 && !selectedCategories.has(p.category)) return false
     if (brandFilter && p.brand !== brandFilter) return false
     if (showApprovedOnly && p.cg_status !== 'approved') return false
-    if (showGoodPlus && computeScrunchScore(p).score < 60) return false
+    if (showGoodPlus && p.cruelty_free !== 'yes') return false
     if (search && !`${p.brand} ${p.name}`.toLowerCase().includes(search.toLowerCase())) return false
     return true
   })
@@ -408,40 +407,8 @@ export function Products() {
               onChange={(e) => setShowGoodPlus(e.target.checked)}
               className="accent-emerald-600 w-4 h-4"
             />
-            <span className="text-gray-600">Score 60+ only</span>
-            <button
-              type="button"
-              onClick={() => setShowScoreInfo(v => !v)}
-              className="text-gray-400 hover:text-violet-600 cursor-pointer text-xs"
-              title="What is the Scrunch Score?"
-            >
-              ⓘ
-            </button>
+            <span className="text-gray-600">🐰 Cruelty-free only</span>
           </label>
-          {showScoreInfo && (
-            <div className="w-full bg-white border border-violet-200 rounded-lg p-4 text-xs text-gray-600 space-y-2 mt-1">
-              <p className="font-semibold text-gray-900 text-sm">What is the Scrunch Score?</p>
-              <p>Every product starts at 100 and gets adjusted based on its ingredients and certifications:</p>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                <span>🟢 CG-approved</span><span className="text-green-600">No penalty</span>
-                <span>🔴 Not CG-approved</span><span className="text-red-600">−40 points</span>
-                <span>Contains silicone</span><span className="text-red-600">−20 points</span>
-                <span>Contains sulfate</span><span className="text-red-600">−20 points</span>
-                <span>Drying alcohol</span><span className="text-red-600">−15 points</span>
-                <span>Mineral oil</span><span className="text-red-600">−15 points</span>
-                <span>Contains wax</span><span className="text-red-600">−10 points</span>
-                <span>🐰 Cruelty-free</span><span className="text-green-600">+5 points</span>
-                <span>Fragrance-free</span><span className="text-green-600">+3 points</span>
-              </div>
-              <div className="flex gap-3 pt-1">
-                <span className="text-emerald-600 font-medium">80+ Excellent</span>
-                <span className="text-green-600 font-medium">60+ Good</span>
-                <span className="text-amber-600 font-medium">40+ Fair</span>
-                <span className="text-red-600 font-medium">&lt;40 Poor</span>
-              </div>
-              <p className="text-gray-400">Hover over any product's score to see its specific breakdown.</p>
-            </div>
-          )}
           {hasFilters && (
             <button
               onClick={() => { setSearch(''); setSelectedCategories(new Set()); setShowApprovedOnly(false); setShowGoodPlus(false); setBrandFilter('') }}
@@ -480,8 +447,10 @@ export function Products() {
         <div className="grid md:grid-cols-2 gap-4">
           {filteredProducts.map((product, i) => {
             const key = productKey(product)
-            const { score, grade, reasons } = computeScrunchScore(product)
-            const scoreConfig = SCRUNCH_SCORE_CONFIG[grade]
+            const isCg = product.cg_status === 'approved'
+            const isCf = product.cruelty_free === 'yes'
+            const notes = (product.notes || '').toLowerCase()
+            const isFragFree = notes.includes('fragrance-free') || notes.includes('fragrance free')
             return (
               <div
                 key={`${key}-${i}`}
@@ -499,12 +468,13 @@ export function Products() {
                       <p className="text-xs text-gray-500">{product.brand}</p>
                       <h3 className="font-semibold text-gray-900 text-sm leading-tight truncate">{product.name}</h3>
                     </div>
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 cursor-help ${scoreConfig.bg} ${scoreConfig.color}`}
-                      title={`Scrunch Score: ${score}/100 (${scoreConfig.label})\n\n${reasons.join('\n')}`}
-                    >
-                      {score}
-                    </span>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${isCg ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                        {isCg ? '🟢 CG' : '🔴 Not CG'}
+                      </span>
+                      {isCf && <span className="text-xs px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600">🐰</span>}
+                      {isFragFree && <span className="text-xs px-1.5 py-0.5 rounded-full bg-violet-50 text-violet-600">🌸</span>}
+                    </div>
                   </div>
                   <p className="text-xs text-gray-500 mb-2">{PRODUCT_CATEGORY_LABELS[product.category]}</p>
                   <div className="flex gap-2 items-center">

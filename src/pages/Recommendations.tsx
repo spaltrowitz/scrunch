@@ -247,7 +247,7 @@ export function Recommendations() {
         </section>
       )}
 
-      {/* Section B: Recommended for you */}
+      {/* Section B: Recommended for you — always show with fallback */}
       {ratingCount >= MIN_RATINGS && (
         <section className="mb-12">
           <h2 className="text-lg font-semibold text-gray-900 mb-1">
@@ -258,9 +258,12 @@ export function Recommendations() {
           </p>
 
           {recommendedProducts.length === 0 ? (
-            <p className="text-gray-500 text-sm py-6">
-              We're still gathering data for your hair type. Check back soon!
-            </p>
+            <div className="py-6 text-center">
+              <p className="text-gray-500 text-sm mb-2">
+                We're building recommendations for your hair type — more users with similar hair will unlock better suggestions.
+              </p>
+              <p className="text-xs text-gray-400">In the meantime, browse our top-scored CG-approved products below.</p>
+            </div>
           ) : (
             <div className="space-y-3">
               {recommendedProducts.map(product => {
@@ -307,6 +310,42 @@ export function Recommendations() {
           )}
         </section>
       )}
+
+      {/* Bookmarked / Want to try */}
+      {(() => {
+        try {
+          const stored = JSON.parse(localStorage.getItem('scrunch_actions') || '{}')
+          const bookmarkedKeys = Object.entries(stored)
+            .filter(([, actions]) => (actions as string[]).includes('bookmarked'))
+            .map(([key]) => key)
+          if (bookmarkedKeys.length === 0) return null
+          return (
+            <section className="mb-12">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">☆ Want to Try ({bookmarkedKeys.length})</h2>
+              <p className="text-sm text-gray-500 mb-3">Products you've saved to try later</p>
+              <div className="space-y-2">
+                {bookmarkedKeys.map(key => {
+                  const [brand, name] = key.split('::')
+                  if (!brand || !name) return null
+                  return (
+                    <Link
+                      key={key}
+                      to="/products"
+                      className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-violet-300 transition no-underline"
+                    >
+                      <ProductImage brand={brand} name={name} className="w-10 h-10" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-gray-500">{brand}</p>
+                        <p className="text-sm font-semibold text-gray-900 truncate">{name}</p>
+                      </div>
+                    </Link>
+                  )
+                })}
+              </div>
+            </section>
+          )
+        } catch { return null }
+      })()}
 
       {/* Section C: Your ratings */}
       {userReviews.length > 0 && (
