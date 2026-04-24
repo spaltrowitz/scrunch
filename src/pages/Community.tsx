@@ -23,8 +23,9 @@ async function searchReddit(query: string): Promise<RedditResult[]> {
 
   for (const sub of ['curlyhair', 'curlygirl']) {
     try {
+      // Use old Reddit JSON endpoint which is more CORS-friendly
       const res = await fetch(
-        `https://www.reddit.com/r/${sub}/search.json?q=${encodeURIComponent(query)}&restrict_sr=on&sort=relevance&limit=5`,
+        `https://old.reddit.com/r/${sub}/search.json?q=${encodeURIComponent(query)}&restrict_sr=on&sort=relevance&limit=5`,
         { headers: { 'Accept': 'application/json' } }
       )
       if (!res.ok) continue
@@ -42,22 +43,29 @@ async function searchReddit(query: string): Promise<RedditResult[]> {
         })
       }
     } catch {
-      // Reddit API can be flaky, continue
+      // Reddit blocks CORS from browsers — fall back to direct links
     }
+  }
+
+  // If CORS blocked all results, provide direct search links instead
+  if (results.length === 0) {
+    const encodedQuery = encodeURIComponent(query)
+    results.push(
+      { title: `Search r/curlyhair for "${query}"`, url: `https://www.reddit.com/r/curlyhair/search/?q=${encodedQuery}&restrict_sr=1`, subreddit: 'r/curlyhair', score: 0, num_comments: 0, snippet: 'Click to search r/curlyhair directly on Reddit' },
+      { title: `Search r/curlygirl for "${query}"`, url: `https://www.reddit.com/r/curlygirl/search/?q=${encodedQuery}&restrict_sr=1`, subreddit: 'r/curlygirl', score: 0, num_comments: 0, snippet: 'Click to search r/curlygirl directly on Reddit' },
+    )
   }
 
   return results.sort((a, b) => b.score - a.score).slice(0, 8)
 }
 
 function generateAiAnswer(question: string, redditResults: RedditResult[]): string {
-  // In Phase 2, this will call a real LLM via Supabase Edge Function
-  // For now, generate a helpful response based on Reddit results
-  if (redditResults.length === 0) {
-    return `Great question! I don't have specific Reddit discussions to reference for "${question}" right now, but here are some general tips:\n\n` +
-      `• Check the r/curlyhair wiki for beginner guides\n` +
-      `• The curly girl method subreddit r/curlygirl has technique breakdowns\n` +
-      `• Try searching with different keywords\n\n` +
-      `Once we connect our AI assistant (coming soon!), I'll be able to give you personalized answers based on your hair profile and community wisdom.`
+  const hasRealResults = redditResults.some(r => r.score > 0)
+
+  if (!hasRealResults) {
+    return `I've created direct search links to Reddit's curly hair communities for "${question}".\n\n` +
+      `Click the links below to search **r/curlyhair** (339K members) and **r/curlygirl** (61K members) directly.\n\n` +
+      `_AI-powered answers that search Reddit automatically are coming soon!_`
   }
 
   const topPost = redditResults[0]

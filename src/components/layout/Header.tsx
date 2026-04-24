@@ -18,16 +18,13 @@ export function Header() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 text-sm">
+          <Link to="/about" className={`no-underline ${isActive('/about')}`}>About</Link>
           <Link to="/products" className={`no-underline ${isActive('/products')}`}>Browse</Link>
-          {user && (
-            <Link to="/my-products" className={`no-underline ${isActive('/my-products')}`}>My Shelf</Link>
-          )}
+          <Link to="/ingredient-checker" className={`no-underline ${isActive('/ingredient-checker')}`}>Ingredient Checker</Link>
           {user && (
             <Link to="/recommendations" className={`no-underline ${isActive('/recommendations')}`}>For You</Link>
           )}
-          <Link to="/ingredient-checker" className={`no-underline ${isActive('/ingredient-checker')}`}>Ingredient Checker</Link>
           <Link to="/community" className={`no-underline ${isActive('/community')}`}>Community</Link>
-          <Link to="/about" className={`no-underline ${isActive('/about')}`}>About</Link>
         </nav>
 
         <div className="flex items-center gap-3">
