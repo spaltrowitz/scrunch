@@ -4,34 +4,6 @@ import { useAuth } from '../../lib/auth'
 import { supabase } from '../../lib/supabase'
 import { CURL_PATTERNS, POROSITY_OPTIONS, HAIR_GOALS, HAIR_GOAL_LABELS, INGREDIENT_PREFERENCES, INGREDIENT_PREFERENCE_LABELS } from '../../lib/constants'
 
-// Inline SVG curl line illustrations — each one is visually distinct
-function CurlLine({ pattern }: { pattern: string }) {
-  const paths: Record<string, string> = {
-    '2A': 'M4,20 Q12,14 20,20 Q28,26 36,20',
-    '2B': 'M4,20 Q10,10 16,20 Q22,30 28,20 Q34,10 40,20',
-    '2C': 'M4,22 Q9,8 14,20 Q19,32 24,20 Q29,8 34,20 Q39,32 44,22',
-    '3A': 'M6,10 C10,10 14,14 14,20 C14,26 10,30 6,30 C3,30 2,26 4,22',
-    '3B': 'M10,6 C14,6 16,10 16,16 C16,20 14,22 10,22 C7,22 6,20 6,16 C6,12 7,8 10,8 M10,22 C14,22 16,26 16,32 C16,36 14,38 12,38',
-    '3C': 'M12,4 C15,4 16,6 16,9 C16,12 15,14 12,14 C9,14 8,12 8,9 C8,6 9,4 12,4 M12,14 C15,14 16,16 16,19 C16,22 15,24 12,24 C9,24 8,22 8,19 C8,16 9,14 12,14 M12,24 C15,24 16,26 16,29 C16,32 15,34 12,34 C9,34 8,32 8,29 C8,26 9,24 12,24',
-    '4A': 'M8,6 C12,6 14,8 12,11 C10,14 8,14 10,17 C12,20 14,20 12,23 C10,26 8,26 10,29 C12,32 14,32 12,35',
-    '4B': 'M8,4 L14,9 L8,14 L14,19 L8,24 L14,29 L8,34 L14,39',
-    '4C': 'M8,4 L13,7 L8,10 L13,13 L8,16 L13,19 L8,22 L13,25 L8,28 L13,31 L8,34 L13,37 L8,40',
-  }
-
-  return (
-    <svg viewBox="0 0 24 44" className="w-6 h-11 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path
-        d={paths[pattern] || paths['3A']}
-        stroke="#6B4226"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-        transform="scale(0.55) translate(0, 0)"
-      />
-    </svg>
-  )
-}
 import type { CurlPattern, Porosity, HairDensity, HairWidth, ScalpType, HairLength, ColorTreatment, Climate, HeatToolUsage, WorkoutFrequency, CgmExperience, FragrancePreference } from '../../lib/database.types'
 
 interface OnboardingData {
@@ -190,9 +162,8 @@ export function OnboardingWizard() {
                 {CURL_PATTERNS.filter(cp => cp.value.startsWith('2')).map(cp => (
                   <OptionButton key={cp.value} selected={data.curl_pattern === cp.value} onClick={() => update('curl_pattern', cp.value)}>
                     <div className="text-center">
-                      <CurlLine pattern={cp.value} />
-                      <span className="font-bold text-sm">{cp.label}</span>
-                      <div className="text-xs text-gray-500 mt-0.5">{cp.description}</div>
+                      <span className="font-bold text-base block">{cp.label}</span>
+                      <div className="text-xs text-gray-500 mt-1">{cp.description}</div>
                     </div>
                   </OptionButton>
                 ))}
@@ -202,9 +173,8 @@ export function OnboardingWizard() {
                 {CURL_PATTERNS.filter(cp => cp.value.startsWith('3')).map(cp => (
                   <OptionButton key={cp.value} selected={data.curl_pattern === cp.value} onClick={() => update('curl_pattern', cp.value)}>
                     <div className="text-center">
-                      <CurlLine pattern={cp.value} />
-                      <span className="font-bold text-sm">{cp.label}</span>
-                      <div className="text-xs text-gray-500 mt-0.5">{cp.description}</div>
+                      <span className="font-bold text-base block">{cp.label}</span>
+                      <div className="text-xs text-gray-500 mt-1">{cp.description}</div>
                     </div>
                   </OptionButton>
                 ))}
@@ -214,9 +184,8 @@ export function OnboardingWizard() {
                 {CURL_PATTERNS.filter(cp => cp.value.startsWith('4')).map(cp => (
                   <OptionButton key={cp.value} selected={data.curl_pattern === cp.value} onClick={() => update('curl_pattern', cp.value)}>
                     <div className="text-center">
-                      <CurlLine pattern={cp.value} />
-                      <span className="font-bold text-sm">{cp.label}</span>
-                      <div className="text-xs text-gray-500 mt-0.5">{cp.description}</div>
+                      <span className="font-bold text-base block">{cp.label}</span>
+                      <div className="text-xs text-gray-500 mt-1">{cp.description}</div>
                     </div>
                   </OptionButton>
                 ))}
@@ -231,7 +200,7 @@ export function OnboardingWizard() {
             <h2 className="text-xl font-bold text-gray-900 mb-2">What's your hair porosity?</h2>
             <p className="text-sm text-gray-500 mb-4">Porosity affects how your hair absorbs products.</p>
             <a
-              href="https://curlmaven.ie/porosity/"
+              href="https://curlmaven.ie/porosity-quiz/"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-xs text-violet-600 hover:text-violet-700 mb-6"
