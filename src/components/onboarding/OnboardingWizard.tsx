@@ -114,7 +114,7 @@ export function OnboardingWizard() {
     <button
       type="button"
       onClick={onClick}
-      className={`px-4 py-3 rounded-lg border text-sm text-left cursor-pointer transition-colors ${
+      className={`px-4 py-3 rounded-lg border text-sm text-left cursor-pointer transition-colors min-h-[4.5rem] ${
         selected ? 'border-violet-500 bg-violet-50 text-violet-700 font-medium' : 'border-gray-200 hover:border-gray-300 text-gray-700'
       }`}
     >
@@ -234,6 +234,13 @@ export function OnboardingWizard() {
                   <div className="text-xs text-gray-500 mt-0.5">{p.description}</div>
                 </OptionButton>
               ))}
+              <button
+                type="button"
+                onClick={() => { update('porosity', null as unknown as Porosity); setStep(s => s + 1) }}
+                className="w-full px-4 py-3 rounded-lg border border-dashed border-gray-300 text-sm text-gray-400 hover:text-gray-600 hover:border-gray-400 cursor-pointer transition text-left"
+              >
+                🧪 Not sure yet — I need to do the test first
+              </button>
             </div>
           </div>
         )}
@@ -331,9 +338,9 @@ export function OnboardingWizard() {
               <button
                 type="button"
                 onClick={() => setStep(s => s + 1)}
-                className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 cursor-pointer"
+                className="px-4 py-2 text-sm text-gray-400 hover:text-gray-600 cursor-pointer"
               >
-                Skip
+                I'll come back to this →
               </button>
               <button
                 type="button"
