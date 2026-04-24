@@ -36,15 +36,54 @@ export const PRODUCT_CATEGORY_LABELS: Record<ProductCategory, string> = {
 }
 
 export const HAIR_GOALS = [
+  'more_volume',
+  'more_shine',
+  'curl_definition',
+  'less_shedding',
+  'more_smoothness',
+  'hair_growth',
   'moisture',
-  'definition',
-  'volume',
   'frizz_control',
-  'length_retention',
   'repair',
-  'shine',
   'scalp_health',
+  'reduce_breakage',
+  'length_retention',
 ] as const
+
+export const HAIR_GOAL_LABELS: Record<string, string> = {
+  more_volume: 'More Volume',
+  more_shine: 'More Shine',
+  curl_definition: 'More Curl Definition',
+  less_shedding: 'Less Shedding',
+  more_smoothness: 'More Smoothness',
+  hair_growth: 'More Hair Growth',
+  moisture: 'Moisture',
+  frizz_control: 'Frizz Control',
+  repair: 'Repair & Strengthen',
+  scalp_health: 'Scalp Health',
+  reduce_breakage: 'Reduce Breakage',
+  length_retention: 'Length Retention',
+}
+
+export const INGREDIENT_PREFERENCES = [
+  'vegan',
+  'silicone_free',
+  'sulfate_free',
+  'fragrance_free',
+  'protein_free',
+  'coconut_free',
+  'aloe_free',
+] as const
+
+export const INGREDIENT_PREFERENCE_LABELS: Record<string, string> = {
+  vegan: '🌱 Vegan',
+  silicone_free: 'Silicone-Free',
+  sulfate_free: 'Sulfate-Free',
+  fragrance_free: 'Fragrance-Free',
+  protein_free: 'Protein-Free',
+  coconut_free: 'Coconut-Free',
+  aloe_free: 'Aloe-Free',
+}
 
 export const SENSITIVITIES = [
   'fragrance',

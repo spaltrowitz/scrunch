@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../lib/auth'
 import { supabase } from '../../lib/supabase'
-import { CURL_PATTERNS, POROSITY_OPTIONS, HAIR_GOALS, SENSITIVITIES } from '../../lib/constants'
+import { CURL_PATTERNS, POROSITY_OPTIONS, HAIR_GOALS, HAIR_GOAL_LABELS, INGREDIENT_PREFERENCES, INGREDIENT_PREFERENCE_LABELS } from '../../lib/constants'
 import { CurlPatternIcon } from '../ui/CurlPatternIcon'
-import type { CurlPattern, Porosity, HairDensity, HairWidth, ScalpType, HairLength, Climate, HeatToolUsage, WorkoutFrequency, CgmExperience, FragrancePreference } from '../../lib/database.types'
+import type { CurlPattern, Porosity, HairDensity, HairWidth, ScalpType, HairLength, ColorTreatment, Climate, HeatToolUsage, WorkoutFrequency, CgmExperience, FragrancePreference } from '../../lib/database.types'
 
 interface OnboardingData {
   curl_pattern: CurlPattern | null
@@ -13,6 +13,7 @@ interface OnboardingData {
   hair_width: HairWidth | null
   scalp_type: ScalpType | null
   hair_length: HairLength | null
+  color_treatment: ColorTreatment | null
   climate: Climate | null
   heat_tool_usage: HeatToolUsage | null
   workout_frequency: WorkoutFrequency | null
@@ -22,7 +23,7 @@ interface OnboardingData {
   sensitivities: string[]
 }
 
-const TOTAL_STEPS = 8
+const TOTAL_STEPS = 11
 
 export function OnboardingWizard() {
   const { user } = useAuth()
@@ -33,9 +34,9 @@ export function OnboardingWizard() {
   const [isEditing, setIsEditing] = useState(false)
   const [data, setData] = useState<OnboardingData>({
     curl_pattern: null, porosity: null, hair_density: null, hair_width: null,
-    scalp_type: null, hair_length: null, climate: null, heat_tool_usage: null,
-    workout_frequency: null, cgm_experience: null, fragrance_preference: null,
-    hair_goals: [], sensitivities: [],
+    scalp_type: null, hair_length: null, color_treatment: null, climate: null,
+    heat_tool_usage: null, workout_frequency: null, cgm_experience: null,
+    fragrance_preference: null, hair_goals: [], sensitivities: [],
   })
 
   // Load existing profile data if editing
@@ -52,6 +53,7 @@ export function OnboardingWizard() {
           hair_width: (profile.hair_width as HairWidth) || null,
           scalp_type: (profile.scalp_type as ScalpType) || null,
           hair_length: (profile.hair_length as HairLength) || null,
+          color_treatment: (profile.color_treatment as ColorTreatment) || null,
           climate: (profile.climate as Climate) || null,
           heat_tool_usage: (profile.heat_tool_usage as HeatToolUsage) || null,
           workout_frequency: (profile.workout_frequency as WorkoutFrequency) || null,
@@ -124,7 +126,7 @@ export function OnboardingWizard() {
           </div>
         </div>
 
-        {/* Steps */}
+        {/* Step 1: Curl Pattern */}
         {step === 1 && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">What's your curl pattern?</h2>
@@ -151,6 +153,7 @@ export function OnboardingWizard() {
           </div>
         )}
 
+        {/* Step 2: Porosity */}
         {step === 2 && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">What's your hair porosity?</h2>
@@ -174,151 +177,151 @@ export function OnboardingWizard() {
           </div>
         )}
 
+        {/* Step 3: Strand Width */}
         {step === 3 && (
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Tell us about your hair</h2>
-            <p className="text-sm text-gray-500 mb-6">Density and width help us find the right products for you.</p>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">Hair density (how much hair)</label>
-                <div className="grid grid-cols-3 gap-3">
-                  {(['thin', 'medium', 'thick'] as const).map(v => (
-                    <OptionButton key={v} selected={data.hair_density === v} onClick={() => update('hair_density', v)}>
-                      {v.charAt(0).toUpperCase() + v.slice(1)}
-                    </OptionButton>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">Strand width (individual hair thickness)</label>
-                <div className="grid grid-cols-3 gap-3">
-                  {(['fine', 'medium', 'coarse'] as const).map(v => (
-                    <OptionButton key={v} selected={data.hair_width === v} onClick={() => update('hair_width', v)}>
-                      {v.charAt(0).toUpperCase() + v.slice(1)}
-                    </OptionButton>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {step === 4 && (
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Scalp & length</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">Scalp type</label>
-                <div className="grid grid-cols-3 gap-3">
-                  {(['dry', 'normal', 'oily'] as const).map(v => (
-                    <OptionButton key={v} selected={data.scalp_type === v} onClick={() => update('scalp_type', v)}>
-                      {v.charAt(0).toUpperCase() + v.slice(1)}
-                    </OptionButton>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">Hair length</label>
-                <div className="grid grid-cols-2 gap-3">
-                  {([['short', 'Short (above ears)'], ['medium', 'Medium (shoulders)'], ['long', 'Long (past shoulders)'], ['extra_long', 'Extra Long']] as const).map(([v, label]) => (
-                    <OptionButton key={v} selected={data.hair_length === v} onClick={() => update('hair_length', v)}>
-                      {label}
-                    </OptionButton>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {step === 5 && (
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Your environment & lifestyle</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">Climate</label>
-                <div className="grid grid-cols-2 gap-3">
-                  {([['humid', '💧 Humid'], ['dry', '🏜️ Dry'], ['variable', '🌤️ Variable'], ['tropical', '🌴 Tropical']] as const).map(([v, label]) => (
-                    <OptionButton key={v} selected={data.climate === v} onClick={() => update('climate', v)}>
-                      {label}
-                    </OptionButton>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">How often do you work out?</label>
-                <div className="grid grid-cols-3 gap-3">
-                  {([['rarely', 'Rarely'], ['few_times_week', 'A few times/week'], ['daily', 'Daily']] as const).map(([v, label]) => (
-                    <OptionButton key={v} selected={data.workout_frequency === v} onClick={() => update('workout_frequency', v)}>
-                      {label}
-                    </OptionButton>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">Heat tool usage</label>
-                <div className="grid grid-cols-3 gap-3">
-                  {([['never', 'Never'], ['occasionally', 'Sometimes'], ['frequently', 'Often']] as const).map(([v, label]) => (
-                    <OptionButton key={v} selected={data.heat_tool_usage === v} onClick={() => update('heat_tool_usage', v)}>
-                      {label}
-                    </OptionButton>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {step === 6 && (
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">CGM experience & preferences</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">How long have you been following the Curly Girl Method?</label>
-                <div className="grid grid-cols-2 gap-3">
-                  {([['just_starting', '🌱 Just starting'], ['under_1_year', '< 1 year'], ['1_to_3_years', '1–3 years'], ['3_plus_years', '3+ years']] as const).map(([v, label]) => (
-                    <OptionButton key={v} selected={data.cgm_experience === v} onClick={() => update('cgm_experience', v)}>
-                      {label}
-                    </OptionButton>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">Fragrance preference</label>
-                <div className="grid grid-cols-3 gap-3">
-                  {([['love_it', '🌸 Love it'], ['no_preference', 'No pref'], ['fragrance_free', 'None please']] as const).map(([v, label]) => (
-                    <OptionButton key={v} selected={data.fragrance_preference === v} onClick={() => update('fragrance_preference', v)}>
-                      {label}
-                    </OptionButton>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {step === 7 && (
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">What are your hair goals?</h2>
-            <p className="text-sm text-gray-500 mb-6">Select all that apply.</p>
-            <div className="grid grid-cols-2 gap-3">
-              {HAIR_GOALS.map(goal => (
-                <OptionButton key={goal} selected={data.hair_goals.includes(goal)} onClick={() => toggleArrayItem('hair_goals', goal)}>
-                  {goal.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+            <h2 className="text-xl font-bold text-gray-900 mb-2">What's your strand width?</h2>
+            <p className="text-sm text-gray-500 mb-4">Roll a single strand between your fingers — can you feel it?</p>
+            <a
+              href="https://www.naturallycurly.com/hair-types"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs text-violet-600 hover:text-violet-700 mb-6"
+            >
+              🤔 Not sure? Learn how to tell →
+            </a>
+            <div className="grid grid-cols-3 gap-3">
+              {(['fine', 'medium', 'coarse'] as const).map(v => (
+                <OptionButton key={v} selected={data.hair_width === v} onClick={() => update('hair_width', v)}>
+                  {v.charAt(0).toUpperCase() + v.slice(1)}
                 </OptionButton>
               ))}
             </div>
           </div>
         )}
 
+        {/* Step 4: Hair Density */}
+        {step === 4 && (
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">How dense is your hair?</h2>
+            <p className="text-sm text-gray-500 mb-4">Part your hair and check the mirror — the more scalp you see, the less dense.</p>
+            <a
+              href="https://www.naturallycurly.com/hair-types"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs text-violet-600 hover:text-violet-700 mb-6"
+            >
+              🤔 Not sure? See the visual guide →
+            </a>
+            <div className="grid grid-cols-3 gap-3">
+              {(['thin', 'medium', 'thick'] as const).map(v => (
+                <OptionButton key={v} selected={data.hair_density === v} onClick={() => update('hair_density', v)}>
+                  {v.charAt(0).toUpperCase() + v.slice(1)}
+                </OptionButton>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Step 5: Hair Length */}
+        {step === 5 && (
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">How long is your hair?</h2>
+            <p className="text-sm text-gray-500 mb-6">If curly, pull the curl all the way down to measure.</p>
+            <div className="grid grid-cols-2 gap-3">
+              {([['short', 'Short (above ears)'], ['medium', 'Medium (shoulders)'], ['long', 'Long (past shoulders)'], ['extra_long', 'Extra Long (waist+)']] as const).map(([v, label]) => (
+                <OptionButton key={v} selected={data.hair_length === v} onClick={() => update('hair_length', v)}>
+                  {label}
+                </OptionButton>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Step 6: Scalp Type */}
+        {step === 6 && (
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">What's your scalp type?</h2>
+            <p className="text-sm text-gray-500 mb-6">Where would you put your scalp on the oily/dry spectrum?</p>
+            <div className="grid grid-cols-3 gap-3">
+              {(['dry', 'normal', 'oily'] as const).map(v => (
+                <OptionButton key={v} selected={data.scalp_type === v} onClick={() => update('scalp_type', v)}>
+                  {v.charAt(0).toUpperCase() + v.slice(1)}
+                </OptionButton>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Step 7: Color Treatment */}
+        {step === 7 && (
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Any color treatment?</h2>
+            <p className="text-sm text-gray-500 mb-6">Color-treated hair has different moisture and protein needs.</p>
+            <div className="grid grid-cols-2 gap-3">
+              {([['virgin', 'Virgin (no color)'], ['color_treated', 'Color Treated'], ['bleached', 'Bleached'], ['highlighted', 'Highlighted']] as const).map(([v, label]) => (
+                <OptionButton key={v} selected={data.color_treatment === v} onClick={() => update('color_treatment', v)}>
+                  {label}
+                </OptionButton>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Step 8: Climate */}
         {step === 8 && (
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Any sensitivities or allergies?</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">What's your climate like?</h2>
+            <p className="text-sm text-gray-500 mb-6">Humidity and dryness affect which products work best for you.</p>
+            <div className="grid grid-cols-2 gap-3">
+              {([['humid', '💧 Humid'], ['dry', '🏜️ Dry'], ['variable', '🌤️ Variable'], ['tropical', '🌴 Tropical']] as const).map(([v, label]) => (
+                <OptionButton key={v} selected={data.climate === v} onClick={() => update('climate', v)}>
+                  {label}
+                </OptionButton>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Step 9: CGM Experience */}
+        {step === 9 && (
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">How long have you been following the Curly Girl Method?</h2>
+            <p className="text-sm text-gray-500 mb-6">This helps us tailor recommendations to your experience level.</p>
+            <div className="grid grid-cols-2 gap-3">
+              {([['just_starting', '🌱 Just starting'], ['under_1_year', '< 1 year'], ['1_to_3_years', '1–3 years'], ['3_plus_years', '3+ years']] as const).map(([v, label]) => (
+                <OptionButton key={v} selected={data.cgm_experience === v} onClick={() => update('cgm_experience', v)}>
+                  {label}
+                </OptionButton>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Step 10: Hair Goals */}
+        {step === 10 && (
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">What are your hair goals?</h2>
+            <p className="text-sm text-gray-500 mb-6">Select all that apply.</p>
+            <div className="grid grid-cols-2 gap-3">
+              {HAIR_GOALS.map(goal => (
+                <OptionButton key={goal} selected={data.hair_goals.includes(goal)} onClick={() => toggleArrayItem('hair_goals', goal)}>
+                  {HAIR_GOAL_LABELS[goal]}
+                </OptionButton>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Step 11: Ingredient Preferences */}
+        {step === 11 && (
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Any ingredient preferences?</h2>
             <p className="text-sm text-gray-500 mb-6">We'll flag products with these ingredients. Select all that apply, or skip.</p>
             <div className="grid grid-cols-2 gap-3">
-              {SENSITIVITIES.map(s => (
-                <OptionButton key={s} selected={data.sensitivities.includes(s)} onClick={() => toggleArrayItem('sensitivities', s)}>
-                  {s.charAt(0).toUpperCase() + s.slice(1)}
+              {INGREDIENT_PREFERENCES.map(pref => (
+                <OptionButton key={pref} selected={data.sensitivities.includes(pref)} onClick={() => toggleArrayItem('sensitivities', pref)}>
+                  {INGREDIENT_PREFERENCE_LABELS[pref]}
                 </OptionButton>
               ))}
             </div>

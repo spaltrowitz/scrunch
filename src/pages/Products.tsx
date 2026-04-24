@@ -7,6 +7,7 @@ import { RequestProductForm } from '../components/products/RequestProductForm'
 
 type ProductAction = 'tried' | 'liked' | 'bookmarked'
 type ProductActions = Record<string, Set<ProductAction>>
+type ProductNotes = Record<string, string>
 
 function getStoredActions(): ProductActions {
   try {
@@ -27,6 +28,16 @@ function storeActions(actions: ProductActions) {
   localStorage.setItem('scrunch_actions', JSON.stringify(serializable))
 }
 
+function getStoredNotes(): ProductNotes {
+  try {
+    return JSON.parse(localStorage.getItem('scrunch_notes') || '{}')
+  } catch { return {} }
+}
+
+function storeNotes(notes: ProductNotes) {
+  localStorage.setItem('scrunch_notes', JSON.stringify(notes))
+}
+
 const ALL_SUGGESTIONS = Array.from(new Set([
   ...SEED_PRODUCTS.map(p => p.brand),
   ...SEED_PRODUCTS.map(p => `${p.brand} ${p.name}`),
@@ -38,6 +49,8 @@ export function Products() {
   const [selectedCategories, setSelectedCategories] = useState<Set<ProductCategory>>(new Set())
   const [showApprovedOnly, setShowApprovedOnly] = useState(false)
   const [actions, setActions] = useState<ProductActions>(getStoredActions)
+  const [notes, setNotes] = useState<ProductNotes>(getStoredNotes)
+  const [editingNote, setEditingNote] = useState<string | null>(null)
   const [showRequestForm, setShowRequestForm] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
 
@@ -78,6 +91,16 @@ export function Products() {
 
   const hasAction = (productKey: string, action: ProductAction) =>
     actions[productKey]?.has(action) ?? false
+
+  const updateNote = (productKey: string, note: string) => {
+    setNotes(prev => {
+      const next = { ...prev }
+      if (note.trim()) next[productKey] = note.trim()
+      else delete next[productKey]
+      storeNotes(next)
+      return next
+    })
+  }
 
   const filteredProducts = SEED_PRODUCTS.filter(p => {
     if (selectedCategories.size > 0 && !selectedCategories.has(p.category)) return false
@@ -250,6 +273,44 @@ export function Products() {
                       {hasAction(key, 'bookmarked') ? '★ Saved' : '☆ Save'}
                     </button>
                   </div>
+
+                  {/* Personal note */}
+                  {notes[key] && editingNote !== key && (
+                    <div
+                      onClick={() => setEditingNote(key)}
+                      className="mt-2 text-xs text-gray-600 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 cursor-pointer hover:border-amber-200"
+                    >
+                      📝 {notes[key]}
+                    </div>
+                  )}
+                  {editingNote === key ? (
+                    <div className="mt-2">
+                      <textarea
+                        autoFocus
+                        defaultValue={notes[key] || ''}
+                        placeholder="Add a personal note... e.g., 'Roots remain oily after use'"
+                        onBlur={(e) => {
+                          updateNote(key, e.target.value)
+                          setEditingNote(null)
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault()
+                            updateNote(key, (e.target as HTMLTextAreaElement).value)
+                            setEditingNote(null)
+                          }
+                        }}
+                        className="w-full text-xs px-3 py-2 border border-violet-300 rounded-lg resize-none h-16 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                      />
+                    </div>
+                  ) : !notes[key] && (
+                    <button
+                      onClick={() => setEditingNote(key)}
+                      className="mt-2 text-xs text-gray-400 hover:text-violet-500 cursor-pointer"
+                    >
+                      + Add note
+                    </button>
+                  )}
                 </div>
               </div>
             )
