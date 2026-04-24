@@ -8,7 +8,7 @@ import { computeScrunchScore } from '../data/seedProducts'
 import { ProductImage } from '../hooks/useProductImage'
 import { QuickRateCard } from '../components/products/QuickRateCard'
 
-const MIN_RATINGS = 5
+const MIN_RATINGS = 10
 
 export function Recommendations() {
   const { user } = useAuth()

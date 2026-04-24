@@ -280,6 +280,8 @@ export function Products() {
   })
 
   const approvedCount = products.filter(p => p.cg_status === 'approved').length
+  const userRatingCount = Object.keys(ratings).length
+  const ratingsNeeded = Math.max(0, 10 - userRatingCount)
   const hasFilters = selectedCategories.size > 0 || showApprovedOnly || showGoodPlus || search
 
   if (loading) {
@@ -297,6 +299,22 @@ export function Products() {
       <p className="text-gray-600 mb-6">
         {products.length} products from the r/curlyhair holy grail list · {approvedCount} CG-approved
       </p>
+
+      {user && ratingsNeeded > 0 && (
+        <div className="mb-6 p-4 bg-violet-50 border border-violet-200 rounded-xl flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-violet-900">
+              Rate {ratingsNeeded} more product{ratingsNeeded !== 1 ? 's' : ''} to unlock personalized suggestions ✨
+            </p>
+            <p className="text-xs text-violet-600 mt-0.5">
+              {userRatingCount}/10 rated — click "Tried it?" on products you've used
+            </p>
+          </div>
+          <div className="w-24 h-2 bg-violet-200 rounded-full shrink-0 ml-4">
+            <div className="h-2 bg-violet-500 rounded-full transition-all" style={{ width: `${Math.min(100, userRatingCount * 10)}%` }} />
+          </div>
+        </div>
+      )}
 
       {/* Search with autocomplete */}
       <div ref={searchRef} className="relative mb-4">
