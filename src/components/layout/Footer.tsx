@@ -2,17 +2,13 @@ import { Link } from 'react-router-dom'
 
 export function Footer() {
   return (
-    <footer className="border-t border-gray-200 bg-gray-50 py-8 mt-auto">
-      <div className="max-w-6xl mx-auto px-4 text-center text-sm text-gray-500">
-        <p className="mb-2">
-          🌀 Scrunch — Community-driven, ad-free, and unbiased.
-        </p>
-        <p>
-          Built with data from the curly hair community. Not affiliated with any brand.
-        </p>
-        <p className="mt-2">
-          <Link to="/terms" className="text-gray-400 hover:text-violet-600 text-xs no-underline">Terms & Disclaimers</Link>
-        </p>
+    <footer className="border-t border-gray-200 py-4 mt-auto">
+      <div className="max-w-6xl mx-auto px-4 flex items-center justify-center gap-3 text-xs text-gray-400">
+        <span>© {new Date().getFullYear()} Scrunch</span>
+        <span>·</span>
+        <Link to="/about" className="hover:text-violet-600 no-underline">About</Link>
+        <span>·</span>
+        <Link to="/terms" className="hover:text-violet-600 no-underline">Terms</Link>
       </div>
     </footer>
   )
