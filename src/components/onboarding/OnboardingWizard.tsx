@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../lib/auth'
 import { supabase } from '../../lib/supabase'
@@ -28,12 +28,41 @@ export function OnboardingWizard() {
   const navigate = useNavigate()
   const [step, setStep] = useState(1)
   const [saving, setSaving] = useState(false)
+  const [loadingProfile, setLoadingProfile] = useState(true)
+  const [isEditing, setIsEditing] = useState(false)
   const [data, setData] = useState<OnboardingData>({
     curl_pattern: null, porosity: null, hair_density: null, hair_width: null,
     scalp_type: null, hair_length: null, climate: null, heat_tool_usage: null,
     workout_frequency: null, cgm_experience: null, fragrance_preference: null,
     hair_goals: [], sensitivities: [],
   })
+
+  // Load existing profile data if editing
+  useEffect(() => {
+    if (!user) { setLoadingProfile(false); return }
+    supabase.from('profiles').select('*').eq('id', user.id).single().then(({ data: rawProfile }) => {
+      const profile = rawProfile as Record<string, unknown> | null
+      if (profile && profile.onboarding_completed) {
+        setIsEditing(true)
+        setData({
+          curl_pattern: (profile.curl_pattern as CurlPattern) || null,
+          porosity: (profile.porosity as Porosity) || null,
+          hair_density: (profile.hair_density as HairDensity) || null,
+          hair_width: (profile.hair_width as HairWidth) || null,
+          scalp_type: (profile.scalp_type as ScalpType) || null,
+          hair_length: (profile.hair_length as HairLength) || null,
+          climate: (profile.climate as Climate) || null,
+          heat_tool_usage: (profile.heat_tool_usage as HeatToolUsage) || null,
+          workout_frequency: (profile.workout_frequency as WorkoutFrequency) || null,
+          cgm_experience: (profile.cgm_experience as CgmExperience) || null,
+          fragrance_preference: (profile.fragrance_preference as FragrancePreference) || null,
+          hair_goals: (profile.hair_goals as string[]) || [],
+          sensitivities: (profile.sensitivities as string[]) || [],
+        })
+      }
+      setLoadingProfile(false)
+    })
+  }, [user])
 
   const update = <K extends keyof OnboardingData>(key: K, value: OnboardingData[K]) => {
     setData(d => ({ ...d, [key]: value }))
@@ -51,13 +80,15 @@ export function OnboardingWizard() {
     setSaving(true)
     const { error } = await supabase.from('profiles').upsert({
       id: user.id,
-      display_name: user.email?.split('@')[0] ?? 'Curly Friend',
+      display_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Curly Friend',
       ...data,
       onboarding_completed: true,
     } as never)
     setSaving(false)
-    if (!error) navigate('/dashboard')
+    if (!error) navigate('/profile')
   }
+
+  if (loadingProfile) return <div className="text-center py-12 text-gray-500">Loading...</div>
 
   const OptionButton = ({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: React.ReactNode }) => (
     <button
@@ -74,6 +105,10 @@ export function OnboardingWizard() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-lg">
+        {/* Header */}
+        {isEditing && step === 1 && (
+          <p className="text-sm text-violet-600 mb-4">✏️ Editing your hair profile — your current selections are pre-loaded</p>
+        )}
         {/* Progress */}
         <div className="mb-8">
           <div className="flex justify-between text-xs text-gray-500 mb-2">
@@ -305,7 +340,7 @@ export function OnboardingWizard() {
               disabled={saving}
               className="px-6 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 disabled:opacity-50 cursor-pointer"
             >
-              {saving ? 'Saving...' : 'Complete Setup ✨'}
+              {saving ? 'Saving...' : isEditing ? 'Save Changes ✨' : 'Complete Setup ✨'}
             </button>
           )}
         </div>
