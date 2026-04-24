@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../lib/auth'
 import { supabase } from '../../lib/supabase'
 import { CURL_PATTERNS, POROSITY_OPTIONS, HAIR_GOALS, SENSITIVITIES } from '../../lib/constants'
+import { CurlPatternIcon } from '../ui/CurlPatternIcon'
 import type { CurlPattern, Porosity, HairDensity, HairWidth, ScalpType, HairLength, Climate, HeatToolUsage, WorkoutFrequency, CgmExperience, FragrancePreference } from '../../lib/database.types'
 
 interface OnboardingData {
@@ -127,12 +128,23 @@ export function OnboardingWizard() {
         {step === 1 && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">What's your curl pattern?</h2>
-            <p className="text-sm text-gray-500 mb-6">Select the closest match. You can always change this later.</p>
+            <p className="text-sm text-gray-500 mb-4">Select the closest match. You can always change this later.</p>
+            <a
+              href="https://www.naturallycurly.com/hair-types"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs text-violet-600 hover:text-violet-700 mb-6"
+            >
+              🤔 Not sure? See the visual curl type guide →
+            </a>
             <div className="grid grid-cols-3 gap-3">
               {CURL_PATTERNS.map(cp => (
                 <OptionButton key={cp.value} selected={data.curl_pattern === cp.value} onClick={() => update('curl_pattern', cp.value)}>
-                  <div className="font-semibold">{cp.label}</div>
-                  <div className="text-xs text-gray-500 mt-0.5">{cp.description}</div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <CurlPatternIcon pattern={cp.value} className="w-10 h-10 shrink-0" />
+                    <span className="font-semibold text-base">{cp.label}</span>
+                  </div>
+                  <div className="text-xs text-gray-500">{cp.description}</div>
                 </OptionButton>
               ))}
             </div>
@@ -142,7 +154,15 @@ export function OnboardingWizard() {
         {step === 2 && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">What's your hair porosity?</h2>
-            <p className="text-sm text-gray-500 mb-6">Porosity affects how your hair absorbs products.</p>
+            <p className="text-sm text-gray-500 mb-4">Porosity affects how your hair absorbs products.</p>
+            <a
+              href="https://curlmaven.ie/porosity/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs text-violet-600 hover:text-violet-700 mb-6"
+            >
+              🤔 Not sure? Learn how to test your porosity →
+            </a>
             <div className="space-y-3">
               {POROSITY_OPTIONS.map(p => (
                 <OptionButton key={p.value} selected={data.porosity === p.value} onClick={() => update('porosity', p.value)}>

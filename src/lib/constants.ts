@@ -1,15 +1,15 @@
 import type { CurlPattern, Porosity, ProductCategory } from './database.types'
 
 export const CURL_PATTERNS: { value: CurlPattern; label: string; description: string }[] = [
-  { value: '2A', label: '2A', description: 'Slight S-wave' },
-  { value: '2B', label: '2B', description: 'Defined S-waves' },
-  { value: '2C', label: '2C', description: 'Deep waves, nearly curly' },
-  { value: '3A', label: '3A', description: 'Loose springy curls' },
-  { value: '3B', label: '3B', description: 'Bouncy ringlets' },
-  { value: '3C', label: '3C', description: 'Tight corkscrew curls' },
-  { value: '4A', label: '4A', description: 'S-shaped coils' },
-  { value: '4B', label: '4B', description: 'Z-shaped coils' },
-  { value: '4C', label: '4C', description: 'Tight, densely packed coils' },
+  { value: '2A', label: '2A', description: 'Almost straight with a slight bend' },
+  { value: '2B', label: '2B', description: 'Like a loose "S"' },
+  { value: '2C', label: '2C', description: 'Defined, S-shaped pattern' },
+  { value: '3A', label: '3A', description: 'Like a loose "C"' },
+  { value: '3B', label: '3B', description: 'Defined & springy C\'s' },
+  { value: '3C', label: '3C', description: 'Like a corkscrew' },
+  { value: '4A', label: '4A', description: 'Tight & springy, like a slinky' },
+  { value: '4B', label: '4B', description: 'A less-defined "Z"' },
+  { value: '4C', label: '4C', description: 'Like a sharply defined "Z"' },
 ]
 
 export const POROSITY_OPTIONS: { value: Porosity; label: string; description: string }[] = [
