@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
-import { PRODUCT_CATEGORY_LABELS, CG_STATUS_CONFIG } from '../lib/constants'
+import { PRODUCT_CATEGORY_LABELS, CG_STATUS_CONFIG, SCRUNCH_SCORE_CONFIG } from '../lib/constants'
 import type { ProductCategory } from '../lib/database.types'
-import { SEED_PRODUCTS } from '../data/seedProducts'
+import { SEED_PRODUCTS, computeScrunchScore } from '../data/seedProducts'
 import { ProductImage } from '../hooks/useProductImage'
 import { RequestProductForm } from '../components/products/RequestProductForm'
 
@@ -48,6 +48,7 @@ export function Products() {
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [selectedCategories, setSelectedCategories] = useState<Set<ProductCategory>>(new Set())
   const [showApprovedOnly, setShowApprovedOnly] = useState(false)
+  const [showGoodPlus, setShowGoodPlus] = useState(false)
   const [actions, setActions] = useState<ProductActions>(getStoredActions)
   const [notes, setNotes] = useState<ProductNotes>(getStoredNotes)
   const [editingNote, setEditingNote] = useState<string | null>(null)
@@ -105,12 +106,13 @@ export function Products() {
   const filteredProducts = SEED_PRODUCTS.filter(p => {
     if (selectedCategories.size > 0 && !selectedCategories.has(p.category)) return false
     if (showApprovedOnly && p.cg_status !== 'approved') return false
+    if (showGoodPlus && computeScrunchScore(p).score < 60) return false
     if (search && !`${p.brand} ${p.name}`.toLowerCase().includes(search.toLowerCase())) return false
     return true
   })
 
   const approvedCount = SEED_PRODUCTS.filter(p => p.cg_status === 'approved').length
-  const hasFilters = selectedCategories.size > 0 || showApprovedOnly || search
+  const hasFilters = selectedCategories.size > 0 || showApprovedOnly || showGoodPlus || search
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
@@ -179,11 +181,20 @@ export function Products() {
               onChange={(e) => setShowApprovedOnly(e.target.checked)}
               className="accent-violet-600 w-4 h-4"
             />
-            <span className="text-gray-600">Show CG-approved only</span>
+            <span className="text-gray-600">CG-approved only</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer text-sm">
+            <input
+              type="checkbox"
+              checked={showGoodPlus}
+              onChange={(e) => setShowGoodPlus(e.target.checked)}
+              className="accent-emerald-600 w-4 h-4"
+            />
+            <span className="text-gray-600">Score 60+ only</span>
           </label>
           {hasFilters && (
             <button
-              onClick={() => { setSearch(''); setSelectedCategories(new Set()); setShowApprovedOnly(false) }}
+              onClick={() => { setSearch(''); setSelectedCategories(new Set()); setShowApprovedOnly(false); setShowGoodPlus(false) }}
               className="text-xs text-violet-600 hover:underline cursor-pointer"
             >
               Clear all filters
@@ -211,7 +222,7 @@ export function Products() {
       {filteredProducts.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-500 mb-2">No products match your filters.</p>
-          <button onClick={() => { setSearch(''); setSelectedCategories(new Set()); setShowApprovedOnly(false) }} className="text-sm text-violet-600 hover:underline cursor-pointer">
+          <button onClick={() => { setSearch(''); setSelectedCategories(new Set()); setShowApprovedOnly(false); setShowGoodPlus(false) }} className="text-sm text-violet-600 hover:underline cursor-pointer">
             Clear filters
           </button>
         </div>
@@ -219,6 +230,8 @@ export function Products() {
         <div className="grid md:grid-cols-2 gap-4">
           {filteredProducts.map((product, i) => {
             const key = `${product.brand}::${product.name}`
+            const { score, grade } = computeScrunchScore(product)
+            const scoreConfig = SCRUNCH_SCORE_CONFIG[grade]
             return (
               <div
                 key={`${key}-${i}`}
@@ -236,9 +249,14 @@ export function Products() {
                       <p className="text-xs text-gray-500">{product.brand}</p>
                       <h3 className="font-semibold text-gray-900 text-sm leading-tight truncate">{product.name}</h3>
                     </div>
-                    <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${CG_STATUS_CONFIG[product.cg_status].bg} ${CG_STATUS_CONFIG[product.cg_status].color}`}>
-                      {CG_STATUS_CONFIG[product.cg_status].icon}
-                    </span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${CG_STATUS_CONFIG[product.cg_status].bg} ${CG_STATUS_CONFIG[product.cg_status].color}`}>
+                        {CG_STATUS_CONFIG[product.cg_status].icon}
+                      </span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${scoreConfig.bg} ${scoreConfig.color}`} title={`Scrunch Score: ${score}/100 — ${scoreConfig.description}`}>
+                        {score}
+                      </span>
+                    </div>
                   </div>
                   <p className="text-xs text-gray-500 mb-2">{PRODUCT_CATEGORY_LABELS[product.category]}</p>
                   <div className="flex gap-2">
