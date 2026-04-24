@@ -134,22 +134,28 @@ Users create a profile with their hair attributes. This is the foundation for pe
 14. **Scalp sensitivity** — "Do you have a sensitive scalp? If you experience tightness, dryness, burning, tingling, pain, itching, or redness, all that counts as sensitivity."
 
 *Treatments & History:*
-15. **Color treatment** — Virgin / Color-treated / Bleached / Highlighted
+15. **Color treatment** — "Is your hair color-treated? If any part of your hair has been lightened or darkened from your natural color, answer yes." — Yes / No — with "Fun fact" tooltip
 16. **Gray percentage** — "How much of your hair is gray? If color-treated, answer with your natural gray percentage." — None / A few grays / About half gray / All or nearly-all gray — with "Tap for pics"
-17. **Chemical treatments** — Relaxer / Keratin / Perm / None
+17. **Textural treatments** — "Has your hair undergone any textural treatments? Select all that apply, even if you're growing one out." — with "Not sure what you got?" expandable. Options: Curly hair became straight(er) [relaxer/keratin] / Straight hair became curly [perm] / Hair was smoothed & straightened for 3-5 months [keratin treatment] / None
 18. **Heat tool usage** — Never / Occasionally / Frequently
 
+*Styling Habits (from Prose — helps with product recommendations):*
+19. **Current products & tools** — "What products and styling tools do you use? Select all that apply, even ones you use infrequently." — Grouped into: CLEANSE + CONDITION (shampoo, co-wash, conditioner, deep conditioner, leave-in) / STYLING PRODUCTS + TOOLS (gel, mousse, cream, custard, oil, diffuser, plopping, denman brush) / TREATMENTS (protein, bond builder, scalp treatment) — with "Why we ask" tooltip
+20. **Styles worn** — "Do you wear any of these styles? Select all that apply." — Beachy or defined natural waves and curls / Buns, braids, ponytails, updos / Protective styles (twists, locs, braids) / Heat-styled (blowouts, straightening) / Extensions or wigs / Head wraps, turbans, scarves — with "Why we ask" tooltip
+21. **Hold preference** — "What level of hold do you prefer when styling?" — No hold / Light hold / Medium hold / Strong hold / Not sure (we'll suggest based on your hair) — with "Why we ask" tooltip
+22. **Routine preference** — "What describes your ideal hair routine?" — Quick & minimal (fewest steps) / Balanced (some effort, good results) / Full routine (I enjoy the process) / Varies by day
+
 *Lifestyle:*
-19. **Climate** — Humid / Dry / Variable / Tropical
-20. **Location** — Zip code (for humidity, water hardness, UV)
-21. **Workout frequency** — Rarely / A few times/week / Daily
-22. **Water type** — Hard / Soft / Don't know
+23. **Climate** — Humid / Dry / Variable / Tropical
+24. **Location** — Zip code (for humidity, water hardness, UV)
+25. **Workout frequency** — Rarely / A few times/week / Daily
+26. **Water type** — Hard / Soft / Don't know
 
 *Preferences & Goals:*
-23. **CGM experience** — Just starting / Under 1 year / 1-3 years / 3+ years
-24. **Hair goals** — Multi-select: moisture, definition, volume, frizz control, length retention, repair, shine, scalp health
-25. **Sensitivities** — Multi-select: fragrance, coconut, protein, sulfate, silicone, aloe
-26. **Fragrance preference** — Love it / No preference / Fragrance-free
+27. **CGM experience** — Just starting / Under 1 year / 1-3 years / 3+ years
+28. **Hair goals** — Multi-select: moisture, definition, volume, frizz control, length retention, repair, shine, scalp health
+29. **Sensitivities** — Multi-select: fragrance, coconut, protein, sulfate, silicone, aloe
+30. **Fragrance preference** — Love it / No preference / Fragrance-free
 
 **UX patterns per question:**
 - **"Why we ask"** — collapsible tooltip explaining how this affects recommendations
