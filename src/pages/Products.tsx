@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import { PRODUCT_CATEGORY_LABELS, PRODUCT_CATEGORY_DESCRIPTIONS } from '../lib/constants'
 import type { ProductCategory } from '../lib/database.types'
 import { SEED_PRODUCTS } from '../data/seedProducts'
@@ -462,26 +463,58 @@ export function Products() {
                 key={`${key}-${i}`}
                 className="flex gap-4 p-4 bg-white rounded-xl border border-gray-200 hover:border-violet-300 transition"
               >
-                <ProductImage
-                  brand={product.brand}
-                  name={product.name}
-                  seedImageUrl={product.image_url}
-                  className="w-16 h-16 shrink-0"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2 mb-1">
-                    <div className="min-w-0">
-                      <p className="text-xs text-gray-500">{product.brand}</p>
-                      <h3 className="font-semibold text-gray-900 text-sm leading-tight truncate">{product.name}</h3>
+                {isUuid(key) ? (
+                  <Link to={`/products/${product.id}`} className="flex gap-4 min-w-0 flex-1">
+                    <ProductImage
+                      brand={product.brand}
+                      name={product.name}
+                      seedImageUrl={product.image_url}
+                      className="w-16 h-16 shrink-0"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <div className="min-w-0">
+                          <p className="text-xs text-gray-500">{product.brand}</p>
+                          <h3 className="font-semibold text-gray-900 text-sm leading-tight truncate">{product.name}</h3>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${isCg ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                            {isCg ? '🟢 CG' : '🔴 Not CG'}
+                          </span>
+                          {isCf && <span className="text-xs px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600">🐰</span>}
+                          {isFragFree && <span className="text-xs px-1.5 py-0.5 rounded-full bg-violet-50 text-violet-600">🌸</span>}
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500">{PRODUCT_CATEGORY_LABELS[product.category]}</p>
                     </div>
-                    <div className="flex items-center gap-1 shrink-0">
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${isCg ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
-                        {isCg ? '🟢 CG' : '🔴 Not CG'}
-                      </span>
-                      {isCf && <span className="text-xs px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600">🐰</span>}
-                      {isFragFree && <span className="text-xs px-1.5 py-0.5 rounded-full bg-violet-50 text-violet-600">🌸</span>}
+                  </Link>
+                ) : (
+                  <>
+                    <ProductImage
+                      brand={product.brand}
+                      name={product.name}
+                      seedImageUrl={product.image_url}
+                      className="w-16 h-16 shrink-0"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <div className="min-w-0">
+                          <p className="text-xs text-gray-500">{product.brand}</p>
+                          <h3 className="font-semibold text-gray-900 text-sm leading-tight truncate">{product.name}</h3>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${isCg ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                            {isCg ? '🟢 CG' : '🔴 Not CG'}
+                          </span>
+                          {isCf && <span className="text-xs px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600">🐰</span>}
+                          {isFragFree && <span className="text-xs px-1.5 py-0.5 rounded-full bg-violet-50 text-violet-600">🌸</span>}
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500">{PRODUCT_CATEGORY_LABELS[product.category]}</p>
                     </div>
-                  </div>
+                  </>
+                )}
+                <div className="flex flex-col justify-end min-w-0">
                   <p className="text-xs text-gray-500 mb-2">{PRODUCT_CATEGORY_LABELS[product.category]}</p>
                   <div className="flex gap-2 items-center">
                     <button
