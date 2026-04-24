@@ -31,6 +31,12 @@ export function Dashboard() {
           <p className="text-xs text-gray-500">Your tried, liked, and saved products with notes</p>
         </Link>
 
+        <Link to="/recommendations" className="block p-5 bg-white rounded-xl border border-gray-200 hover:border-violet-300 hover:shadow-sm transition no-underline">
+          <div className="text-2xl mb-2">✨</div>
+          <h3 className="font-semibold text-gray-900 mb-1">For You</h3>
+          <p className="text-xs text-gray-500">Personalized product recommendations for your hair</p>
+        </Link>
+
         <Link to="/community" className="block p-5 bg-white rounded-xl border border-gray-200 hover:border-violet-300 hover:shadow-sm transition no-underline">
           <div className="text-2xl mb-2">💬</div>
           <h3 className="font-semibold text-gray-900 mb-1">Community</h3>

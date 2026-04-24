@@ -16,6 +16,7 @@ import { ProfilePage } from './pages/Profile'
 import { IngredientCheckerPage } from './pages/IngredientCheckerPage'
 import { Community } from './pages/Community'
 import { About } from './pages/About'
+import { Recommendations } from './pages/Recommendations'
 
 const queryClient = new QueryClient()
 
@@ -32,6 +33,7 @@ function AppRoutes() {
       <Route path="/products" element={<Products />} />
       <Route path="/products/:id" element={<ProductDetail />} />
       <Route path="/my-products" element={<MyProducts />} />
+      <Route path="/recommendations" element={<Recommendations />} />
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/ingredient-checker" element={<IngredientCheckerPage />} />
       <Route path="/community" element={<Community />} />

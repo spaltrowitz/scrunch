@@ -22,6 +22,9 @@ export function Header() {
           {user && (
             <Link to="/my-products" className={`no-underline ${isActive('/my-products')}`}>My Shelf</Link>
           )}
+          {user && (
+            <Link to="/recommendations" className={`no-underline ${isActive('/recommendations')}`}>For You</Link>
+          )}
           <Link to="/ingredient-checker" className={`no-underline ${isActive('/ingredient-checker')}`}>Ingredient Checker</Link>
           <Link to="/community" className={`no-underline ${isActive('/community')}`}>Community</Link>
           <Link to="/about" className={`no-underline ${isActive('/about')}`}>About</Link>
