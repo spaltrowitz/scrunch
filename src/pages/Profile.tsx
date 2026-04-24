@@ -75,25 +75,38 @@ export function ProfilePage() {
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h2 className="font-semibold text-gray-900 mb-4">Hair Profile</h2>
             <div className="grid grid-cols-2 gap-4 text-sm">
-              <ProfileField
-                label="Curl Pattern"
-                value={profile!.curl_pattern ? `${profile!.curl_pattern} — ${CURL_PATTERNS.find(c => c.value === profile!.curl_pattern)?.description}` : null}
-              />
-              <ProfileField
-                label="Porosity"
-                value={profile!.porosity ? POROSITY_OPTIONS.find(p => p.value === profile!.porosity)?.label : null}
-              />
-              <ProfileField label="Hair Density" value={profile!.hair_density} />
-              <ProfileField label="Hair Width" value={profile!.hair_width} />
-              <ProfileField label="Scalp Type" value={profile!.scalp_type} />
-              <ProfileField label="Hair Length" value={profile!.hair_length?.replace(/_/g, ' ')} />
-              <ProfileField label="Climate" value={profile!.climate} />
-              <ProfileField label="CGM Experience" value={profile!.cgm_experience?.replace(/_/g, ' ')} />
-              <ProfileField label="Heat Tools" value={profile!.heat_tool_usage?.replace(/_/g, ' ')} />
-              <ProfileField label="Workout Frequency" value={profile!.workout_frequency?.replace(/_/g, ' ')} />
-              <ProfileField label="Fragrance Preference" value={profile!.fragrance_preference?.replace(/_/g, ' ')} />
-              <ProfileField label="Color Treatment" value={profile!.color_treatment?.replace(/_/g, ' ')} />
+              {[
+                { label: 'Curl Pattern', value: profile!.curl_pattern ? `${profile!.curl_pattern} — ${CURL_PATTERNS.find(c => c.value === profile!.curl_pattern)?.description}` : null },
+                { label: 'Porosity', value: profile!.porosity ? POROSITY_OPTIONS.find(p => p.value === profile!.porosity)?.label : null },
+                { label: 'Hair Density', value: profile!.hair_density },
+                { label: 'Hair Width', value: profile!.hair_width },
+                { label: 'Hair Length', value: profile!.hair_length?.replace(/_/g, ' ') },
+                { label: 'Scalp Type', value: profile!.scalp_type },
+                { label: 'Climate', value: profile!.climate },
+                { label: 'CGM Experience', value: profile!.cgm_experience?.replace(/_/g, ' ') },
+                { label: 'Heat Tools', value: profile!.heat_tool_usage?.replace(/_/g, ' ') },
+                { label: 'Workout Frequency', value: profile!.workout_frequency?.replace(/_/g, ' ') },
+                { label: 'Fragrance Preference', value: profile!.fragrance_preference?.replace(/_/g, ' ') },
+                { label: 'Color Treatment', value: profile!.color_treatment?.replace(/_/g, ' ') },
+              ].filter(f => f.value).map(f => (
+                <ProfileField key={f.label} label={f.label} value={f.value} />
+              ))}
             </div>
+
+            {/* Count unset optional fields */}
+            {(() => {
+              const optional = [profile!.scalp_type, profile!.climate, profile!.cgm_experience, profile!.heat_tool_usage, profile!.workout_frequency, profile!.fragrance_preference, profile!.color_treatment]
+              const unsetCount = optional.filter(v => !v).length
+              if (unsetCount === 0) return null
+              return (
+                <button
+                  onClick={() => navigate('/onboarding')}
+                  className="mt-4 text-xs text-violet-600 hover:underline cursor-pointer"
+                >
+                  + Add {unsetCount} more detail{unsetCount !== 1 ? 's' : ''} for better recommendations
+                </button>
+              )
+            })()}
           </div>
 
           <div className="bg-white rounded-xl border border-gray-200 p-6">
