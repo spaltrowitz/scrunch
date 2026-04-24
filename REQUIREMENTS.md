@@ -153,8 +153,8 @@ Users create a profile with their hair attributes. This is the foundation for pe
 
 *Preferences & Goals:*
 27. **CGM experience** — Just starting / Under 1 year / 1-3 years / 3+ years
-28. **Ingredient preferences** — "Any specific haircare ingredient preferences? All Scrunch-recommended products are already free of parabens, mineral oils, and animal cruelty. Select all that apply." — Silicone-free (with "What is silicone again?" expandable) / Sulfate-free / Fragrance-free / Vegan / Protein-free / Alcohol-free / Coconut-free / Aloe-free. Multi-select with educational expandables per ingredient.
-29. **Hair goals** — "What are your hair goals?" — with "Not sure? Tap for a tip" expandable. Multi-select: moisture, definition, volume, frizz control, length retention, repair/strengthen, shine, scalp health, reduce breakage, color protection, heat protection
+28. **Ingredient preferences** — "Any specific haircare ingredient preferences? All Scrunch-recommended products are already free of parabens, mineral oils, and animal cruelty. Select all that apply." — Vegan / Silicone-free (with "What is silicone again?" expandable) / Sulfate-free / Fragrance-free / Protein-free / Coconut-free / Aloe-free. Multi-select with educational expandables per ingredient.
+29. **Hair goals** — "What are your hair goals?" — with "Not sure? Tap for a tip" expandable. Multi-select: more volume, more shine, more curl definition, less shedding, more smoothness, more hair growth, moisture, frizz control, repair/strengthen, scalp health, reduce breakage, length retention
 30. **Fragrance preference** — Love it / No preference / Fragrance-free
 
 **UX patterns per question:**
@@ -171,6 +171,25 @@ Users create a profile with their hair attributes. This is the foundation for pe
 - Gray percentage: Hair swatch photos from "a few grays" to "nearly all gray"
 - Porosity: Float test diagram or spray test animation
 - Each with "Tap for pics" expandable photo reference panel
+
+**Environmental Stressor Dashboard (technical spec):**
+
+When a user enters their zip code/location, we display a personalized dashboard showing environmental factors that affect their hair. This is a key differentiator and "wow moment" in the onboarding.
+
+| Stressor | Data Source | Free Tier? | Global? | Notes |
+|---|---|---|---|---|
+| **UV Rays** | OpenWeatherMap One Call API | Yes (1K calls/day) | ✅ Worldwide | UV index by coordinates |
+| **Pollution** | OpenWeatherMap Air Pollution API | Yes (1K calls/day) | ✅ Worldwide | PM2.5, AQI by coordinates |
+| **Humidity** | OpenWeatherMap Weather API | Yes (1K calls/day) | ✅ Worldwide | Average humidity by coordinates |
+| **Water Hardness** | USGS Water Quality API (US) | Yes | ❌ US only | Most impactful for curly hair. Outside US: show "Unknown — check with your local water utility" |
+| **Wind** | OpenWeatherMap Weather API | Yes (1K calls/day) | ✅ Worldwide | Average wind speed |
+
+**Implementation approach:**
+- **Phase 1 (US):** OpenWeatherMap (free API key needed — you'd sign up at openweathermap.org) + USGS for water hardness. Covers all 5 stressors in the US.
+- **Phase 2 (Global):** UV/pollution/humidity/wind work globally via OpenWeatherMap. Water hardness is US-only initially — for international users, show 4/5 stressors with a note about checking local water utility.
+- **Caching:** Cache environmental data per zip code in Supabase (data doesn't change frequently). Re-fetch monthly.
+- **Score normalization:** Convert raw API values to 0-100 scores for easy display (e.g., UV index 8 → 72/100, humidity 85% → 85/100)
+- **API key needed:** You'll need a free OpenWeatherMap API key. Sign up at https://openweathermap.org/api — free tier gives 1,000 calls/day which is plenty.
 
 ### F2: Product Database
 
