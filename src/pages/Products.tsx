@@ -125,12 +125,20 @@ export function Products() {
       if (cancelled || !data) return
       const reviewActions: ProductActions = {}
       const reviewNotes: ProductNotes = {}
+      const reviewRatings: ProductRatings = {}
       for (const review of data) {
         const key = review.product_id
         reviewActions[key] = new Set()
         if (review.status) reviewActions[key].add('tried')
-        if (review.rating != null && review.rating >= 4) reviewActions[key].add('tried')
+        if (review.rating != null) reviewActions[key].add('tried')
         if (review.results_notes) reviewNotes[key] = review.results_notes
+        // Sync rating label from Supabase
+        if (review.rating != null) {
+          if (review.rating >= 5) reviewRatings[key] = 'loved'
+          else if (review.rating >= 4) reviewRatings[key] = 'liked'
+          else if (review.rating >= 2) reviewRatings[key] = 'ok'
+          else reviewRatings[key] = 'disliked'
+        }
       }
       // Preserve localStorage bookmarks
       const stored = getStoredActions()
@@ -142,6 +150,7 @@ export function Products() {
       }
       setActions(reviewActions)
       setNotes(prev => ({ ...prev, ...reviewNotes }))
+      setRatings(prev => ({ ...prev, ...reviewRatings }))
     }
     loadReviews()
     return () => { cancelled = true }

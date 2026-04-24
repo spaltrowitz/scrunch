@@ -259,15 +259,7 @@ export function Recommendations() {
             {profile?.curl_pattern ? 'Based on what works for people with similar hair' : 'Top-rated CG-approved products you haven\'t tried yet'}
           </p>
 
-          {recommendedProducts.length === 0 ? (
-            <div className="py-6 text-center">
-              <p className="text-gray-500 text-sm mb-2">
-                We're building recommendations for your hair type — more users with similar hair will unlock better suggestions.
-              </p>
-              <p className="text-xs text-gray-400">In the meantime, browse our top-scored CG-approved products below.</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
+          <div className="space-y-3">
               {recommendedProducts.map(product => {
                 const { grade, score } = computeScrunchScore(product)
                 const scoreConfig = SCRUNCH_SCORE_CONFIG[grade]
@@ -309,7 +301,6 @@ export function Recommendations() {
                 )
               })}
             </div>
-          )}
         </section>
       )}
 

@@ -24,7 +24,7 @@ export function MyProducts() {
       .eq('user_id', user!.id)
       .order('created_at', { ascending: false })
 
-    setReviews((data as ReviewWithProduct[] | null) ?? [])
+    setReviews(((data as ReviewWithProduct[] | null) ?? []).filter(r => r.products != null))
     setLoading(false)
   }
 
@@ -65,7 +65,7 @@ export function MyProducts() {
                 <p className="text-xs text-gray-500">{review.products.brand}</p>
                 <h3 className="font-semibold text-gray-900 truncate">{review.products.name}</h3>
                 <p className="text-xs text-gray-500">
-                  {PRODUCT_CATEGORY_LABELS[review.products.category]} · {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
+                  {PRODUCT_CATEGORY_LABELS[review.products.category]}{review.rating != null && <> · {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</>}
                 </p>
               </div>
               <div className="text-right shrink-0">
@@ -75,7 +75,7 @@ export function MyProducts() {
                 }`}>
                   {review.would_repurchase === 'yes' ? '👍 Repurchase' : review.would_repurchase === 'no' ? '👎 Nope' : '🤔 Maybe'}
                 </span>
-                <p className="text-xs text-gray-400 mt-1">{review.status.replace(/_/g, ' ')}</p>
+                {review.status && <p className="text-xs text-gray-400 mt-1">{review.status.replace(/_/g, ' ')}</p>}
               </div>
             </Link>
           ))}
