@@ -268,8 +268,23 @@ export const SEED_PRODUCTS: SeedProduct[] = [
   // REDDIT-SOURCED PRODUCTS (r/curlyhair & r/curlygirl community picks)
   // ══════════════════════════════════════════════════════════════════════
 
-  // ── CLARIFYING SHAMPOO (Reddit) ─────────────────────────────────────
+  // ── CLARIFYING SHAMPOO ─────────────────────────────────────────────
   { brand: 'Acure', name: 'Curiously Clarifying Shampoo', category: 'clarifying_shampoo', cg_status: 'approved', cruelty_free: 'yes', notes: 'LB/PETA. Contains sodium coco-sulfate (gentle sulfate, suitable for clarifying use)', image_url: 'https://target.scene7.com/is/image/Target/GUEST_bb389b7c-b2c1-4c1e-b53d-f2c13bd3b4b4' },
+  { brand: 'Aveda', name: 'Rosemary Mint Purifying Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: null, notes: 'Contains sulfate (intentional for clarifying)', image_url: null },
+  { brand: 'Bumble and Bumble', name: 'Sunday Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: 'yes', notes: 'Contains sulfate (intentional for clarifying)', image_url: null },
+  { brand: 'Garnier', name: 'Pure Clean Clarifying Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: null, notes: 'Contains sulfate and drying alcohol', image_url: null },
+  { brand: 'Giovanni', name: '50:50 Balanced Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: null, notes: 'Contains sulfate', image_url: null },
+  { brand: 'Kinky Curly', name: 'Come Clean Shampoo', category: 'clarifying_shampoo', cg_status: 'approved', cruelty_free: 'yes', notes: 'Chelating (sulfate-free clarifier)', image_url: null },
+  { brand: 'Kristin Ess', name: 'Deep Clean Clarifying Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: null, notes: 'Contains sulfate', image_url: null },
+  { brand: 'Malibu C', name: 'Hard Water Wellness Shampoo', category: 'clarifying_shampoo', cg_status: 'approved', cruelty_free: 'yes', notes: 'Chelating (sulfate-free)', image_url: null },
+  { brand: 'Malibu C', name: 'Un-Do-Goo pH 9 Shampoo', category: 'clarifying_shampoo', cg_status: 'approved', cruelty_free: 'yes', notes: null, image_url: null },
+  { brand: 'Noughty', name: 'Detox Dynamo Shampoo', category: 'clarifying_shampoo', cg_status: 'approved', cruelty_free: null, notes: 'Chelating (sulfate-free)', image_url: null },
+  { brand: 'Ouai', name: 'Detox Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: null, notes: 'Chelating. Contains drying alcohol', image_url: null },
+  { brand: 'Ouidad', name: 'Water Works Clarifying Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: null, notes: 'Chelating. Contains sulfate and drying alcohol', image_url: null },
+  { brand: "Sally's", name: 'Ion Hard Water Shampoo', category: 'clarifying_shampoo', cg_status: 'approved', cruelty_free: 'unclear', notes: 'Chelating', image_url: null },
+  { brand: 'Suave', name: 'Essentials Daily Clarifying Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: 'yes', notes: 'Suave Naturally Derived are NOT clarifying. Contains sulfate', image_url: null },
+  { brand: 'Twist by Ouidad', name: 'Hit Reset Clarifying Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: null, notes: 'Contains sulfate and drying alcohol', image_url: null },
+  { brand: 'VO5', name: 'Clarifying Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: 'no', notes: 'NOT 2- or 3-in-one. Contains sulfate', image_url: null },
 
   // ── LOW POO (Reddit) ────────────────────────────────────────────────
   { brand: 'Inahsi Naturals', name: 'Soothing Mint Gentle Cleansing Shampoo', category: 'low_poo', cg_status: 'approved', cruelty_free: 'yes', notes: 'Black-owned. Sulfate-free, vegan', image_url: null },

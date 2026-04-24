@@ -62,6 +62,7 @@ export function Products() {
   const [selectedCategories, setSelectedCategories] = useState<Set<ProductCategory>>(new Set())
   const [showApprovedOnly, setShowApprovedOnly] = useState(false)
   const [showGoodPlus, setShowGoodPlus] = useState(false)
+  const [showScoreInfo, setShowScoreInfo] = useState(false)
   const [actions, setActions] = useState<ProductActions>(getStoredActions)
   const [ratings, setRatings] = useState<ProductRatings>(() => {
     try { return JSON.parse(localStorage.getItem('scrunch_ratings') || '{}') } catch { return {} }
@@ -367,7 +368,39 @@ export function Products() {
               className="accent-emerald-600 w-4 h-4"
             />
             <span className="text-gray-600">Score 60+ only</span>
+            <button
+              type="button"
+              onClick={() => setShowScoreInfo(v => !v)}
+              className="text-gray-400 hover:text-violet-600 cursor-pointer text-xs"
+              title="What is the Scrunch Score?"
+            >
+              ⓘ
+            </button>
           </label>
+          {showScoreInfo && (
+            <div className="w-full bg-white border border-violet-200 rounded-lg p-4 text-xs text-gray-600 space-y-2 mt-1">
+              <p className="font-semibold text-gray-900 text-sm">What is the Scrunch Score?</p>
+              <p>Every product starts at 100 and gets adjusted based on its ingredients and certifications:</p>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                <span>🟢 CG-approved</span><span className="text-green-600">No penalty</span>
+                <span>🔴 Not CG-approved</span><span className="text-red-600">−40 points</span>
+                <span>Contains silicone</span><span className="text-red-600">−20 points</span>
+                <span>Contains sulfate</span><span className="text-red-600">−20 points</span>
+                <span>Drying alcohol</span><span className="text-red-600">−15 points</span>
+                <span>Mineral oil</span><span className="text-red-600">−15 points</span>
+                <span>Contains wax</span><span className="text-red-600">−10 points</span>
+                <span>🐰 Cruelty-free</span><span className="text-green-600">+5 points</span>
+                <span>Fragrance-free</span><span className="text-green-600">+3 points</span>
+              </div>
+              <div className="flex gap-3 pt-1">
+                <span className="text-emerald-600 font-medium">80+ Excellent</span>
+                <span className="text-green-600 font-medium">60+ Good</span>
+                <span className="text-amber-600 font-medium">40+ Fair</span>
+                <span className="text-red-600 font-medium">&lt;40 Poor</span>
+              </div>
+              <p className="text-gray-400">Hover over any product's score to see its specific breakdown.</p>
+            </div>
+          )}
           {hasFilters && (
             <button
               onClick={() => { setSearch(''); setSelectedCategories(new Set()); setShowApprovedOnly(false); setShowGoodPlus(false) }}

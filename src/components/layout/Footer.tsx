@@ -8,6 +8,9 @@ export function Footer() {
         <p>
           Built with data from the curly hair community. Not affiliated with any brand.
         </p>
+        <p className="mt-2">
+          <a href="#/terms" className="text-gray-400 hover:text-violet-600 text-xs">Terms & Disclaimers</a>
+        </p>
       </div>
     </footer>
   )
