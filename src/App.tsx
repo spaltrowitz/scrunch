@@ -15,6 +15,7 @@ import { MyProducts } from './pages/MyProducts'
 import { ProfilePage } from './pages/Profile'
 import { IngredientCheckerPage } from './pages/IngredientCheckerPage'
 import { Credits } from './pages/Credits'
+import { Community } from './pages/Community'
 
 const queryClient = new QueryClient()
 
@@ -37,6 +38,7 @@ function App() {
                 <Route path="/my-products" element={<MyProducts />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/ingredient-checker" element={<IngredientCheckerPage />} />
+                <Route path="/community" element={<Community />} />
                 <Route path="/credits" element={<Credits />} />
               </Routes>
             </main>
