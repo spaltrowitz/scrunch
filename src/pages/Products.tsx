@@ -8,7 +8,7 @@ import { RequestProductForm } from '../components/products/RequestProductForm'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth'
 
-type TriedRating = 'loved' | 'ok' | 'disliked'
+type TriedRating = 'loved' | 'liked' | 'ok' | 'disliked'
 type ProductAction = 'tried' | 'bookmarked'
 type ProductActions = Record<string, Set<ProductAction>>
 type ProductRatings = Record<string, TriedRating>
@@ -234,8 +234,8 @@ export function Products() {
 
     // Persist to Supabase
     if (user && isUuid(key)) {
-      const ratingMap: Record<TriedRating, number> = { loved: 5, ok: 3, disliked: 1 }
-      const repurchaseMap: Record<TriedRating, string> = { loved: 'yes', ok: 'maybe', disliked: 'no' }
+      const ratingMap: Record<TriedRating, number> = { loved: 5, liked: 4, ok: 3, disliked: 1 }
+      const repurchaseMap: Record<TriedRating, string> = { loved: 'yes', liked: 'yes', ok: 'maybe', disliked: 'no' }
       supabase.from('product_reviews').upsert({
         user_id: user.id,
         product_id: key,
@@ -472,14 +472,16 @@ export function Products() {
                       className={`text-xs px-2.5 py-1 rounded-full border cursor-pointer transition ${
                         hasAction(key, 'tried')
                           ? ratings[key] === 'loved' ? 'bg-green-100 border-green-300 text-green-700'
+                            : ratings[key] === 'liked' ? 'bg-emerald-100 border-emerald-300 text-emerald-700'
                             : ratings[key] === 'disliked' ? 'bg-red-100 border-red-300 text-red-700'
                             : 'bg-amber-100 border-amber-300 text-amber-700'
                           : 'border-gray-200 text-gray-500 hover:border-gray-300'
                       }`}
                     >
                       {hasAction(key, 'tried')
-                        ? ratings[key] === 'loved' ? '👍 Loved it'
-                          : ratings[key] === 'disliked' ? '👎 Didn\'t work'
+                        ? ratings[key] === 'loved' ? '💚 Loved it'
+                          : ratings[key] === 'liked' ? '👍 Liked it'
+                          : ratings[key] === 'disliked' ? '👎 Didn\'t like'
                           : '😐 It was ok'
                         : 'Tried it?'}
                     </button>
@@ -501,13 +503,16 @@ export function Products() {
                       <p className="text-xs font-medium text-gray-700 mb-2">How was it for your hair?</p>
                       <div className="flex gap-2">
                         <button onClick={() => submitRating(key, 'loved')} className="flex-1 text-xs py-2 bg-green-100 text-green-700 rounded-lg border border-green-200 hover:bg-green-200 cursor-pointer font-medium">
-                          👍 Loved it
+                          💚 Loved it
+                        </button>
+                        <button onClick={() => submitRating(key, 'liked')} className="flex-1 text-xs py-2 bg-emerald-100 text-emerald-700 rounded-lg border border-emerald-200 hover:bg-emerald-200 cursor-pointer font-medium">
+                          👍 Liked it
                         </button>
                         <button onClick={() => submitRating(key, 'ok')} className="flex-1 text-xs py-2 bg-amber-100 text-amber-700 rounded-lg border border-amber-200 hover:bg-amber-200 cursor-pointer font-medium">
                           😐 It was ok
                         </button>
                         <button onClick={() => submitRating(key, 'disliked')} className="flex-1 text-xs py-2 bg-red-100 text-red-700 rounded-lg border border-red-200 hover:bg-red-200 cursor-pointer font-medium">
-                          👎 Nope
+                          👎 Didn't like
                         </button>
                       </div>
                       <button onClick={() => setRatingPopup(null)} className="text-xs text-gray-400 mt-2 hover:text-gray-600 cursor-pointer">Cancel</button>
