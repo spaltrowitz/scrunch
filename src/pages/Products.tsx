@@ -71,7 +71,6 @@ export function Products() {
   const [notes, setNotes] = useState<ProductNotes>(getStoredNotes)
   const [editingNote, setEditingNote] = useState<string | null>(null)
   const [showRequestForm, setShowRequestForm] = useState(false)
-  const [isBeginner, setIsBeginner] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
 
   // Load products from Supabase, fall back to SEED_PRODUCTS
@@ -129,7 +128,7 @@ export function Products() {
         const key = review.product_id
         reviewActions[key] = new Set()
         if (review.status) reviewActions[key].add('tried')
-        if (review.rating != null && review.rating >= 4) reviewActions[key].add('liked')
+        if (review.rating != null && review.rating >= 4) reviewActions[key].add('tried')
         if (review.results_notes) reviewNotes[key] = review.results_notes
       }
       // Preserve localStorage bookmarks
@@ -449,8 +448,8 @@ export function Products() {
             const key = productKey(product)
             const isCg = product.cg_status === 'approved'
             const isCf = product.cruelty_free === 'yes'
-            const notes = (product.notes || '').toLowerCase()
-            const isFragFree = notes.includes('fragrance-free') || notes.includes('fragrance free')
+            const productNotes = (product.notes || '').toLowerCase()
+            const isFragFree = productNotes.includes('fragrance-free') || productNotes.includes('fragrance free')
             return (
               <div
                 key={`${key}-${i}`}

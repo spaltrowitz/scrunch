@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 export function Footer() {
   return (
     <footer className="border-t border-gray-200 bg-gray-50 py-8 mt-auto">
@@ -9,7 +11,7 @@ export function Footer() {
           Built with data from the curly hair community. Not affiliated with any brand.
         </p>
         <p className="mt-2">
-          <a href="#/terms" className="text-gray-400 hover:text-violet-600 text-xs">Terms & Disclaimers</a>
+          <Link to="/terms" className="text-gray-400 hover:text-violet-600 text-xs no-underline">Terms & Disclaimers</Link>
         </p>
       </div>
     </footer>

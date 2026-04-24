@@ -119,6 +119,23 @@ export function OnboardingWizard() {
     if (!error) navigate('/profile')
   }
 
+  if (!user) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-lg text-center">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Sign in to set up your hair profile</h2>
+          <p className="text-sm text-gray-500 mb-6">Create an account or sign in to save your hair profile and get personalized recommendations.</p>
+          <button
+            onClick={() => navigate('/login')}
+            className="px-6 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 cursor-pointer"
+          >
+            Sign In →
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   if (loadingProfile) return <div className="text-center py-12 text-gray-500">Loading...</div>
 
   const OptionButton = ({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: React.ReactNode }) => (

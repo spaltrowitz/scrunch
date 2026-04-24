@@ -28,6 +28,16 @@ export function MyProducts() {
     setLoading(false)
   }
 
+  if (!user) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-12 text-center">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">My Products</h1>
+        <p className="text-gray-600 mb-4">Sign in to see your product shelf.</p>
+        <Link to="/login" className="text-violet-600 hover:underline">Sign in →</Link>
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
       <h1 className="text-2xl font-bold text-gray-900 mb-2">My Products</h1>
