@@ -234,10 +234,10 @@ export function Recommendations() {
             <p className="text-sm text-gray-500">The more you rate, the better your recommendations get</p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {popularProducts
               .filter(p => !ratedProductIds.has(p.id))
-              .slice(0, 12)
+              .slice(0, 6)
               .map(product => (
                 <QuickRateCard
                   key={product.id}
