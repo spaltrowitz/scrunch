@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { PRODUCT_CATEGORY_LABELS, SCRUNCH_SCORE_CONFIG } from '../lib/constants'
+import { PRODUCT_CATEGORY_LABELS, PRODUCT_CATEGORY_DESCRIPTIONS, SCRUNCH_SCORE_CONFIG } from '../lib/constants'
 import type { ProductCategory } from '../lib/database.types'
 import { SEED_PRODUCTS, computeScrunchScore } from '../data/seedProducts'
 import type { SeedProduct } from '../data/seedProducts'
@@ -63,6 +63,7 @@ export function Products() {
   const [showApprovedOnly, setShowApprovedOnly] = useState(false)
   const [showGoodPlus, setShowGoodPlus] = useState(false)
   const [showScoreInfo, setShowScoreInfo] = useState(false)
+  const [brandFilter, setBrandFilter] = useState('')
   const [actions, setActions] = useState<ProductActions>(getStoredActions)
   const [ratings, setRatings] = useState<ProductRatings>(() => {
     try { return JSON.parse(localStorage.getItem('scrunch_ratings') || '{}') } catch { return {} }
@@ -71,6 +72,7 @@ export function Products() {
   const [notes, setNotes] = useState<ProductNotes>(getStoredNotes)
   const [editingNote, setEditingNote] = useState<string | null>(null)
   const [showRequestForm, setShowRequestForm] = useState(false)
+  const [isBeginner, setIsBeginner] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
 
   // Load products from Supabase, fall back to SEED_PRODUCTS
@@ -168,6 +170,7 @@ export function Products() {
     : []
 
   const toggleCategory = (cat: ProductCategory) => {
+    setSearch('') // Clear search text when changing categories
     setSelectedCategories(prev => {
       const next = new Set(prev)
       if (next.has(cat)) next.delete(cat)
@@ -273,16 +276,21 @@ export function Products() {
 
   const filteredProducts = products.filter(p => {
     if (selectedCategories.size > 0 && !selectedCategories.has(p.category)) return false
+    if (brandFilter && p.brand !== brandFilter) return false
     if (showApprovedOnly && p.cg_status !== 'approved') return false
     if (showGoodPlus && computeScrunchScore(p).score < 60) return false
     if (search && !`${p.brand} ${p.name}`.toLowerCase().includes(search.toLowerCase())) return false
     return true
   })
 
+  const allBrands = useMemo(() =>
+    Array.from(new Set(products.map(p => p.brand))).sort()
+  , [products])
+
   const approvedCount = products.filter(p => p.cg_status === 'approved').length
   const userRatingCount = Object.keys(ratings).length
   const ratingsNeeded = Math.max(0, 10 - userRatingCount)
-  const hasFilters = selectedCategories.size > 0 || showApprovedOnly || showGoodPlus || search
+  const hasFilters = selectedCategories.size > 0 || showApprovedOnly || showGoodPlus || search || brandFilter
 
   if (loading) {
     return (
@@ -342,7 +350,7 @@ export function Products() {
         )}
       </div>
 
-      {/* Category chips — multi-select */}
+      {/* Category chips — multi-select with tooltips */}
       <div className="mb-4">
         <div className="flex flex-wrap gap-2">
           {Object.entries(PRODUCT_CATEGORY_LABELS).map(([value, label]) => {
@@ -353,6 +361,7 @@ export function Products() {
               <button
                 key={value}
                 onClick={() => toggleCategory(cat)}
+                title={PRODUCT_CATEGORY_DESCRIPTIONS[cat]}
                 className={`text-xs px-3 py-1.5 rounded-full border cursor-pointer transition ${
                   isSelected
                     ? 'bg-violet-100 border-violet-300 text-violet-700 font-medium'
@@ -364,6 +373,20 @@ export function Products() {
             )
           })}
         </div>
+      </div>
+
+      {/* Brand filter */}
+      <div className="flex flex-wrap gap-3 mb-4">
+        <select
+          value={brandFilter}
+          onChange={(e) => setBrandFilter(e.target.value)}
+          className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white"
+        >
+          <option value="">All Brands ({allBrands.length})</option>
+          {allBrands.map(brand => (
+            <option key={brand} value={brand}>{brand}</option>
+          ))}
+        </select>
       </div>
 
       {/* Approved toggle + count */}
@@ -421,7 +444,7 @@ export function Products() {
           )}
           {hasFilters && (
             <button
-              onClick={() => { setSearch(''); setSelectedCategories(new Set()); setShowApprovedOnly(false); setShowGoodPlus(false) }}
+              onClick={() => { setSearch(''); setSelectedCategories(new Set()); setShowApprovedOnly(false); setShowGoodPlus(false); setBrandFilter('') }}
               className="text-xs text-violet-600 hover:underline cursor-pointer"
             >
               Clear all filters
@@ -449,7 +472,7 @@ export function Products() {
       {filteredProducts.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-500 mb-2">No products match your filters.</p>
-          <button onClick={() => { setSearch(''); setSelectedCategories(new Set()); setShowApprovedOnly(false); setShowGoodPlus(false) }} className="text-sm text-violet-600 hover:underline cursor-pointer">
+          <button onClick={() => { setSearch(''); setSelectedCategories(new Set()); setShowApprovedOnly(false); setShowGoodPlus(false); setBrandFilter('') }} className="text-sm text-violet-600 hover:underline cursor-pointer">
             Clear filters
           </button>
         </div>

@@ -35,6 +35,23 @@ export const PRODUCT_CATEGORY_LABELS: Record<ProductCategory, string> = {
   scalp_treatment: 'Scalp Treatment',
 }
 
+export const PRODUCT_CATEGORY_DESCRIPTIONS: Record<ProductCategory, string> = {
+  clarifying_shampoo: 'Contains sulfates to remove buildup. Use as your first wash when starting CG, then infrequently as needed.',
+  low_poo: 'Gentle, sulfate-free shampoo. Good for low porosity, fine hair, and loose curls that need cleansing without stripping.',
+  co_wash: 'Conditioner-based cleansing — replaces shampoo in the CG method. Great for high porosity, coarse, and tight curls.',
+  rinse_out_conditioner: 'Standard conditioner for detangling and moisture. Almost everyone benefits from these. Can double as co-wash or leave-in.',
+  deep_conditioner: 'Intensive treatment applied for minutes to an hour. Best for high porosity, damaged, or dry-climate hair. May contain protein.',
+  leave_in_conditioner: 'Applied after washing, not rinsed out. Adds lasting moisture without hold. Also called "milks" or "sprays."',
+  curl_cream: 'Heavier alternative to leave-in conditioner. Ultra conditioning with light hold. Some overlap with curl enhancers.',
+  gel: '#1 recommended styler! Provides hold, increases definition, and reduces frizz. Don\'t forget to scrunch out the crunch (SOTC).',
+  mousse: 'Lightweight alternative to gel. Great for low porosity, fine, or low density hair. Softer look than gel.',
+  custard: 'Jelly-like texture that provides hold similar to gel. Some work as "one and done" stylers. Curl enhancers promote tighter curls.',
+  oil_serum: 'Used to seal moisture (SOTC) or as a pre-poo. Look for pure, cold-pressed oils. Always check labels — many contain silicones.',
+  spray_refresher: 'Revives curls between wash days or provides flexible hold. Virtually weightless.',
+  protein_treatment: 'Helps curls "bounce back." Best for high porosity, fine, or damaged hair. Use when curls feel mushy or lack elasticity.',
+  scalp_treatment: 'Products specifically targeting scalp health — dryness, flakiness, irritation, or buildup.',
+}
+
 export const HAIR_GOALS = [
   'more_volume',
   'more_shine',
