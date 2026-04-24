@@ -2,13 +2,160 @@ import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth'
-import { PRODUCT_CATEGORY_LABELS, SCRUNCH_SCORE_CONFIG } from '../lib/constants'
-import type { Product, ProductReview, Profile } from '../lib/database.types'
-import { computeScrunchScore } from '../data/seedProducts'
+import { PRODUCT_CATEGORY_LABELS } from '../lib/constants'
+import type { Product, ProductReview, Profile, ProductCategory, CurlPattern, Porosity } from '../lib/database.types'
 import { ProductImage } from '../hooks/useProductImage'
 import { QuickRateCard } from '../components/products/QuickRateCard'
 
-const MIN_RATINGS = 10
+// ---------------------------------------------------------------------------
+// Tier helpers
+// ---------------------------------------------------------------------------
+
+type Tier = 1 | 2 | 3 | 4
+
+function determineTier(
+  profile: Profile | null,
+  ratingCount: number,
+  hasSimilarUsers: boolean,
+): Tier {
+  const profileDone = profile?.onboarding_completed && !!profile.curl_pattern
+  if (!profileDone) return 1
+  if (ratingCount < 5) return 2
+  if (hasSimilarUsers) return 4
+  return 3
+}
+
+// Categories prioritised per curl-pattern band
+const CURL_CATEGORY_PRIORITY: Record<string, ProductCategory[]> = {
+  wavy:       ['mousse', 'gel', 'low_poo'],
+  wavy_curly: ['gel', 'leave_in_conditioner', 'curl_cream'],
+  curly:      ['curl_cream', 'gel', 'custard', 'deep_conditioner'],
+  coily:      ['curl_cream', 'custard', 'oil_serum', 'deep_conditioner', 'co_wash'],
+}
+
+function curlBand(cp: CurlPattern): string {
+  if (cp === '2A' || cp === '2B') return 'wavy'
+  if (cp === '2C' || cp === '3A') return 'wavy_curly'
+  if (cp === '3B' || cp === '3C') return 'curly'
+  return 'coily' // 4A-4C
+}
+
+const LIGHTWEIGHT_CATEGORIES: ProductCategory[] = ['mousse', 'gel', 'spray_refresher']
+const HEAVY_MOISTURE_CATEGORIES: ProductCategory[] = ['deep_conditioner', 'oil_serum', 'curl_cream']
+
+function porosityBoost(porosity: Porosity, category: ProductCategory): number {
+  if (porosity === 'low' && (LIGHTWEIGHT_CATEGORIES as string[]).includes(category)) return 2
+  if (porosity === 'high' && (HEAVY_MOISTURE_CATEGORIES as string[]).includes(category)) return 2
+  return 0
+}
+
+// Tier 1: pick ~3 from each major category for variety
+const TIER1_CATEGORIES: ProductCategory[] = [
+  'low_poo', 'rinse_out_conditioner', 'leave_in_conditioner',
+  'curl_cream', 'gel', 'mousse', 'deep_conditioner',
+]
+
+function buildTier1(products: Product[]): Product[] {
+  const approved = products.filter(p => p.cg_status === 'approved')
+  const result: Product[] = []
+  for (const cat of TIER1_CATEGORIES) {
+    const catProducts = approved
+      .filter(p => p.category === cat && !result.some(r => r.id === p.id))
+      .slice(0, 3)
+    result.push(...catProducts)
+  }
+  return result.slice(0, 20)
+}
+
+function buildTier2(
+  products: Product[],
+  curlPattern: CurlPattern,
+  porosity: Porosity,
+  ratedIds: Set<string>,
+): Product[] {
+  const approved = products.filter(
+    p => p.cg_status === 'approved' && !ratedIds.has(p.id),
+  )
+  const band = curlBand(curlPattern)
+  const priorities = CURL_CATEGORY_PRIORITY[band] ?? []
+
+  const scored = approved.map(p => {
+    let s = 0
+    const idx = priorities.indexOf(p.category)
+    if (idx !== -1) s += (priorities.length - idx) * 3
+    s += porosityBoost(porosity, p.category)
+    return { ...p, _score: s }
+  })
+
+  scored.sort((a, b) => b._score - a._score)
+  return scored.slice(0, 20)
+}
+
+function buildTier3(
+  allProducts: Product[],
+  reviews: (ProductReview & { products: Product })[],
+  ratedIds: Set<string>,
+): Product[] {
+  const loved = reviews.filter(r => r.rating != null && r.rating >= 4)
+  const disliked = reviews.filter(r => r.rating != null && r.rating <= 2)
+
+  // Count loved / disliked categories
+  const lovedCats: Record<string, number> = {}
+  for (const r of loved) {
+    const cat = r.products.category
+    lovedCats[cat] = (lovedCats[cat] || 0) + 1
+  }
+  const dislikedCats = new Set(disliked.map(r => r.products.category))
+
+  const candidates = allProducts.filter(p => !ratedIds.has(p.id))
+
+  const scored = candidates.map(p => {
+    let s = 0
+    if (lovedCats[p.category]) s += lovedCats[p.category] * 5
+    if (dislikedCats.has(p.category)) s -= 10
+    if (p.cg_status === 'approved') s += 3
+    s += Math.min(p.review_count, 10) // popularity tiebreaker
+    return { ...p, _score: s }
+  })
+
+  scored.sort((a, b) => b._score - a._score)
+  return scored.slice(0, 20)
+}
+
+// ---------------------------------------------------------------------------
+// Header / subtitle per tier
+// ---------------------------------------------------------------------------
+
+function tierHeader(tier: Tier, profile: Profile | null): { title: string; subtitle: string } {
+  switch (tier) {
+    case 1:
+      return {
+        title: 'Popular CG-Approved Products',
+        subtitle: 'Complete your hair profile to get personalized recommendations',
+      }
+    case 2:
+      return {
+        title: `Recommended for your ${profile?.curl_pattern} ${profile?.porosity} hair`,
+        subtitle: 'Based on what typically works for your hair type',
+      }
+    case 3:
+      return {
+        title: 'Recommended for you',
+        subtitle: 'Based on your ratings and hair profile',
+      }
+    case 4:
+      return {
+        title: `People with ${profile?.curl_pattern} ${profile?.porosity} hair who like similar products also loved\u2026`,
+        subtitle: 'Based on your ratings and hair profile',
+      }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
+
+const MIN_RATINGS_FOR_ADVANCED = 5
 
 export function Recommendations() {
   const { user } = useAuth()
@@ -16,21 +163,31 @@ export function Recommendations() {
   const [userReviews, setUserReviews] = useState<(ProductReview & { products: Product })[]>([])
   const [popularProducts, setPopularProducts] = useState<Product[]>([])
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([])
+  const [tier, setTier] = useState<Tier>(1)
   const [loading, setLoading] = useState(true)
   const [ratingCount, setRatingCount] = useState(0)
-  const [showCelebration, setShowCelebration] = useState(false)
+  const [showRatingPopup, setShowRatingPopup] = useState<string | null>(null)
 
   const ratedProductIds = new Set(userReviews.map(r => r.product_id))
+
+  // ----- data loading -----
 
   const loadData = useCallback(async () => {
     if (!user) return
     setLoading(true)
 
-    // Load profile, user reviews, and popular products in parallel
     const [profileRes, reviewsRes, productsRes] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', user.id).single(),
-      supabase.from('product_reviews').select('*, products(*)').eq('user_id', user.id).order('created_at', { ascending: false }),
-      supabase.from('products').select('*').order('review_count', { ascending: false }).limit(24),
+      supabase
+        .from('product_reviews')
+        .select('*, products(*)')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('products')
+        .select('*')
+        .order('review_count', { ascending: false })
+        .limit(200),
     ])
 
     const userProfile = profileRes.data as unknown as Profile | null
@@ -42,113 +199,149 @@ export function Recommendations() {
     setRatingCount(reviews.length)
     setPopularProducts(products)
 
-    // Load recommendations if profile is complete (curl pattern + porosity)
-    if (userProfile?.curl_pattern && userProfile?.porosity) {
-      await loadRecommendations(userProfile, reviews)
-    } else if (reviews.length > 0) {
-      // Even without full profile, show fallback recommendations
-      await loadRecommendations(userProfile || {} as Profile, reviews)
+    const ratedIds = new Set(reviews.map(r => r.product_id))
+    const reviewsWithRating = reviews.filter(r => r.rating != null)
+
+    // Determine tier & build recommendations
+    const profileDone = userProfile?.onboarding_completed && !!userProfile.curl_pattern
+    let currentTier: Tier = 1
+    let recs: Product[] = []
+
+    if (!profileDone) {
+      // Tier 1
+      currentTier = 1
+      recs = buildTier1(products)
+    } else if (reviewsWithRating.length < MIN_RATINGS_FOR_ADVANCED) {
+      // Tier 2
+      currentTier = 2
+      recs = buildTier2(products, userProfile!.curl_pattern!, userProfile!.porosity!, ratedIds)
+    } else {
+      // Tier 3 or 4 — check for similar users
+      const { collabRecs, hasSimilarUsers } = await loadCollaborativeRecs(
+        userProfile!,
+        reviews,
+        ratedIds,
+      )
+      if (hasSimilarUsers && collabRecs.length > 0) {
+        currentTier = 4
+        const tier3 = buildTier3(products, reviews, ratedIds)
+        // Blend: collab first, then tier3 fill, dedupe
+        const seen = new Set(collabRecs.map(p => p.id))
+        const blended = [...collabRecs]
+        for (const p of tier3) {
+          if (!seen.has(p.id)) {
+            blended.push(p)
+            seen.add(p.id)
+          }
+        }
+        recs = blended.slice(0, 20)
+      } else {
+        currentTier = 3
+        recs = buildTier3(products, reviews, ratedIds)
+      }
     }
 
+    setTier(currentTier)
+    setRecommendedProducts(recs)
     setLoading(false)
   }, [user])
 
-  const loadRecommendations = async (
+  /** Collaborative filtering: find users with same curl_pattern + porosity, get their 4-5 rated products */
+  const loadCollaborativeRecs = async (
     userProfile: Profile,
-    reviews: (ProductReview & { products: Product })[]
-  ) => {
-    const reviewedIds = reviews.map(r => r.product_id)
+    reviews: (ProductReview & { products: Product })[],
+    ratedIds: Set<string>,
+  ): Promise<{ collabRecs: Product[]; hasSimilarUsers: boolean }> => {
+    if (!userProfile.curl_pattern || !userProfile.porosity) {
+      return { collabRecs: [], hasSimilarUsers: false }
+    }
 
-    // Find similar users (same curl pattern + porosity)
     const { data: similarProfiles } = await supabase
       .from('profiles')
       .select('id')
-      .eq('curl_pattern', userProfile.curl_pattern!)
-      .eq('porosity', userProfile.porosity!)
+      .eq('curl_pattern', userProfile.curl_pattern)
+      .eq('porosity', userProfile.porosity)
 
     const similarUserIds = ((similarProfiles as unknown as { id: string }[]) ?? [])
       .map(p => p.id)
       .filter(id => id !== userProfile.id)
 
-    let recommended: Product[] = []
+    if (similarUserIds.length === 0) {
+      return { collabRecs: [], hasSimilarUsers: false }
+    }
 
-    if (similarUserIds.length > 0) {
-      // Get products those similar users rated 4+
-      const { data: similarReviews } = await supabase
-        .from('product_reviews')
-        .select('product_id, rating')
-        .in('user_id', similarUserIds)
-        .gte('rating', 4)
+    const { data: similarReviews } = await supabase
+      .from('product_reviews')
+      .select('product_id, rating')
+      .in('user_id', similarUserIds)
+      .gte('rating', 4)
 
-      const castReviews = (similarReviews as unknown as { product_id: string; rating: number }[]) ?? []
+    const castReviews =
+      (similarReviews as unknown as { product_id: string; rating: number }[]) ?? []
 
-      // Count how many similar users loved each product, excluding already reviewed
-      const productCounts: Record<string, number> = {}
-      for (const review of castReviews) {
-        if (!reviewedIds.includes(review.product_id)) {
-          productCounts[review.product_id] = (productCounts[review.product_id] || 0) + 1
-        }
-      }
+    // Deprioritise categories the user disliked
+    const dislikedCats = new Set(
+      reviews.filter(r => r.rating != null && r.rating <= 2).map(r => r.products.category),
+    )
 
-      const rankedIds = Object.entries(productCounts)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 20)
-        .map(([id]) => id)
-
-      if (rankedIds.length > 0) {
-        const { data: recProducts } = await supabase
-          .from('products')
-          .select('*')
-          .in('id', rankedIds)
-
-        recommended = (recProducts as unknown as Product[]) ?? []
-        // Preserve ranking order
-        recommended.sort((a, b) => rankedIds.indexOf(a.id) - rankedIds.indexOf(b.id))
+    const productCounts: Record<string, number> = {}
+    for (const review of castReviews) {
+      if (!ratedIds.has(review.product_id)) {
+        productCounts[review.product_id] = (productCounts[review.product_id] || 0) + 1
       }
     }
 
-    // Fallback: CG-approved products sorted by Scrunch Score
-    if (recommended.length < 5) {
-      const { data: fallbackProducts } = await supabase
-        .from('products')
-        .select('*')
-        .eq('cg_status', 'approved')
-        .limit(40)
+    const rankedIds = Object.entries(productCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 20)
+      .map(([id]) => id)
 
-      const fallback = (fallbackProducts as unknown as Product[]) ?? []
-      const existingIds = new Set([...reviewedIds, ...recommended.map(p => p.id)])
-      const scored = fallback
-        .filter(p => !existingIds.has(p.id))
-        .map(p => ({ ...p, scrunchScore: computeScrunchScore(p).score }))
-        .sort((a, b) => b.scrunchScore - a.scrunchScore)
-        .slice(0, 20 - recommended.length)
-
-      recommended = [...recommended, ...scored]
+    if (rankedIds.length === 0) {
+      return { collabRecs: [], hasSimilarUsers: true }
     }
 
-    setRecommendedProducts(recommended)
+    const { data: recProducts } = await supabase
+      .from('products')
+      .select('*')
+      .in('id', rankedIds)
+
+    let recs = (recProducts as unknown as Product[]) ?? []
+    // Preserve ranking & deprioritise disliked categories
+    recs.sort((a, b) => {
+      const aDis = dislikedCats.has(a.category) ? 1 : 0
+      const bDis = dislikedCats.has(b.category) ? 1 : 0
+      if (aDis !== bDis) return aDis - bDis
+      return rankedIds.indexOf(a.id) - rankedIds.indexOf(b.id)
+    })
+
+    return { collabRecs: recs, hasSimilarUsers: true }
   }
 
   useEffect(() => {
     loadData()
   }, [loadData])
 
+  // ----- rating handler -----
+
   const handleRate = async (productId: string, rating: number) => {
     if (!user) return
 
     await supabase
       .from('product_reviews')
-      .upsert({
-        user_id: user.id,
-        product_id: productId,
-        rating,
-        status: 'tried_once',
-        would_repurchase: rating >= 4 ? 'yes' : rating <= 2 ? 'no' : 'maybe',
-        photo_urls: [],
-      } as never, { onConflict: 'user_id,product_id' })
+      .upsert(
+        {
+          user_id: user.id,
+          product_id: productId,
+          rating,
+          status: 'tried_once',
+          would_repurchase: rating >= 4 ? 'yes' : rating <= 2 ? 'no' : 'maybe',
+          photo_urls: [],
+        } as never,
+        { onConflict: 'user_id,product_id' },
+      )
 
-    const newCount = ratingCount + 1
-    setRatingCount(newCount)
+    setRatingCount(prev => prev + 1)
+    setShowRatingPopup(null)
 
     // Refresh reviews
     const { data: freshReviews } = await supabase
@@ -159,35 +352,20 @@ export function Recommendations() {
 
     const reviews = (freshReviews as unknown as (ProductReview & { products: Product })[]) ?? []
     setUserReviews(reviews)
-
-    // Celebration + load recs when they hit threshold
-    if (newCount >= MIN_RATINGS && ratingCount < MIN_RATINGS) {
-      setShowCelebration(true)
-      setTimeout(() => setShowCelebration(false), 3000)
-      if (profile?.curl_pattern && profile?.porosity) {
-        await loadRecommendations(profile, reviews)
-      }
-    }
   }
 
-  const handleBookmark = async (productId: string) => {
-    if (!user) return
-    await supabase
-      .from('product_reviews')
-      .upsert({
-        user_id: user.id,
-        product_id: productId,
-        status: 'tried_once',
-        photo_urls: [],
-      } as never, { onConflict: 'user_id,product_id' })
-  }
+  // ----- render gates -----
 
   if (!user) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12 text-center">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">For You</h1>
-        <p className="text-gray-600 mb-4">Sign in to get personalized product recommendations.</p>
-        <Link to="/login" className="text-violet-600 hover:underline">Sign in →</Link>
+        <p className="text-gray-600 mb-4">
+          Sign in to get personalized product recommendations.
+        </p>
+        <Link to="/login" className="text-violet-600 hover:underline">
+          Sign in →
+        </Link>
       </div>
     )
   }
@@ -195,116 +373,91 @@ export function Recommendations() {
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <div className="text-center py-12 text-gray-500">Loading recommendations...</div>
+        <div className="text-center py-12 text-gray-500">Loading recommendations…</div>
       </div>
     )
   }
 
-  const lovedReviews = userReviews.filter(r => r.rating != null && r.rating >= 4)
-  const okReviews = userReviews.filter(r => r.rating === 3)
-  const dislikedReviews = userReviews.filter(r => r.rating != null && r.rating <= 2)
+  const firstName = profile?.display_name?.split(' ')[0] ?? 'there'
+  const { title: recTitle, subtitle: recSubtitle } = tierHeader(tier, profile)
+
+  const lovedReviews = userReviews.filter(r => r.rating != null && r.rating >= 4 && r.rating <= 5)
+  const likedReviews = userReviews.filter(r => r.rating === 3)
+  const mehReviews = userReviews.filter(r => r.rating === 2)
+  const dislikedReviews = userReviews.filter(r => r.rating != null && r.rating <= 1)
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">For You</h1>
-      <p className="text-gray-600 mb-8">Product recommendations based on your hair profile and ratings.</p>
+      {/* Greeting */}
+      <h1 className="text-2xl font-bold text-gray-900 mb-8">
+        Hey {firstName} ✨
+      </h1>
 
-      {/* Celebration banner */}
-      {showCelebration && (
-        <div className="mb-6 p-4 bg-violet-50 border border-violet-200 rounded-xl text-center animate-pulse">
-          <p className="text-lg font-bold text-violet-700">🎉 You did it!</p>
-          <p className="text-sm text-violet-600">Your personalized recommendations are ready below.</p>
-        </div>
-      )}
+      {/* ───────── Tier-appropriate recommendations ───────── */}
+      <section className="mb-12">
+        <h2 className="text-lg font-semibold text-gray-900 mb-1">{recTitle}</h2>
+        <p className="text-sm text-gray-500 mb-4">{recSubtitle}</p>
 
-      {/* Profile completion nudge */}
-      {profile && !profile.onboarding_completed && (
-        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
-          <p className="text-sm font-medium text-amber-900">Complete your hair profile for better recommendations</p>
-          <p className="text-xs text-amber-700 mt-1">We need your curl pattern and porosity to find people with similar hair.</p>
-          <Link to="/onboarding" className="text-xs text-violet-600 font-medium hover:underline mt-2 inline-block">Complete profile →</Link>
-        </div>
-      )}
+        {tier === 1 && (
+          <Link
+            to="/onboarding"
+            className="inline-block mb-4 text-sm font-medium text-violet-600 hover:underline"
+          >
+            Complete your hair profile →
+          </Link>
+        )}
 
-      {/* Quick rate section — always show if there are unrated products */}
+        {tier === 2 && (
+          <p className="text-xs text-gray-400 mb-4">
+            Rate products you've tried for even better recommendations
+          </p>
+        )}
+
+        {recommendedProducts.length > 0 ? (
+          <div className="space-y-3">
+            {recommendedProducts.map(product => (
+              <RecommendedCard
+                key={product.id}
+                product={product}
+                showRatingPopup={showRatingPopup === product.id}
+                onOpenRating={() => setShowRatingPopup(product.id)}
+                onCloseRating={() => setShowRatingPopup(null)}
+                onRate={handleRate}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-gray-400">No recommendations yet — keep rating!</p>
+        )}
+      </section>
+
+      {/* ───────── separator ───────── */}
+      <hr className="border-gray-200 mb-12" />
+
+      {/* ───────── Rate products you've used ───────── */}
       {popularProducts.filter(p => !ratedProductIds.has(p.id)).length > 0 && (
         <section className="mb-12">
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 mb-1">Rate products you've used</h2>
-            <p className="text-sm text-gray-500">The more you rate, the better your recommendations get</p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">
+            Rate products you've used
+          </h2>
+          <p className="text-sm text-gray-500 mb-4">
+            The more you rate, the better your recommendations get
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {popularProducts
               .filter(p => !ratedProductIds.has(p.id))
-              .slice(0, 6)
+              .slice(0, 12)
               .map(product => (
-                <QuickRateCard
-                  key={product.id}
-                  product={product}
-                  onRate={handleRate}
-                />
+                <QuickRateCard key={product.id} product={product} onRate={handleRate} />
               ))}
           </div>
         </section>
       )}
 
-      {/* Recommended for you — always show if we have any */}
-      {recommendedProducts.length > 0 && (
-        <section className="mb-12">
-          <h2 className="text-lg font-semibold text-gray-900 mb-1">
-            Recommended for {profile?.curl_pattern && profile?.porosity ? `your ${profile.curl_pattern} ${profile.porosity} porosity hair` : 'you'}
-          </h2>
-          <p className="text-sm text-gray-500 mb-4">
-            {profile?.curl_pattern ? 'Based on what works for people with similar hair' : 'Top-rated CG-approved products you haven\'t tried yet'}
-          </p>
+      {/* ───────── separator ───────── */}
+      <hr className="border-gray-200 mb-12" />
 
-          <div className="space-y-3">
-              {recommendedProducts.map(product => {
-                const { grade, score } = computeScrunchScore(product)
-                const scoreConfig = SCRUNCH_SCORE_CONFIG[grade]
-                return (
-                  <div
-                    key={product.id}
-                    className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200"
-                  >
-                    <ProductImage brand={product.brand} name={product.name} seedImageUrl={product.image_url} className="w-14 h-14" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-gray-500">{product.brand}</p>
-                      <Link to={`/products/${product.id}`} className="font-semibold text-gray-900 hover:text-violet-600 no-underline truncate block">
-                        {product.name}
-                      </Link>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-xs text-gray-500">
-                          {PRODUCT_CATEGORY_LABELS[product.category]}
-                        </span>
-                        <span className={`text-xs px-1.5 py-0.5 rounded ${scoreConfig.bg} ${scoreConfig.color}`}>
-                          {score} {scoreConfig.label}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex gap-2 shrink-0">
-                      <button
-                        onClick={() => handleBookmark(product.id)}
-                        className="text-xs px-3 py-1.5 rounded-lg bg-violet-50 text-violet-600 hover:bg-violet-100 transition cursor-pointer border-0"
-                      >
-                        ☆ Save
-                      </button>
-                      <Link
-                        to={`/products/${product.id}`}
-                        className="text-xs px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition no-underline"
-                      >
-                        Already tried
-                      </Link>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-        </section>
-      )}
-
-      {/* Bookmarked / Want to try */}
+      {/* ───────── Want to Try (bookmarked) ───────── */}
       {(() => {
         try {
           const stored = JSON.parse(localStorage.getItem('scrunch_actions') || '{}')
@@ -314,8 +467,12 @@ export function Recommendations() {
           if (bookmarkedKeys.length === 0) return null
           return (
             <section className="mb-12">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">☆ Saved ({bookmarkedKeys.length})</h2>
-              <p className="text-sm text-gray-500 mb-3">Products you've saved to try later</p>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                ☆ Want to Try ({bookmarkedKeys.length})
+              </h2>
+              <p className="text-sm text-gray-500 mb-3">
+                Products you've saved to try later
+              </p>
               <div className="space-y-2">
                 {bookmarkedKeys.map(key => {
                   const [brand, name] = key.split('::')
@@ -337,48 +494,182 @@ export function Recommendations() {
               </div>
             </section>
           )
-        } catch { return null }
+        } catch {
+          return null
+        }
       })()}
 
-      {/* Section C: Your ratings */}
+      {/* ───────── separator ───────── */}
+      {userReviews.length > 0 && <hr className="border-gray-200 mb-12" />}
+
+      {/* ───────── Your Ratings ───────── */}
       {userReviews.length > 0 && (
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Your Ratings</h2>
 
           {lovedReviews.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-sm font-medium text-green-700 mb-2">👍 Loved ({lovedReviews.length})</h3>
-              <div className="space-y-2">
-                {lovedReviews.map(review => (
-                  <RatingRow key={review.id} review={review} />
-                ))}
-              </div>
-            </div>
+            <RatingGroup
+              label="👍 Loved"
+              count={lovedReviews.length}
+              colorClass="text-green-700"
+              reviews={lovedReviews}
+            />
           )}
 
-          {okReviews.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-sm font-medium text-amber-700 mb-2">😐 It was ok ({okReviews.length})</h3>
-              <div className="space-y-2">
-                {okReviews.map(review => (
-                  <RatingRow key={review.id} review={review} />
-                ))}
-              </div>
-            </div>
+          {likedReviews.length > 0 && (
+            <RatingGroup
+              label="👍 Liked"
+              count={likedReviews.length}
+              colorClass="text-emerald-600"
+              reviews={likedReviews}
+            />
+          )}
+
+          {mehReviews.length > 0 && (
+            <RatingGroup
+              label="😐 It was ok"
+              count={mehReviews.length}
+              colorClass="text-amber-700"
+              reviews={mehReviews}
+            />
           )}
 
           {dislikedReviews.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-sm font-medium text-red-700 mb-2">👎 Didn't work ({dislikedReviews.length})</h3>
-              <div className="space-y-2">
-                {dislikedReviews.map(review => (
-                  <RatingRow key={review.id} review={review} />
-                ))}
-              </div>
-            </div>
+            <RatingGroup
+              label="👎 Didn't like"
+              count={dislikedReviews.length}
+              colorClass="text-red-700"
+              reviews={dislikedReviews}
+            />
           )}
         </section>
       )}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Sub-components
+// ---------------------------------------------------------------------------
+
+function RecommendedCard({
+  product,
+  showRatingPopup,
+  onOpenRating,
+  onCloseRating,
+  onRate,
+}: {
+  product: Product
+  showRatingPopup: boolean
+  onOpenRating: () => void
+  onCloseRating: () => void
+  onRate: (productId: string, rating: number) => Promise<void>
+}) {
+  const isCg = product.cg_status === 'approved'
+  const isCf = product.cruelty_free === 'yes'
+  const productNotes = (product.notes || '').toLowerCase()
+  const isFragFree =
+    productNotes.includes('fragrance-free') || productNotes.includes('fragrance free')
+
+  return (
+    <div className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 relative">
+      <ProductImage
+        brand={product.brand}
+        name={product.name}
+        seedImageUrl={product.image_url}
+        className="w-14 h-14 shrink-0"
+      />
+
+      <div className="flex-1 min-w-0">
+        <p className="text-xs text-gray-500">{product.brand}</p>
+        <Link
+          to={`/products/${product.id}`}
+          className="font-semibold text-gray-900 hover:text-violet-600 no-underline truncate block"
+        >
+          {product.name}
+        </Link>
+
+        <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+          <span className="text-xs text-gray-500">
+            {PRODUCT_CATEGORY_LABELS[product.category]}
+          </span>
+          <span
+            className={`text-xs px-2 py-0.5 rounded-full ${isCg ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}
+          >
+            {isCg ? '🟢 CG' : '🔴 Not CG'}
+          </span>
+          {isCf && (
+            <span className="text-xs px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600">
+              🐰
+            </span>
+          )}
+          {isFragFree && (
+            <span className="text-xs px-1.5 py-0.5 rounded-full bg-violet-50 text-violet-600">
+              🌸
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className="shrink-0">
+        <button
+          onClick={onOpenRating}
+          className="text-xs px-3 py-1.5 rounded-lg bg-violet-50 text-violet-600 hover:bg-violet-100 transition cursor-pointer border-0"
+        >
+          Tried it?
+        </button>
+      </div>
+
+      {/* Inline rating popup */}
+      {showRatingPopup && (
+        <div className="absolute right-4 top-full mt-1 z-10 bg-white border border-gray-200 rounded-xl shadow-lg p-3 flex gap-2">
+          {[
+            { rating: 5, emoji: '👍', label: 'Loved' },
+            { rating: 3, emoji: '😐', label: 'Ok' },
+            { rating: 1, emoji: '👎', label: 'Nope' },
+          ].map(({ rating, emoji, label }) => (
+            <button
+              key={rating}
+              onClick={() => onRate(product.id, rating)}
+              className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-lg hover:bg-gray-50 transition cursor-pointer border-0 bg-transparent"
+            >
+              <span className="text-lg">{emoji}</span>
+              <span className="text-xs text-gray-500">{label}</span>
+            </button>
+          ))}
+          <button
+            onClick={onCloseRating}
+            className="text-xs text-gray-400 hover:text-gray-600 px-1 cursor-pointer border-0 bg-transparent"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function RatingGroup({
+  label,
+  count,
+  colorClass,
+  reviews,
+}: {
+  label: string
+  count: number
+  colorClass: string
+  reviews: (ProductReview & { products: Product })[]
+}) {
+  return (
+    <div className="mb-6">
+      <h3 className={`text-sm font-medium ${colorClass} mb-2`}>
+        {label} ({count})
+      </h3>
+      <div className="space-y-2">
+        {reviews.map(review => (
+          <RatingRow key={review.id} review={review} />
+        ))}
+      </div>
     </div>
   )
 }
@@ -389,13 +680,22 @@ function RatingRow({ review }: { review: ProductReview & { products: Product } }
       to={`/products/${review.product_id}`}
       className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-violet-300 transition no-underline"
     >
-      <ProductImage brand={review.products.brand} name={review.products.name} seedImageUrl={review.products.image_url} className="w-10 h-10" />
+      <ProductImage
+        brand={review.products.brand}
+        name={review.products.name}
+        seedImageUrl={review.products.image_url}
+        className="w-10 h-10"
+      />
       <div className="flex-1 min-w-0">
         <p className="text-xs text-gray-500">{review.products.brand}</p>
-        <p className="text-sm font-semibold text-gray-900 truncate">{review.products.name}</p>
+        <p className="text-sm font-semibold text-gray-900 truncate">
+          {review.products.name}
+        </p>
       </div>
       {review.results_notes && (
-        <p className="text-xs text-gray-400 truncate max-w-[150px]">{review.results_notes}</p>
+        <p className="text-xs text-gray-400 truncate max-w-[150px]">
+          {review.results_notes}
+        </p>
       )}
     </Link>
   )
