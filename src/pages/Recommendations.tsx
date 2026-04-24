@@ -42,9 +42,12 @@ export function Recommendations() {
     setRatingCount(reviews.length)
     setPopularProducts(products)
 
-    // If user has enough ratings, load recommendations
-    if (reviews.length >= MIN_RATINGS && userProfile?.curl_pattern && userProfile?.porosity) {
+    // Load recommendations if profile is complete (curl pattern + porosity)
+    if (userProfile?.curl_pattern && userProfile?.porosity) {
       await loadRecommendations(userProfile, reviews)
+    } else if (reviews.length > 0) {
+      // Even without full profile, show fallback recommendations
+      await loadRecommendations(userProfile || {} as Profile, reviews)
     }
 
     setLoading(false)
@@ -214,28 +217,27 @@ export function Recommendations() {
         </div>
       )}
 
-      {/* Section A: Rate products to unlock */}
-      {ratingCount < MIN_RATINGS && (
+      {/* Profile completion nudge */}
+      {profile && !profile.onboarding_completed && (
+        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+          <p className="text-sm font-medium text-amber-900">Complete your hair profile for better recommendations</p>
+          <p className="text-xs text-amber-700 mt-1">We need your curl pattern and porosity to find people with similar hair.</p>
+          <Link to="/onboarding" className="text-xs text-violet-600 font-medium hover:underline mt-2 inline-block">Complete profile →</Link>
+        </div>
+      )}
+
+      {/* Quick rate section — always show if there are unrated products */}
+      {popularProducts.filter(p => !ratedProductIds.has(p.id)).length > 0 && (
         <section className="mb-12">
           <div className="mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">
-              Rate at least {MIN_RATINGS} products to unlock personalized recommendations
-            </h2>
-            <div className="flex items-center gap-3">
-              <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-violet-500 rounded-full transition-all duration-500"
-                  style={{ width: `${Math.min(100, (ratingCount / MIN_RATINGS) * 100)}%` }}
-                />
-              </div>
-              <span className="text-sm font-medium text-gray-600">{ratingCount}/{MIN_RATINGS}</span>
-            </div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-1">Rate products you've used</h2>
+            <p className="text-sm text-gray-500">The more you rate, the better your recommendations get</p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {popularProducts
               .filter(p => !ratedProductIds.has(p.id))
-              .slice(0, 20)
+              .slice(0, 12)
               .map(product => (
                 <QuickRateCard
                   key={product.id}
@@ -247,14 +249,14 @@ export function Recommendations() {
         </section>
       )}
 
-      {/* Section B: Recommended for you — always show with fallback */}
-      {ratingCount >= MIN_RATINGS && (
+      {/* Recommended for you — always show if we have any */}
+      {recommendedProducts.length > 0 && (
         <section className="mb-12">
           <h2 className="text-lg font-semibold text-gray-900 mb-1">
-            Recommended for your {profile?.curl_pattern ?? ''} {profile?.porosity ?? ''} hair
+            Recommended for {profile?.curl_pattern && profile?.porosity ? `your ${profile.curl_pattern} ${profile.porosity} porosity hair` : 'you'}
           </h2>
           <p className="text-sm text-gray-500 mb-4">
-            Based on what works for people with similar hair
+            {profile?.curl_pattern ? 'Based on what works for people with similar hair' : 'Top-rated CG-approved products you haven\'t tried yet'}
           </p>
 
           {recommendedProducts.length === 0 ? (
