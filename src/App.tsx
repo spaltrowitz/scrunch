@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider } from './lib/auth'
 import { Header } from './components/layout/Header'
 import { Footer } from './components/layout/Footer'
+import { FeedbackButton } from './components/FeedbackButton'
 import { Home } from './pages/Home'
 import { Login } from './pages/Login'
 import { SignUp } from './pages/SignUp'
@@ -40,6 +41,7 @@ function App() {
               </Routes>
             </main>
             <Footer />
+            <FeedbackButton />
           </div>
         </HashRouter>
       </AuthProvider>
