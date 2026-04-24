@@ -11,6 +11,10 @@ export function Footer() {
         <a href="#/credits" className="text-violet-500 hover:text-violet-700 text-xs">
           Credits & Sources
         </a>
+        <span className="text-gray-300 mx-2">·</span>
+        <a href="#/about" className="text-violet-500 hover:text-violet-700 text-xs">
+          About Scrunch
+        </a>
       </div>
     </footer>
   )

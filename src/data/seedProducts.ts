@@ -1,6 +1,7 @@
 import type { ProductCategory, CgStatus } from '../lib/database.types'
+import type { ScrunchScore } from '../lib/constants'
 
-interface SeedProduct {
+export interface SeedProduct {
   brand: string
   name: string
   category: ProductCategory
@@ -8,6 +9,33 @@ interface SeedProduct {
   cruelty_free: 'yes' | 'no' | 'unclear' | null
   notes: string | null
   image_url: string | null
+}
+
+// Compute Scrunch Score from product data
+export function computeScrunchScore(product: SeedProduct): { score: number; grade: ScrunchScore } {
+  let score = 100
+
+  // CG status
+  if (product.cg_status === 'not_approved') score -= 40
+  else if (product.cg_status === 'caution') score -= 15
+
+  // Check notes for known concerns
+  const n = (product.notes || '').toLowerCase()
+  if (n.includes('drying alcohol')) score -= 15
+  if (n.includes('silicone')) score -= 20
+  if (n.includes('sulfate') && product.category !== 'clarifying_shampoo') score -= 20
+  if (n.includes('mineral oil')) score -= 15
+  if (n.includes('wax')) score -= 10
+
+  // Bonuses
+  if (product.cruelty_free === 'yes') score += 5
+  if (n.includes('fragrance-free') || n.includes('fragrance free')) score += 3
+  if (n.includes('sample sizes')) score += 2
+
+  score = Math.max(0, Math.min(100, score))
+
+  const grade: ScrunchScore = score >= 80 ? 'excellent' : score >= 60 ? 'good' : score >= 40 ? 'fair' : 'poor'
+  return { score, grade }
 }
 
 export const SEED_PRODUCTS: SeedProduct[] = [

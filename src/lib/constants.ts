@@ -99,3 +99,12 @@ export const CG_STATUS_CONFIG = {
   not_approved: { label: 'Not CG Approved', color: 'text-red-600', bg: 'bg-red-50', icon: '🔴' },
   caution: { label: 'Caution', color: 'text-amber-600', bg: 'bg-amber-50', icon: '🟡' },
 } as const
+
+export type ScrunchScore = 'excellent' | 'good' | 'fair' | 'poor'
+
+export const SCRUNCH_SCORE_CONFIG: Record<ScrunchScore, { label: string; color: string; bg: string; description: string; minScore: number }> = {
+  excellent: { label: 'Excellent', color: 'text-emerald-700', bg: 'bg-emerald-50', description: 'Clean ingredients, CG-approved, no concerns', minScore: 80 },
+  good: { label: 'Good', color: 'text-green-600', bg: 'bg-green-50', description: 'CG-approved with minor considerations', minScore: 60 },
+  fair: { label: 'Fair', color: 'text-amber-600', bg: 'bg-amber-50', description: 'Some questionable ingredients', minScore: 40 },
+  poor: { label: 'Poor', color: 'text-red-600', bg: 'bg-red-50', description: 'Contains harsh or harmful ingredients', minScore: 0 },
+} as const

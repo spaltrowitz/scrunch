@@ -16,6 +16,7 @@ import { ProfilePage } from './pages/Profile'
 import { IngredientCheckerPage } from './pages/IngredientCheckerPage'
 import { Credits } from './pages/Credits'
 import { Community } from './pages/Community'
+import { About } from './pages/About'
 
 const queryClient = new QueryClient()
 
@@ -39,6 +40,7 @@ function App() {
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/ingredient-checker" element={<IngredientCheckerPage />} />
                 <Route path="/community" element={<Community />} />
+                <Route path="/about" element={<About />} />
                 <Route path="/credits" element={<Credits />} />
               </Routes>
             </main>
