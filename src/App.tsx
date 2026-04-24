@@ -1,6 +1,6 @@
 import { HashRouter, Routes, Route } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { AuthProvider } from './lib/auth'
+import { AuthProvider, useAuth } from './lib/auth'
 import { Header } from './components/layout/Header'
 import { Footer } from './components/layout/Footer'
 import { FeedbackButton } from './components/FeedbackButton'
@@ -14,11 +14,31 @@ import { ProductDetail } from './pages/ProductDetail'
 import { MyProducts } from './pages/MyProducts'
 import { ProfilePage } from './pages/Profile'
 import { IngredientCheckerPage } from './pages/IngredientCheckerPage'
-import { Credits } from './pages/Credits'
 import { Community } from './pages/Community'
 import { About } from './pages/About'
 
 const queryClient = new QueryClient()
+
+function AppRoutes() {
+  const { user, loading } = useAuth()
+  if (loading) return null
+  return (
+    <Routes>
+      <Route path="/" element={user ? <Dashboard /> : <Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<SignUp />} />
+      <Route path="/onboarding" element={<Onboarding />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/products" element={<Products />} />
+      <Route path="/products/:id" element={<ProductDetail />} />
+      <Route path="/my-products" element={<MyProducts />} />
+      <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/ingredient-checker" element={<IngredientCheckerPage />} />
+      <Route path="/community" element={<Community />} />
+      <Route path="/about" element={<About />} />
+    </Routes>
+  )
+}
 
 function App() {
   return (
@@ -28,21 +48,7 @@ function App() {
           <div className="min-h-screen flex flex-col bg-gray-50">
             <Header />
             <main className="flex-1">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/onboarding" element={<Onboarding />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/products" element={<Products />} />
-                <Route path="/products/:id" element={<ProductDetail />} />
-                <Route path="/my-products" element={<MyProducts />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/ingredient-checker" element={<IngredientCheckerPage />} />
-                <Route path="/community" element={<Community />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/credits" element={<Credits />} />
-              </Routes>
+              <AppRoutes />
             </main>
             <Footer />
             <FeedbackButton />

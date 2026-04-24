@@ -15,10 +15,22 @@ export function RequestProductForm({ onClose }: { onClose: () => void }) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Store in localStorage for now; will move to Supabase
-    const existing = JSON.parse(localStorage.getItem('scrunch_product_requests') || '[]')
-    existing.push({ ...request, created_at: new Date().toISOString() })
-    localStorage.setItem('scrunch_product_requests', JSON.stringify(existing))
+    // Create GitHub Issue with product-request label → triggers Copilot auto-add workflow
+    const issueBody = [
+      `### Brand\n${request.brand}`,
+      `### Product Name\n${request.name}`,
+      `### Category\n${request.category || 'Not specified'}`,
+      request.link ? `### Product Link\n${request.link}` : '',
+      `---`,
+      `*Submitted via Scrunch app on ${new Date().toISOString()}*`,
+    ].filter(Boolean).join('\n\n')
+
+    const params = new URLSearchParams({
+      title: `[Product Request] ${request.brand} — ${request.name}`,
+      body: issueBody,
+      labels: 'product-request,from-app',
+    })
+    window.open(`https://github.com/spaltrowitz/scrunch/issues/new?${params}`, '_blank')
     setSubmitted(true)
   }
 
@@ -28,7 +40,8 @@ export function RequestProductForm({ onClose }: { onClose: () => void }) {
         <div className="text-3xl mb-3">🎉</div>
         <h3 className="font-semibold text-gray-900 mb-1">Request submitted!</h3>
         <p className="text-sm text-gray-500 mb-4">
-          We'll review and add <strong>{request.brand} {request.name}</strong> to the database.
+          A GitHub issue has been created for <strong>{request.brand} {request.name}</strong>.
+          Copilot will automatically look up the product details, find an image, run ingredient analysis, and create a PR to add it.
         </p>
         <button onClick={onClose} className="text-sm text-violet-600 hover:underline cursor-pointer">
           Close

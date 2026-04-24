@@ -129,11 +129,69 @@ export function About() {
           <p className="text-sm text-gray-500">
             Made with 🌀 by the curly hair community, for the curly hair community.
           </p>
-          <a href="#/credits" className="text-sm text-violet-600 hover:underline mt-2 inline-block">
-            View all sources & credits →
-          </a>
         </div>
+
+        {/* Sources & Credits */}
+        <section className="mt-12 pt-8 border-t border-gray-200" id="credits">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Sources & Credits</h2>
+          <p className="text-sm text-gray-600 mb-6">
+            We believe in transparency — here are the sources that power this app.
+          </p>
+
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wide mb-3">📦 Product Data</h3>
+              <div className="space-y-2">
+                <SourceCard name="r/curlyhair Holy Grail Product List" url="https://docs.google.com/spreadsheets/d/1gn6VnPsRU1H3ziElbWqNVFY5mev6GB1pwKKt_MNpoAY/" description="Community-curated spreadsheet of CG-approved products. Our initial database is seeded from this list." />
+                <SourceCard name="Open Beauty Facts" url="https://world.openbeautyfacts.org/" description="Open-source cosmetics database. We use their API for product images." />
+                <SourceCard name="CurlScan" url="https://curlscan.com/" description="CG-approved product search and barcode scanner. We cross-reference CG status." />
+                <SourceCard name="IsItCG" url="https://www.isitcg.com/" description="Ingredient checker for CGM compliance. We cross-reference their analysis rules." />
+                <SourceCard name="CurlsBot" url="https://www.curlsbot.com/" description="Ingredient analysis tool. Additional cross-reference for our analyzer." />
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wide mb-3">📚 Educational Resources</h3>
+              <div className="space-y-2">
+                <SourceCard name="Curly World (Lorraine Massey)" url="https://www.curlyworld.com/cgmethod" description="The original Curly Girl Method — the foundational guide." />
+                <SourceCard name="Curl Maven" url="https://curlmaven.ie/what-is-the-curly-girl-method/" description="Deep CGM guides, technique tutorials, European product focus." />
+                <SourceCard name="The Everygirl" url="https://theeverygirl.com/curly-girl-method/" description="Accessible beginner guides with real routine breakdowns." />
+                <SourceCard name="Real Simple" url="https://www.realsimple.com/beauty-fashion/hair/hair-care/curly-girl-method-review" description="Expert-backed editorial CGM reviews." />
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wide mb-3">💬 Community</h3>
+              <div className="space-y-2">
+                <SourceCard name="r/curlyhair" url="https://www.reddit.com/r/curlyhair/" description="339K weekly visitors. Holy grail threads, routine megathreads, technique discussions." />
+                <SourceCard name="r/curlygirl" url="https://www.reddit.com/r/curlygirl/" description="61K weekly visitors. Focused on CGM with beginner guides." />
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wide mb-3">✨ Design Inspirations</h3>
+              <div className="space-y-2">
+                <SourceCard name="Yuka" url="https://yuka.io/" description="Product scanning UX inspiration. Color-coded health ratings inspired our Scrunch Score." />
+                <SourceCard name="Prose" url="https://prose.com/" description="Onboarding quiz flow inspiration for hair profile creation." />
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </div>
+  )
+}
+
+function SourceCard({ name, url, description }: { name: string; url: string; description: string }) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block p-3 bg-white rounded-lg border border-gray-200 hover:border-violet-300 transition no-underline"
+    >
+      <h4 className="font-medium text-gray-900 text-sm">{name}</h4>
+      <p className="text-xs text-gray-500">{description}</p>
+    </a>
   )
 }

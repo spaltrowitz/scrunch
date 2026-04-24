@@ -5,16 +5,9 @@ export function Footer() {
         <p className="mb-2">
           🌀 Scrunch — Community-driven, ad-free, and unbiased.
         </p>
-        <p className="mb-3">
+        <p>
           Built with data from the curly hair community. Not affiliated with any brand.
         </p>
-        <a href="#/credits" className="text-violet-500 hover:text-violet-700 text-xs">
-          Credits & Sources
-        </a>
-        <span className="text-gray-300 mx-2">·</span>
-        <a href="#/about" className="text-violet-500 hover:text-violet-700 text-xs">
-          About Scrunch
-        </a>
       </div>
     </footer>
   )

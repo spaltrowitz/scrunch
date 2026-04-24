@@ -1,0 +1,49 @@
+name: 📦 Product Request
+description: Request a product to be added to the Scrunch database
+labels: ["product-request", "from-app"]
+assignees: []
+body:
+  - type: input
+    id: brand
+    attributes:
+      label: Brand
+      placeholder: e.g., SheaMoisture
+    validations:
+      required: true
+  - type: input
+    id: product_name
+    attributes:
+      label: Product Name
+      placeholder: e.g., Coconut & Hibiscus Curl Enhancing Smoothie
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Product Category
+      options:
+        - Low-Poo (Sulfate-Free Shampoo)
+        - Clarifying Shampoo
+        - Co-Wash
+        - Rinse-Out Conditioner
+        - Deep Conditioner / Hair Mask
+        - Leave-In Conditioner
+        - Curl Cream / Styling Cream
+        - Gel
+        - Mousse / Foam
+        - Custard / Pudding
+        - Oil / Serum
+        - Spray / Refresher
+        - Protein Treatment
+        - Scalp Treatment
+        - Not sure
+  - type: input
+    id: product_link
+    attributes:
+      label: Product Link (optional)
+      placeholder: https://target.com/... or brand website link
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes (optional)
+      placeholder: Any additional info — ingredients list, why you want it added, etc.
