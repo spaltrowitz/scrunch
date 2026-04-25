@@ -289,7 +289,7 @@ export function Products() {
   const filteredProducts = products.filter(p => {
     if (selectedCategories.size > 0 && !selectedCategories.has(p.category)) return false
     if (brandFilter && p.brand !== brandFilter) return false
-    if (regionFilter && !(p.country_availability || ['{US}']).some(c => c === regionFilter)) return false
+    if (regionFilter && (p.country_availability || ['US'])[0] !== regionFilter) return false
     if (showApprovedOnly && p.cg_status !== 'approved') return false
     if (showGoodPlus && p.cruelty_free !== 'yes') return false
     if (search && !`${p.brand} ${p.name}`.toLowerCase().includes(search.toLowerCase())) return false
@@ -410,7 +410,7 @@ export function Products() {
           onChange={(e) => setRegionFilter(e.target.value)}
           className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white"
         >
-          <option value="">🌍 Available Anywhere</option>
+          <option value="">🌍 All Countries</option>
           <option value="US">🇺🇸 United States</option>
           <option value="CA">🇨🇦 Canada</option>
           <option value="UK">🇬🇧 United Kingdom</option>
@@ -427,6 +427,9 @@ export function Products() {
           <option value="CO">🇨🇴 Colombia</option>
           <option value="AR">🇦🇷 Argentina</option>
           <option value="JM">🇯🇲 Jamaica</option>
+          <option value="TR">🇹🇷 Turkey</option>
+          <option value="SE">🇸🇪 Scandinavia</option>
+          <option value="KE">🇰🇪 East Africa</option>
         </select>
       </div>
 
