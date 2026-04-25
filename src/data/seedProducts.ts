@@ -343,4 +343,29 @@ export const SEED_PRODUCTS: SeedProduct[] = [
 
   // ── SPRAY REFRESHER (Reddit) ────────────────────────────────────────
   { brand: 'DevaCurl', name: 'Mist of Wonders Multi-Benefit Spray', category: 'spray_refresher', cg_status: 'approved', cruelty_free: 'yes', notes: 'PETA. Multi-benefit hydration and refresh spray', image_url: 'https://media.ulta.com/i/ulta/2240512' },
+
+  // ══════════════════════════════════════════════════════════════════════
+  // ASIAN WAVY/CURLY HAIR (naturally wavy/curly Asian hair community picks)
+  // ══════════════════════════════════════════════════════════════════════
+  // Asian hair (East, Southeast & South Asian) is often fine–medium texture,
+  // low porosity, and prone to being weighed down. Lightweight, rice-water–
+  // infused, and protein-balanced products work especially well.
+
+  // ── LOW POO (Asian Hair) ────────────────────────────────────────────
+  { brand: 'Bouclème', name: 'Curl Cleanser', category: 'low_poo', cg_status: 'approved', cruelty_free: 'yes', notes: 'LB/PETA. UK brand. Lightweight; popular in Asian wavy/curly hair community.', image_url: 'https://boucleme.us/cdn/shop/files/CurlCleanser-300ml-Front_1200x.png' },
+  { brand: 'SheaMoisture', name: 'Purple Rice Water Strength & Color Care Shampoo', category: 'low_poo', cg_status: 'approved', cruelty_free: 'yes', notes: 'CFK/PETA. Fermented rice water. Traditional East Asian hair care ingredient.', image_url: 'https://i5.walmartimages.com/seo/SheaMoisture-Purple-Rice-Water-Strength-Color-Care-Shampoo-13-fl-oz_931c3112-dbdd-48eb-9dea-f34812a17154.22cc4f902eb4daba128e93e535ee8c86.jpeg' },
+
+  // ── RINSE-OUT CONDITIONER (Asian Hair) ──────────────────────────────
+  { brand: 'Bouclème', name: 'Curl Conditioner', category: 'rinse_out_conditioner', cg_status: 'approved', cruelty_free: 'yes', notes: 'LB/PETA. UK brand. Lightweight hydration for fine/low-porosity curls.', image_url: null },
+  { brand: 'SheaMoisture', name: 'Purple Rice Water Strength & Color Care Conditioner', category: 'rinse_out_conditioner', cg_status: 'approved', cruelty_free: 'yes', notes: 'CFK/PETA. Fermented rice water and wild orchid extract.', image_url: 'https://i5.walmartimages.com/seo/SheaMoisture-Purple-Rice-Water-Strength-Color-Care-Conditioner-13-fl-oz_a2f6a2e1-6d6a-4e97-96d8-c8b5eeb20b8e.bdfdc2e6f6d402c0dc8f983e832e756a.jpeg' },
+  { brand: 'Hask', name: 'Knot A Chance Rice Water Rinse', category: 'rinse_out_conditioner', cg_status: 'approved', cruelty_free: 'yes', notes: 'LB. Hydrolyzed rice protein. Reduces shedding, silicone-free.', image_url: 'https://cdn.shopify.com/s/files/1/0576/2492/1373/files/Knot-A-Chance-Rice-Water-Rinse_1024x1024.jpg' },
+
+  // ── DEEP CONDITIONER (Asian Hair) ───────────────────────────────────
+  { brand: 'Bouclème', name: 'Intensive Moisture Treatment', category: 'deep_conditioner', cg_status: 'approved', cruelty_free: 'yes', notes: 'LB/PETA. UK brand. Deep moisturizing treatment for all curl types.', image_url: null },
+
+  // ── CURL CREAM (Asian Hair) ──────────────────────────────────────────
+  { brand: 'Bouclème', name: 'Curl Cream', category: 'curl_cream', cg_status: 'approved', cruelty_free: 'yes', notes: 'LB/PETA. UK brand. Lightweight definition for fine/wavy hair.', image_url: null },
+
+  // ── GEL (Asian Hair) ────────────────────────────────────────────────
+  { brand: 'Bouclème', name: 'Curl Defining Gel', category: 'gel', cg_status: 'approved', cruelty_free: 'yes', notes: 'LB/PETA. UK brand. Lightweight flaxseed gel; top pick for Asian wavy hair.', image_url: null },
 ]
