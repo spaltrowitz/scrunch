@@ -410,7 +410,7 @@ export function Products() {
           onChange={(e) => setRegionFilter(e.target.value)}
           className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white"
         >
-          <option value="">🌍 All Regions</option>
+          <option value="">🌍 Available Anywhere</option>
           <option value="US">🇺🇸 United States</option>
           <option value="CA">🇨🇦 Canada</option>
           <option value="UK">🇬🇧 United Kingdom</option>
