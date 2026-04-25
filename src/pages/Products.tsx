@@ -15,7 +15,7 @@ type ProductActions = Record<string, Set<ProductAction>>
 type ProductRatings = Record<string, TriedRating>
 type ProductNotes = Record<string, string>
 
-type DisplayProduct = SeedProduct & { id?: string }
+type DisplayProduct = SeedProduct & { id?: string; country_availability?: string[] }
 
 function productKey(p: DisplayProduct): string {
   return p.id || `${p.brand}::${p.name}`
@@ -64,6 +64,7 @@ export function Products() {
   const [showApprovedOnly, setShowApprovedOnly] = useState(false)
   const [showGoodPlus, setShowGoodPlus] = useState(false)
   const [brandFilter, setBrandFilter] = useState('')
+  const [regionFilter, setRegionFilter] = useState('')
   const [actions, setActions] = useState<ProductActions>(getStoredActions)
   const [ratings, setRatings] = useState<ProductRatings>(() => {
     try { return JSON.parse(localStorage.getItem('scrunch_ratings') || '{}') } catch { return {} }
@@ -91,6 +92,7 @@ export function Products() {
               cruelty_free: p.cruelty_free,
               notes: p.notes,
               image_url: p.image_url,
+              country_availability: p.country_availability,
             })).filter((p, i, arr) =>
               // Dedup by brand+name (case-insensitive)
               arr.findIndex(x => x.brand.toLowerCase() === p.brand.toLowerCase() && x.name.toLowerCase() === p.name.toLowerCase()) === i
@@ -287,6 +289,7 @@ export function Products() {
   const filteredProducts = products.filter(p => {
     if (selectedCategories.size > 0 && !selectedCategories.has(p.category)) return false
     if (brandFilter && p.brand !== brandFilter) return false
+    if (regionFilter && !(p.country_availability || ['{US}']).some(c => c === regionFilter)) return false
     if (showApprovedOnly && p.cg_status !== 'approved') return false
     if (showGoodPlus && p.cruelty_free !== 'yes') return false
     if (search && !`${p.brand} ${p.name}`.toLowerCase().includes(search.toLowerCase())) return false
@@ -305,7 +308,7 @@ export function Products() {
   const approvedCount = products.filter(p => p.cg_status === 'approved').length
   const userRatingCount = Object.keys(ratings).length
   const ratingsNeeded = Math.max(0, 10 - userRatingCount)
-  const hasFilters = selectedCategories.size > 0 || showApprovedOnly || showGoodPlus || search || brandFilter
+  const hasFilters = selectedCategories.size > 0 || showApprovedOnly || showGoodPlus || search || brandFilter || regionFilter
 
   if (loading) {
     return (
@@ -402,6 +405,29 @@ export function Products() {
             <option key={brand} value={brand}>{brand}</option>
           ))}
         </select>
+        <select
+          value={regionFilter}
+          onChange={(e) => setRegionFilter(e.target.value)}
+          className="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white"
+        >
+          <option value="">🌍 All Regions</option>
+          <option value="US">🇺🇸 United States</option>
+          <option value="CA">🇨🇦 Canada</option>
+          <option value="UK">🇬🇧 United Kingdom</option>
+          <option value="EU">🇪🇺 Europe</option>
+          <option value="AU">🇦🇺 Australia</option>
+          <option value="IN">🇮🇳 India</option>
+          <option value="BR">🇧🇷 Brazil</option>
+          <option value="JP">🇯🇵 Japan</option>
+          <option value="KR">🇰🇷 South Korea</option>
+          <option value="NG">🇳🇬 Nigeria</option>
+          <option value="ZA">🇿🇦 South Africa</option>
+          <option value="PH">🇵🇭 Philippines</option>
+          <option value="MX">🇲🇽 Mexico</option>
+          <option value="CO">🇨🇴 Colombia</option>
+          <option value="AR">🇦🇷 Argentina</option>
+          <option value="JM">🇯🇲 Jamaica</option>
+        </select>
       </div>
 
       {/* Approved toggle + count */}
@@ -427,7 +453,7 @@ export function Products() {
           </label>
           {hasFilters && (
             <button
-              onClick={() => { setSearch(''); setSelectedCategories(new Set()); setShowApprovedOnly(false); setShowGoodPlus(false); setBrandFilter('') }}
+              onClick={() => { setSearch(''); setSelectedCategories(new Set()); setShowApprovedOnly(false); setShowGoodPlus(false); setBrandFilter(''); setRegionFilter('') }}
               className="text-xs text-violet-600 hover:underline cursor-pointer"
             >
               Clear all filters
@@ -455,7 +481,7 @@ export function Products() {
       {filteredProducts.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-500 mb-2">No products match your filters.</p>
-          <button onClick={() => { setSearch(''); setSelectedCategories(new Set()); setShowApprovedOnly(false); setShowGoodPlus(false); setBrandFilter('') }} className="text-sm text-violet-600 hover:underline cursor-pointer">
+          <button onClick={() => { setSearch(''); setSelectedCategories(new Set()); setShowApprovedOnly(false); setShowGoodPlus(false); setBrandFilter(''); setRegionFilter('') }} className="text-sm text-violet-600 hover:underline cursor-pointer">
             Clear filters
           </button>
         </div>
