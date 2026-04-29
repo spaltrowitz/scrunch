@@ -65,7 +65,7 @@ function buildTier1(products: Product[]): Product[] {
       .slice(0, 3)
     result.push(...catProducts)
   }
-  return result.slice(0, 20)
+  return result.slice(0, 5)
 }
 
 function buildTier2(
@@ -93,7 +93,7 @@ function buildTier2(
   })
 
   scored.sort((a, b) => b._score - a._score)
-  return scored.slice(0, 20)
+  return scored.slice(0, 5)
 }
 
 function buildTier3(
@@ -124,7 +124,7 @@ function buildTier3(
   })
 
   scored.sort((a, b) => b._score - a._score)
-  return scored.slice(0, 20)
+  return scored.slice(0, 5)
 }
 
 /** Tier 2.5: ingredient-based recommendations */
@@ -172,8 +172,22 @@ function buildIngredientTier(
   }
 
   scored.sort((a, b) => b._score - a._score)
-  return { recs: scored.slice(0, 20), sensitivityFilterCount }
+  return { recs: scored.slice(0, 5), sensitivityFilterCount }
 }
+
+// ---------------------------------------------------------------------------
+// Dismiss-reason chips
+// ---------------------------------------------------------------------------
+
+const DISMISS_REASONS = [
+  'Too heavy for my hair',
+  'Contains ingredients I avoid',
+  'Wrong for my porosity',
+  'Too expensive',
+  'Not available near me',
+  'Already tried — didn\'t work',
+  'Not interested',
+]
 
 // ---------------------------------------------------------------------------
 // Header / subtitle per tier
@@ -227,6 +241,9 @@ export function Recommendations() {
   const [ratingCount, setRatingCount] = useState(0)
   const [showRatingPopup, setShowRatingPopup] = useState<string | null>(null)
   const [sensitivityFilterCount, setSensitivityFilterCount] = useState(0)
+  const [dismissingProduct, setDismissingProduct] = useState<string | null>(null)
+  const [dismissReasons, setDismissReasons] = useState<Set<string>>(new Set())
+  const [dismissNote, setDismissNote] = useState('')
 
   const ratedProductIds = new Set(userReviews.map(r => r.product_id))
 
@@ -297,7 +314,7 @@ export function Recommendations() {
             seen.add(p.id)
           }
         }
-        recs = blended.slice(0, 20)
+        recs = blended.slice(0, 5)
         ingredientResults = ingRecs
       } else {
         currentTier = 2
@@ -332,7 +349,7 @@ export function Recommendations() {
             seen.add(p.id)
           }
         }
-        recs = blended.slice(0, 20)
+        recs = blended.slice(0, 5)
       } else {
         currentTier = 3
         recs = buildTier3(products, reviews, ratedIds)
@@ -393,7 +410,7 @@ export function Recommendations() {
 
     const rankedIds = Object.entries(productCounts)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 20)
+      .slice(0, 5)
       .map(([id]) => id)
 
     if (rankedIds.length === 0) {
@@ -452,6 +469,50 @@ export function Recommendations() {
 
     const reviews = (freshReviews as unknown as (ProductReview & { products: Product })[]) ?? []
     setUserReviews(reviews)
+  }
+
+  // ----- bookmark handler -----
+
+  const handleBookmark = (productId: string) => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('scrunch_actions') || '{}')
+      if (!stored[productId]) stored[productId] = []
+      if (!stored[productId].includes('bookmarked')) {
+        stored[productId].push('bookmarked')
+      }
+      localStorage.setItem('scrunch_actions', JSON.stringify(stored))
+    } catch { /* ignore */ }
+  }
+
+  // ----- dismiss handler -----
+
+  const handleDismiss = async (productId: string) => {
+    if (!user || dismissReasons.size === 0) return
+
+    const reasonText = [...dismissReasons].join(', ')
+    const notes = dismissNote.trim()
+      ? `${reasonText}. ${dismissNote.trim()}`
+      : reasonText
+
+    await supabase
+      .from('product_reviews')
+      .upsert(
+        {
+          user_id: user.id,
+          product_id: productId,
+          rating: 1,
+          would_repurchase: 'no',
+          results_notes: notes,
+          status: 'tried_once',
+          photo_urls: [],
+        } as never,
+        { onConflict: 'user_id,product_id' },
+      )
+
+    setDismissingProduct(null)
+    setDismissReasons(new Set())
+    setDismissNote('')
+    loadData()
   }
 
   // ----- render gates -----
@@ -526,10 +587,36 @@ export function Recommendations() {
                 key={product.id}
                 product={product}
                 reason={product._reason}
+                matchScore={product._score}
                 showRatingPopup={showRatingPopup === product.id}
                 onOpenRating={() => setShowRatingPopup(product.id)}
                 onCloseRating={() => setShowRatingPopup(null)}
                 onRate={handleRate}
+                isDismissing={dismissingProduct === product.id}
+                dismissReasons={dismissingProduct === product.id ? dismissReasons : new Set<string>()}
+                dismissNote={dismissingProduct === product.id ? dismissNote : ''}
+                onOpenDismiss={() => {
+                  setDismissingProduct(product.id)
+                  setDismissReasons(new Set())
+                  setDismissNote('')
+                  setShowRatingPopup(null)
+                }}
+                onCloseDismiss={() => {
+                  setDismissingProduct(null)
+                  setDismissReasons(new Set())
+                  setDismissNote('')
+                }}
+                onToggleDismissReason={(reason: string) => {
+                  setDismissReasons(prev => {
+                    const next = new Set(prev)
+                    if (next.has(reason)) next.delete(reason)
+                    else next.add(reason)
+                    return next
+                  })
+                }}
+                onDismissNoteChange={(val: string) => setDismissNote(val)}
+                onSubmitDismiss={() => handleDismiss(product.id)}
+                onBookmark={() => handleBookmark(product.id)}
               />
             ))}
           </div>
@@ -559,6 +646,31 @@ export function Recommendations() {
                   onOpenRating={() => setShowRatingPopup(product.id)}
                   onCloseRating={() => setShowRatingPopup(null)}
                   onRate={handleRate}
+                  isDismissing={dismissingProduct === product.id}
+                  dismissReasons={dismissingProduct === product.id ? dismissReasons : new Set<string>()}
+                  dismissNote={dismissingProduct === product.id ? dismissNote : ''}
+                  onOpenDismiss={() => {
+                    setDismissingProduct(product.id)
+                    setDismissReasons(new Set())
+                    setDismissNote('')
+                    setShowRatingPopup(null)
+                  }}
+                  onCloseDismiss={() => {
+                    setDismissingProduct(null)
+                    setDismissReasons(new Set())
+                    setDismissNote('')
+                  }}
+                  onToggleDismissReason={(reason: string) => {
+                    setDismissReasons(prev => {
+                      const next = new Set(prev)
+                      if (next.has(reason)) next.delete(reason)
+                      else next.add(reason)
+                      return next
+                    })
+                  }}
+                  onDismissNoteChange={(val: string) => setDismissNote(val)}
+                  onSubmitDismiss={() => handleDismiss(product.id)}
+                  onBookmark={() => handleBookmark(product.id)}
                 />
               ))}
             </div>
@@ -692,6 +804,7 @@ export function Recommendations() {
 function RecommendedCard({
   product,
   reason,
+  matchScore,
   showRatingPopup,
   onOpenRating,
   onCloseRating,
@@ -699,6 +812,7 @@ function RecommendedCard({
 }: {
   product: Product
   reason?: string
+  matchScore?: number
   showRatingPopup: boolean
   onOpenRating: () => void
   onCloseRating: () => void
@@ -720,7 +834,18 @@ function RecommendedCard({
       />
 
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-gray-500">{product.brand}</p>
+        <div className="flex items-center gap-2">
+          <p className="text-xs text-gray-500">{product.brand}</p>
+          {matchScore != null && matchScore > 0 && (
+            <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${
+              matchScore >= 80 ? 'bg-emerald-50 text-emerald-700' :
+              matchScore >= 60 ? 'bg-green-50 text-green-700' :
+              'bg-amber-50 text-amber-700'
+            }`}>
+              {matchScore}% match
+            </span>
+          )}
+        </div>
         <Link
           to={`/products/${product.id}`}
           className="font-semibold text-gray-900 hover:text-violet-600 no-underline truncate block"
