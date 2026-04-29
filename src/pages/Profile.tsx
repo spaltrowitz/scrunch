@@ -171,10 +171,30 @@ export function ProfilePage() {
   )
 }
 
+const HAIR_PROPERTY_GUIDES: Record<string, string> = {
+  'Porosity': 'https://www.reddit.com/r/curlyhair/wiki/index#wiki_porosity',
+  'Hair Density': 'https://www.reddit.com/r/curlyhair/wiki/index#wiki_density',
+  'Hair Width': 'https://www.reddit.com/r/curlyhair/wiki/index#wiki_texture',
+}
+
 function ProfileField({ label, value }: { label: string; value: string | null | undefined }) {
+  const guideUrl = HAIR_PROPERTY_GUIDES[label]
   return (
     <div>
-      <span className="text-gray-500">{label}</span>
+      <span className="text-gray-500">
+        {label}
+        {guideUrl && (
+          <a
+            href={guideUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-1.5 text-violet-500 hover:text-violet-700 text-xs font-normal"
+            title={`Learn more about ${label.toLowerCase()}`}
+          >
+            Learn more ↗
+          </a>
+        )}
+      </span>
       <p className={`font-medium capitalize ${value ? 'text-gray-900' : 'text-gray-300'}`}>
         {value || 'Not set'}
       </p>
