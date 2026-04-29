@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
 import { supabase } from '../lib/supabase'
-import { CURL_PATTERNS, POROSITY_OPTIONS } from '../lib/constants'
+import { CURL_PATTERNS, POROSITY_OPTIONS, parseSensitivity, INGREDIENT_PREFERENCE_LABELS } from '../lib/constants'
 import type { Profile } from '../lib/database.types'
 
 export function ProfilePage() {
@@ -93,20 +93,7 @@ export function ProfilePage() {
               ))}
             </div>
 
-            {/* Count unset optional fields */}
-            {(() => {
-              const optional = [profile!.scalp_type, profile!.climate, profile!.cgm_experience, profile!.heat_tool_usage, profile!.workout_frequency, profile!.fragrance_preference, profile!.color_treatment]
-              const unsetCount = optional.filter(v => !v).length
-              if (unsetCount === 0) return null
-              return (
-                <button
-                  onClick={() => navigate('/onboarding')}
-                  className="mt-4 text-xs text-violet-600 hover:underline cursor-pointer"
-                >
-                  + Add {unsetCount} more detail{unsetCount !== 1 ? 's' : ''} for better recommendations
-                </button>
-              )
-            })()}
+            {/* Optional detail fields — will prompt when additional wizard steps are added */}
           </div>
 
           <div className="bg-white rounded-xl border border-gray-200 p-6">
@@ -125,11 +112,18 @@ export function ProfilePage() {
               <div>
                 <span className="text-sm text-gray-500">Sensitivities</span>
                 <div className="flex flex-wrap gap-2 mt-1">
-                  {profile!.sensitivities.length > 0 ? profile!.sensitivities.map(s => (
-                    <span key={s} className="text-xs px-2 py-1 bg-red-50 text-red-700 rounded-full">
-                      {s}
-                    </span>
-                  )) : <span className="text-sm text-gray-400">None set</span>}
+                  {profile!.sensitivities.length > 0 ? profile!.sensitivities.map(s => {
+                    const { name, strictness } = parseSensitivity(s)
+                    const label = INGREDIENT_PREFERENCE_LABELS[name] || name.replace(/_/g, ' ')
+                    return (
+                      <span
+                        key={s}
+                        className={`text-xs px-2 py-1 rounded-full ${strictness === 'strict' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700'}`}
+                      >
+                        {strictness === 'strict' ? '🚫' : '⚠️'} {label}
+                      </span>
+                    )
+                  }) : <span className="text-sm text-gray-400">None set</span>}
                 </div>
               </div>
             </div>
@@ -171,10 +165,30 @@ export function ProfilePage() {
   )
 }
 
+const HAIR_PROPERTY_GUIDES: Record<string, string> = {
+  'Porosity': 'https://docs.google.com/document/d/1Q6Dj9WAZxlfBhJSyS5on2rw3-if5cOV3oV-dQ3B0AHA/edit#bookmark=kix.y3l0h5s9oqk9',
+  'Hair Density': 'https://docs.google.com/document/d/1Q6Dj9WAZxlfBhJSyS5on2rw3-if5cOV3oV-dQ3B0AHA/edit#bookmark=id.8igp5xhonl09',
+  'Hair Width': 'https://docs.google.com/document/d/1Q6Dj9WAZxlfBhJSyS5on2rw3-if5cOV3oV-dQ3B0AHA/edit#bookmark=id.epzf99ee7zm5',
+}
+
 function ProfileField({ label, value }: { label: string; value: string | null | undefined }) {
+  const guideUrl = HAIR_PROPERTY_GUIDES[label]
   return (
     <div>
-      <span className="text-gray-500">{label}</span>
+      <span className="text-gray-500">
+        {label}
+        {guideUrl && (
+          <a
+            href={guideUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-1.5 text-violet-500 hover:text-violet-700 text-xs font-normal"
+            title={`Learn more about ${label.toLowerCase()}`}
+          >
+            Learn more ↗
+          </a>
+        )}
+      </span>
       <p className={`font-medium capitalize ${value ? 'text-gray-900' : 'text-gray-300'}`}>
         {value || 'Not set'}
       </p>
