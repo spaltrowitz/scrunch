@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../lib/auth'
 import { supabase } from '../../lib/supabase'
-import { CURL_PATTERNS, POROSITY_OPTIONS, HAIR_GOALS, HAIR_GOAL_LABELS, INGREDIENT_PREFERENCES, INGREDIENT_PREFERENCE_LABELS } from '../../lib/constants'
+import { CURL_PATTERNS, POROSITY_OPTIONS, HAIR_GOALS, HAIR_GOAL_LABELS, INGREDIENT_PREFERENCES, INGREDIENT_PREFERENCE_LABELS, parseSensitivity, encodeSensitivity } from '../../lib/constants'
 
 import type { CurlPattern, Porosity, HairDensity, HairWidth, ScalpType, HairLength, ColorTreatment, Climate, HeatToolUsage, WorkoutFrequency, CgmExperience, FragrancePreference } from '../../lib/database.types'
 
@@ -75,6 +75,34 @@ export function OnboardingWizard() {
     setData(d => ({
       ...d,
       [key]: d[key].includes(item) ? d[key].filter(i => i !== item) : [...d[key], item],
+    }))
+  }
+
+  /** Check if a sensitivity (by base name) is currently selected, regardless of strictness. */
+  const isSensitivitySelected = (name: string): boolean => {
+    return data.sensitivities.some(s => parseSensitivity(s).name === name)
+  }
+
+  /** Get the strictness for a selected sensitivity. Defaults to 'flexible'. */
+  const getSensitivityStrictness = (name: string): 'strict' | 'flexible' => {
+    const found = data.sensitivities.find(s => parseSensitivity(s).name === name)
+    return found ? parseSensitivity(found).strictness : 'flexible'
+  }
+
+  /** Toggle a sensitivity on/off. When toggling on, defaults to 'flexible'. */
+  const toggleSensitivity = (name: string) => {
+    if (isSensitivitySelected(name)) {
+      setData(d => ({ ...d, sensitivities: d.sensitivities.filter(s => parseSensitivity(s).name !== name) }))
+    } else {
+      setData(d => ({ ...d, sensitivities: [...d.sensitivities, encodeSensitivity(name, 'flexible')] }))
+    }
+  }
+
+  /** Update the strictness of an already-selected sensitivity. */
+  const setSensitivityStrictness = (name: string, strictness: 'strict' | 'flexible') => {
+    setData(d => ({
+      ...d,
+      sensitivities: d.sensitivities.map(s => parseSensitivity(s).name === name ? encodeSensitivity(name, strictness) : s),
     }))
   }
 
@@ -199,6 +227,14 @@ export function OnboardingWizard() {
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">What's your hair porosity?</h2>
             <p className="text-sm text-gray-500 mb-3">Porosity is how well your hair absorbs and holds moisture. It's the most important factor for choosing products.</p>
+            <a
+              href="https://docs.google.com/document/d/1Q6Dj9WAZxlfBhJSyS5on2rw3-if5cOV3oV-dQ3B0AHA/edit#bookmark=kix.y3l0h5s9oqk9"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm text-violet-600 hover:text-violet-700 mb-3 font-medium"
+            >
+              📖 Read the r/curlyhair porosity guide →
+            </a>
 
             <details className="mb-5 bg-violet-50 border border-violet-200 rounded-lg">
               <summary className="px-4 py-2.5 text-sm text-violet-700 font-medium cursor-pointer">
@@ -253,7 +289,15 @@ export function OnboardingWizard() {
 
             <div className="mb-6">
               <h3 className="text-sm font-semibold text-gray-800 mb-1">Density</h3>
-              <p className="text-xs text-gray-500 mb-3">Part your hair and check the mirror — the more scalp you see, the less dense.</p>
+              <p className="text-xs text-gray-500 mb-1">Part your hair and check the mirror — the more scalp you see, the less dense.</p>
+              <a
+                href="https://docs.google.com/document/d/1Q6Dj9WAZxlfBhJSyS5on2rw3-if5cOV3oV-dQ3B0AHA/edit#bookmark=id.8igp5xhonl09"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block text-xs text-violet-600 hover:text-violet-700 font-medium mb-3"
+              >
+                📖 Learn more about density →
+              </a>
               <div className="grid grid-cols-3 gap-3">
                 {(['thin', 'medium', 'thick'] as const).map(v => (
                   <OptionButton key={v} selected={data.hair_density === v} onClick={() => update('hair_density', v)}>
@@ -265,7 +309,15 @@ export function OnboardingWizard() {
 
             <div>
               <h3 className="text-sm font-semibold text-gray-800 mb-1">Strand Width</h3>
-              <p className="text-xs text-gray-500 mb-3">Roll a single strand between your fingers — can you feel it?</p>
+              <p className="text-xs text-gray-500 mb-1">Roll a single strand between your fingers — can you feel it?</p>
+              <a
+                href="https://docs.google.com/document/d/1Q6Dj9WAZxlfBhJSyS5on2rw3-if5cOV3oV-dQ3B0AHA/edit#bookmark=id.epzf99ee7zm5"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block text-xs text-violet-600 hover:text-violet-700 font-medium mb-3"
+              >
+                📖 Learn more about strand width →
+              </a>
               <div className="grid grid-cols-3 gap-3">
                 {(['fine', 'medium', 'coarse'] as const).map(v => (
                   <OptionButton key={v} selected={data.hair_width === v} onClick={() => update('hair_width', v)}>
@@ -311,14 +363,56 @@ export function OnboardingWizard() {
         {step === 6 && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Any ingredient preferences?</h2>
-            <p className="text-sm text-gray-500 mb-6">We'll flag products with these ingredients. Select all that apply, or skip.</p>
-            <div className="grid grid-cols-2 gap-3">
-              {INGREDIENT_PREFERENCES.map(pref => (
-                <OptionButton key={pref} selected={data.sensitivities.includes(pref)} onClick={() => toggleArrayItem('sensitivities', pref)}>
-                  {INGREDIENT_PREFERENCE_LABELS[pref]}
-                </OptionButton>
-              ))}
+            <p className="text-sm text-gray-500 mb-6">Select ingredients you want to watch for, then choose how strictly to enforce each one.</p>
+            <div className="space-y-3">
+              {INGREDIENT_PREFERENCES.map(pref => {
+                const selected = isSensitivitySelected(pref)
+                const strictness = getSensitivityStrictness(pref)
+                return (
+                  <div key={pref}>
+                    <button
+                      type="button"
+                      onClick={() => toggleSensitivity(pref)}
+                      className={`w-full px-4 py-3 rounded-lg border text-sm text-left cursor-pointer transition-colors ${
+                        selected ? 'border-violet-500 bg-violet-50 text-violet-700 font-medium' : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                      } ${selected ? 'rounded-b-none border-b-0' : ''}`}
+                    >
+                      {INGREDIENT_PREFERENCE_LABELS[pref]}
+                    </button>
+                    {selected && (
+                      <div className="flex border border-t-0 border-violet-500 rounded-b-lg overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => setSensitivityStrictness(pref, 'flexible')}
+                          className={`flex-1 px-3 py-2 text-xs cursor-pointer transition-colors ${
+                            strictness === 'flexible'
+                              ? 'bg-amber-50 text-amber-700 font-medium'
+                              : 'bg-white text-gray-500 hover:bg-gray-50'
+                          }`}
+                        >
+                          ⚠️ Prefer to avoid
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSensitivityStrictness(pref, 'strict')}
+                          className={`flex-1 px-3 py-2 text-xs cursor-pointer transition-colors border-l ${
+                            strictness === 'strict'
+                              ? 'bg-red-50 text-red-700 font-medium border-l-red-200'
+                              : 'bg-white text-gray-500 hover:bg-gray-50 border-l-gray-200'
+                          }`}
+                        >
+                          🚫 Must avoid
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
             </div>
+            <p className="text-xs text-gray-400 mt-4">
+              <strong>Prefer to avoid</strong> — we'll warn you but still show the product.
+              <strong> Must avoid</strong> — we'll hide it from recommendations.
+            </p>
           </div>
         )}
 

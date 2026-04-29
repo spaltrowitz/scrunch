@@ -102,6 +102,25 @@ export const INGREDIENT_PREFERENCE_LABELS: Record<string, string> = {
   aloe_free: 'Aloe-Free',
 }
 
+/**
+ * Parse a sensitivity string that may include a strictness suffix.
+ * Format: "silicone_free" (defaults to strict) or "silicone_free:flexible"
+ */
+export function parseSensitivity(encoded: string): { name: string; strictness: 'strict' | 'flexible' } {
+  if (encoded.endsWith(':flexible')) {
+    return { name: encoded.replace(':flexible', ''), strictness: 'flexible' }
+  }
+  if (encoded.endsWith(':strict')) {
+    return { name: encoded.replace(':strict', ''), strictness: 'strict' }
+  }
+  return { name: encoded, strictness: 'strict' }
+}
+
+/** Encode a sensitivity name + strictness back into a storable string. */
+export function encodeSensitivity(name: string, strictness: 'strict' | 'flexible'): string {
+  return strictness === 'strict' ? `${name}:strict` : `${name}:flexible`
+}
+
 export const SENSITIVITIES = [
   'fragrance',
   'coconut',

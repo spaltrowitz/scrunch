@@ -9,7 +9,7 @@ import { QuickRateCard } from '../components/products/QuickRateCard'
 import {
   buildIngredientProfile,
   scoreProductByIngredients,
-  checkSensitivities,
+  checkSensitivitiesWithStrictness,
   formatIngredientList,
 } from '../utils/ingredientMatcher'
 
@@ -22,6 +22,7 @@ type Tier = 1 | 2 | 2.5 | 3 | 4
 // A recommended product carries a reason string for display
 interface RecommendedProduct extends Product {
   _reason?: string
+  _sensitivityWarning?: string
 }
 
 const MIN_RATINGS_FOR_INGREDIENTS = 3
@@ -155,11 +156,20 @@ function buildIngredientTier(
 
   const scored: (RecommendedProduct & { _score: number })[] = []
   for (const product of candidates) {
-    // Sensitivity filter
+    // Sensitivity filter (strict = exclude, flexible = warn)
     if (sensitivities.length > 0) {
-      const flagged = checkSensitivities(product, sensitivities)
-      if (flagged.length > 0) {
+      const { strict, flexible } = checkSensitivitiesWithStrictness(product, sensitivities)
+      if (strict.length > 0) {
         sensitivityFilterCount++
+        continue
+      }
+      if (flexible.length > 0) {
+        const { score, matchedIngredients } = scoreProductByIngredients(product, profile)
+        if (score > 0 && matchedIngredients.length > 0) {
+          const reason = `Contains ${formatIngredientList(matchedIngredients)} — ingredients you've loved in other products`
+          const warning = `⚠️ Contains ${formatIngredientList(flexible)} (you prefer to avoid)`
+          scored.push({ ...product, _score: score * 0.7, _reason: reason, _sensitivityWarning: warning })
+        }
         continue
       }
     }
@@ -587,6 +597,7 @@ export function Recommendations() {
                 key={product.id}
                 product={product}
                 reason={product._reason}
+                sensitivityWarning={product._sensitivityWarning}
                 matchScore={product._score}
                 showRatingPopup={showRatingPopup === product.id}
                 onOpenRating={() => setShowRatingPopup(product.id)}
@@ -642,6 +653,7 @@ export function Recommendations() {
                   key={product.id}
                   product={product}
                   reason={product._reason}
+                  sensitivityWarning={product._sensitivityWarning}
                   showRatingPopup={showRatingPopup === product.id}
                   onOpenRating={() => setShowRatingPopup(product.id)}
                   onCloseRating={() => setShowRatingPopup(null)}
@@ -804,6 +816,7 @@ export function Recommendations() {
 function RecommendedCard({
   product,
   reason,
+  sensitivityWarning,
   matchScore,
   showRatingPopup,
   onOpenRating,
@@ -821,6 +834,7 @@ function RecommendedCard({
 }: {
   product: Product
   reason?: string
+  sensitivityWarning?: string
   matchScore?: number
   showRatingPopup: boolean
   onOpenRating: () => void
@@ -895,6 +909,11 @@ function RecommendedCard({
           {reason && (
             <p className="text-xs text-violet-500 mt-1 truncate">
               ✨ {reason}
+            </p>
+          )}
+          {sensitivityWarning && (
+            <p className="text-xs text-amber-600 mt-1 truncate">
+              {sensitivityWarning}
             </p>
           )}
         </div>
