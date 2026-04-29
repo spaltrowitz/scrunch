@@ -158,7 +158,8 @@ export function scoreProductByIngredients(
 
 /**
  * Check whether a product contains ingredients that match any of the user's
- * stated sensitivities. Returns a list of flagged ingredient names.
+ * stated sensitivities. Returns flagged items grouped by strictness.
+ * Sensitivity strings may include a strictness suffix (e.g. "silicone_free:strict").
  */
 export function checkSensitivities(
   product: { ingredients: string[] },
@@ -166,10 +167,12 @@ export function checkSensitivities(
 ): string[] {
   if (!sensitivities.length) return []
 
+  // Parse strictness but still return all flagged ingredients for backward compatibility
   const flagged: string[] = []
   for (const ing of product.ingredients) {
-    for (const sensitivity of sensitivities) {
-      const patterns = SENSITIVITY_MAP[sensitivity.toLowerCase()]
+    for (const raw of sensitivities) {
+      const name = raw.replace(/:(?:strict|flexible)$/, '')
+      const patterns = SENSITIVITY_MAP[name.toLowerCase()]
       if (patterns) {
         if (patterns.some(p => p.test(ing))) {
           flagged.push(ing.trim())
@@ -177,7 +180,7 @@ export function checkSensitivities(
         }
       } else {
         // Fallback: direct substring match for unknown sensitivities
-        if (normalize(ing).includes(sensitivity.toLowerCase())) {
+        if (normalize(ing).includes(name.toLowerCase())) {
           flagged.push(ing.trim())
           break
         }
@@ -185,6 +188,45 @@ export function checkSensitivities(
     }
   }
   return flagged
+}
+
+/**
+ * Check sensitivities with strictness awareness.
+ * Returns separate lists for strict and flexible matches.
+ */
+export function checkSensitivitiesWithStrictness(
+  product: { ingredients: string[] },
+  sensitivities: string[],
+): { strict: string[]; flexible: string[] } {
+  if (!sensitivities.length) return { strict: [], flexible: [] }
+
+  const strict: string[] = []
+  const flexible: string[] = []
+
+  for (const ing of product.ingredients) {
+    for (const raw of sensitivities) {
+      const name = raw.replace(/:(?:strict|flexible)$/, '')
+      const isFlexible = raw.endsWith(':flexible')
+      const patterns = SENSITIVITY_MAP[name.toLowerCase()]
+      let matched = false
+
+      if (patterns) {
+        matched = patterns.some(p => p.test(ing))
+      } else {
+        matched = normalize(ing).includes(name.toLowerCase())
+      }
+
+      if (matched) {
+        if (isFlexible) {
+          flexible.push(ing.trim())
+        } else {
+          strict.push(ing.trim())
+        }
+        break
+      }
+    }
+  }
+  return { strict, flexible }
 }
 
 /**
