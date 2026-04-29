@@ -1,4 +1,4 @@
-import type { CurlPattern, Porosity, ProductCategory } from './database.types'
+import type { CurlPattern, Porosity, ProductCategory, ScalpType, ColorTreatment, Climate, HeatToolUsage, WorkoutFrequency, CgmExperience, FragrancePreference, WaterType } from './database.types'
 
 export const CURL_PATTERNS: { value: CurlPattern; label: string; description: string }[] = [
   { value: '2A', label: '2A', description: 'Almost straight with a slight bend' },
@@ -12,10 +12,27 @@ export const CURL_PATTERNS: { value: CurlPattern; label: string; description: st
   { value: '4C', label: '4C', description: 'Like a sharply defined "Z"' },
 ]
 
-export const POROSITY_OPTIONS: { value: Porosity; label: string; description: string }[] = [
-  { value: 'low', label: 'Low', description: 'Water beads on hair, products sit on top' },
-  { value: 'medium', label: 'Medium', description: 'Hair absorbs and retains moisture well' },
-  { value: 'high', label: 'High', description: 'Hair absorbs quickly but loses moisture fast' },
+export const POROSITY_OPTIONS: { value: Porosity; label: string; description: string; characteristics: string[] }[] = [
+  { value: 'low', label: 'Low', description: 'Hair resists absorbing moisture — products sit on top', characteristics: [
+    'Water beads up on hair instead of absorbing',
+    'Takes a long time to get fully wet and even longer to dry',
+    'Products tend to build up quickly',
+    'Shiny, smooth-feeling strands',
+    'Resistant to chemical treatments (dye, relaxer)',
+  ] },
+  { value: 'medium', label: 'Medium', description: 'Hair absorbs and retains moisture well — easy to work with', characteristics: [
+    'Hair gets wet fairly quickly and dries in a few hours',
+    'Holds styles well and responds to products predictably',
+    'Takes color as expected',
+    'Generally healthy-looking with some shine',
+  ] },
+  { value: 'high', label: 'High', description: 'Hair absorbs fast but loses moisture quickly — needs sealing', characteristics: [
+    'Gets wet immediately and may dry very fast',
+    'Soaks in products quickly — may feel like nothing is "enough"',
+    'Tangles easily, feels rough or bumpy',
+    'Can look dull or feel dry',
+    'May be from damage (heat, bleach, chemical treatments) or genetics',
+  ] },
 ]
 
 export const PRODUCT_CATEGORY_LABELS: Record<ProductCategory, string> = {
@@ -110,6 +127,57 @@ export const SENSITIVITIES = [
   'silicone',
   'aloe',
 ] as const
+
+export const SCALP_TYPE_OPTIONS: { value: ScalpType; label: string; description: string }[] = [
+  { value: 'dry', label: 'Dry', description: 'Tight, flaky, or itchy scalp' },
+  { value: 'normal', label: 'Normal', description: 'Balanced — not too oily, not too dry' },
+  { value: 'oily', label: 'Oily', description: 'Gets greasy quickly, especially at the roots' },
+]
+
+export const COLOR_TREATMENT_OPTIONS: { value: ColorTreatment; label: string }[] = [
+  { value: 'virgin', label: 'Virgin (untreated)' },
+  { value: 'color_treated', label: 'Color-treated' },
+  { value: 'bleached', label: 'Bleached / Lightened' },
+  { value: 'highlighted', label: 'Highlighted / Balayage' },
+]
+
+export const HEAT_TOOL_OPTIONS: { value: HeatToolUsage; label: string }[] = [
+  { value: 'never', label: 'Never' },
+  { value: 'occasionally', label: 'Occasionally (a few times/year)' },
+  { value: 'frequently', label: 'Frequently (weekly+)' },
+]
+
+export const CGM_EXPERIENCE_OPTIONS: { value: CgmExperience; label: string; description: string }[] = [
+  { value: 'just_starting', label: 'Just starting', description: 'Haven\'t done a CGM routine yet' },
+  { value: 'under_1_year', label: 'Under 1 year', description: 'Still experimenting' },
+  { value: '1_to_3_years', label: '1–3 years', description: 'Know what works for my hair' },
+  { value: '3_plus_years', label: '3+ years', description: 'Experienced CGM practitioner' },
+]
+
+export const CLIMATE_OPTIONS: { value: Climate; label: string; description: string }[] = [
+  { value: 'humid', label: 'Humid', description: 'Sticky summers, dew points >60°F' },
+  { value: 'dry', label: 'Dry', description: 'Arid, low humidity' },
+  { value: 'variable', label: 'Variable', description: 'Seasons change a lot' },
+  { value: 'tropical', label: 'Tropical', description: 'Hot and humid year-round' },
+]
+
+export const WORKOUT_FREQUENCY_OPTIONS: { value: WorkoutFrequency; label: string }[] = [
+  { value: 'rarely', label: 'Rarely' },
+  { value: 'few_times_week', label: 'A few times/week' },
+  { value: 'daily', label: 'Daily' },
+]
+
+export const FRAGRANCE_PREFERENCE_OPTIONS: { value: FragrancePreference; label: string }[] = [
+  { value: 'love_it', label: 'Love it — bring on the scents' },
+  { value: 'no_preference', label: 'No preference' },
+  { value: 'fragrance_free', label: 'Prefer fragrance-free' },
+]
+
+export const WATER_TYPE_OPTIONS: { value: WaterType; label: string; description: string }[] = [
+  { value: 'hard', label: 'Hard water', description: 'Leaves mineral buildup — you may need chelating shampoo' },
+  { value: 'soft', label: 'Soft water', description: 'Low mineral content' },
+  { value: 'unknown', label: 'Not sure', description: 'Check with your local water utility' },
+]
 
 export const CG_STATUS_CONFIG = {
   approved: { label: 'CG Approved', color: 'text-green-600', bg: 'bg-green-50', icon: '🟢' },

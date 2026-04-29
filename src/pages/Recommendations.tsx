@@ -26,7 +26,25 @@ interface RecommendedProduct extends Product {
 
 const MIN_RATINGS_FOR_INGREDIENTS = 3
 
-// Categories prioritised per curl-pattern band
+// Category priorities by POROSITY + TEXTURE (the guide says these matter most)
+const POROSITY_TEXTURE_PRIORITY: Record<string, ProductCategory[]> = {
+  // Low porosity, fine: lightweight everything, clarifying often
+  'low_fine':    ['mousse', 'gel', 'spray_refresher', 'low_poo', 'clarifying_shampoo'],
+  'low_medium':  ['gel', 'mousse', 'low_poo', 'leave_in_conditioner', 'spray_refresher'],
+  'low_coarse':  ['gel', 'curl_cream', 'low_poo', 'rinse_out_conditioner'],
+
+  // Medium porosity: flexible, most things work
+  'medium_fine':    ['mousse', 'gel', 'leave_in_conditioner', 'low_poo'],
+  'medium_medium':  ['gel', 'curl_cream', 'leave_in_conditioner', 'rinse_out_conditioner'],
+  'medium_coarse':  ['curl_cream', 'gel', 'deep_conditioner', 'leave_in_conditioner', 'co_wash'],
+
+  // High porosity: heavy moisture, sealing, protein treatments
+  'high_fine':    ['gel', 'leave_in_conditioner', 'protein_treatment', 'deep_conditioner'],
+  'high_medium':  ['curl_cream', 'gel', 'deep_conditioner', 'oil_serum', 'protein_treatment'],
+  'high_coarse':  ['curl_cream', 'custard', 'oil_serum', 'deep_conditioner', 'co_wash', 'protein_treatment'],
+}
+
+// Fallback: curl pattern bands (secondary signal, used as tiebreaker)
 const CURL_CATEGORY_PRIORITY: Record<string, ProductCategory[]> = {
   wavy:       ['mousse', 'gel', 'low_poo'],
   wavy_curly: ['gel', 'leave_in_conditioner', 'curl_cream'],
@@ -41,6 +59,11 @@ function curlBand(cp: CurlPattern): string {
   return 'coily' // 4A-4C
 }
 
+function porosityTextureKey(porosity: Porosity, width: string | null): string {
+  const texture = width || 'medium'
+  return `${porosity}_${texture}`
+}
+
 const LIGHTWEIGHT_CATEGORIES: ProductCategory[] = ['mousse', 'gel', 'spray_refresher']
 const HEAVY_MOISTURE_CATEGORIES: ProductCategory[] = ['deep_conditioner', 'oil_serum', 'curl_cream']
 
@@ -52,13 +75,20 @@ function porosityBoost(porosity: Porosity, category: ProductCategory): number {
 
 // Tier 1: pick ~3 from each major category for variety
 const TIER1_CATEGORIES: ProductCategory[] = [
-  'low_poo', 'rinse_out_conditioner', 'leave_in_conditioner',
+  'clarifying_shampoo', 'low_poo', 'rinse_out_conditioner', 'leave_in_conditioner',
   'curl_cream', 'gel', 'mousse', 'deep_conditioner',
 ]
 
-function buildTier1(products: Product[]): Product[] {
+function buildTier1(products: Product[], cgmExperience?: string | null): Product[] {
   const approved = products.filter(p => p.cg_status === 'approved')
   const result: Product[] = []
+
+  // CGM beginners: always lead with clarifying shampoo
+  if (!cgmExperience || cgmExperience === 'just_starting') {
+    const clarifiers = products.filter(p => p.category === 'clarifying_shampoo')
+    if (clarifiers.length > 0) result.push(clarifiers[0])
+  }
+
   for (const cat of TIER1_CATEGORIES) {
     const catProducts = approved
       .filter(p => p.category === cat && !result.some(r => r.id === p.id))
@@ -70,26 +100,53 @@ function buildTier1(products: Product[]): Product[] {
 
 function buildTier2(
   products: Product[],
-  curlPattern: CurlPattern,
-  porosity: Porosity,
+  profile: Profile,
   ratedIds: Set<string>,
 ): RecommendedProduct[] {
   const approved = products.filter(
     p => p.cg_status === 'approved' && !ratedIds.has(p.id),
   )
-  const band = curlBand(curlPattern)
-  const priorities = CURL_CATEGORY_PRIORITY[band] ?? []
+  const porosity = profile.porosity || 'medium'
+  const width = profile.hair_width || 'medium'
+  const key = porosityTextureKey(porosity, width)
+
+  // Primary: porosity + texture priorities
+  const primaryPriorities = POROSITY_TEXTURE_PRIORITY[key] ?? POROSITY_TEXTURE_PRIORITY['medium_medium']
+
+  // Secondary: curl pattern band (optional tiebreaker)
+  const curlPriorities = profile.curl_pattern
+    ? CURL_CATEGORY_PRIORITY[curlBand(profile.curl_pattern)] ?? []
+    : []
 
   const scored = approved.map(p => {
     let s = 0
-    const idx = priorities.indexOf(p.category)
-    if (idx !== -1) s += (priorities.length - idx) * 3
+    // Primary: porosity + texture match (high weight)
+    const primaryIdx = primaryPriorities.indexOf(p.category)
+    if (primaryIdx !== -1) s += (primaryPriorities.length - primaryIdx) * 4
+
+    // Secondary: curl pattern match (lower weight)
+    const curlIdx = curlPriorities.indexOf(p.category)
+    if (curlIdx !== -1) s += (curlPriorities.length - curlIdx) * 1
+
     s += porosityBoost(porosity, p.category)
-    return {
-      ...p,
-      _score: s,
-      _reason: `Popular with ${curlPattern} ${porosity} porosity hair`,
-    }
+
+    // Protein-moisture balance
+    if (porosity === 'high' && p.category === 'protein_treatment') s += 3
+    if (porosity === 'low' && p.category === 'protein_treatment') s -= 2
+
+    // CGM beginner boost for clarifying shampoo
+    if (profile.cgm_experience === 'just_starting' && p.category === 'clarifying_shampoo') s += 5
+
+    // Climate-aware: humid → deprioritize heavy humectants, dry → boost sealing products
+    if (profile.climate === 'humid' && p.category === 'oil_serum') s += 2
+    if (profile.climate === 'dry' && p.category === 'oil_serum') s += 3
+
+    const reasonParts = [`${porosity} porosity`]
+    if (width !== 'medium') reasonParts.push(`${width} texture`)
+    if (profile.curl_pattern) reasonParts.push(profile.curl_pattern)
+    const reason = `Recommended for ${reasonParts.join(', ')} hair`
+
+    return { ...p, _score: s, _reason: reason }
   })
 
   scored.sort((a, b) => b._score - a._score)
@@ -194,16 +251,21 @@ const DISMISS_REASONS = [
 // ---------------------------------------------------------------------------
 
 function tierHeader(tier: Tier, profile: Profile | null): { title: string; subtitle: string } {
+  const porosity = profile?.porosity || 'your'
+  const width = profile?.hair_width ? `, ${profile.hair_width}` : ''
+  const curlInfo = profile?.curl_pattern ? ` ${profile.curl_pattern}` : ''
   switch (tier) {
     case 1:
       return {
         title: 'Popular CG-Approved Products',
-        subtitle: 'Complete your hair profile to get personalized recommendations',
+        subtitle: profile?.cgm_experience === 'just_starting'
+          ? 'Starting CGM? Your first step is a clarifying wash — we\'ve included one below'
+          : 'Complete your hair profile to get personalized recommendations',
       }
     case 2:
       return {
-        title: `Recommended for your ${profile?.curl_pattern} ${profile?.porosity} hair`,
-        subtitle: 'Based on what typically works for your hair type',
+        title: `Recommended for ${porosity} porosity${width} hair`,
+        subtitle: `Based on what works for ${porosity} porosity${width}${curlInfo} hair`,
       }
     case 2.5:
       return {
@@ -217,7 +279,7 @@ function tierHeader(tier: Tier, profile: Profile | null): { title: string; subti
       }
     case 4:
       return {
-        title: `People with ${profile?.curl_pattern} ${profile?.porosity} hair who like similar products also loved\u2026`,
+        title: `People with ${porosity} porosity${width} hair who like similar products also loved\u2026`,
         subtitle: 'Based on your ratings and hair profile',
       }
   }
@@ -281,7 +343,9 @@ export function Recommendations() {
     const sensitivities = userProfile?.sensitivities ?? []
 
     // Determine tier & build recommendations
-    const profileDone = userProfile?.onboarding_completed && !!userProfile.curl_pattern
+    // Profile is "done" if porosity is set (the most important factor per CG guide)
+    // curl_pattern is now optional
+    const profileDone = userProfile?.onboarding_completed && !!userProfile.porosity
     let currentTier: Tier = 1
     let recs: RecommendedProduct[] = []
     let ingredientResults: RecommendedProduct[] = []
@@ -290,11 +354,11 @@ export function Recommendations() {
     if (!profileDone) {
       // Tier 1
       currentTier = 1
-      recs = buildTier1(products)
+      recs = buildTier1(products, userProfile?.cgm_experience)
     } else if (reviewsWithRating.length < MIN_RATINGS_FOR_INGREDIENTS) {
-      // Tier 2
+      // Tier 2 — now uses porosity + texture (not curl pattern)
       currentTier = 2
-      recs = buildTier2(products, userProfile!.curl_pattern!, userProfile!.porosity!, ratedIds)
+      recs = buildTier2(products, userProfile!, ratedIds)
     } else if (reviewsWithRating.length < MIN_RATINGS_FOR_ADVANCED) {
       // Tier 2.5 — ingredient-based
       currentTier = 2.5
