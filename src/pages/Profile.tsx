@@ -93,20 +93,7 @@ export function ProfilePage() {
               ))}
             </div>
 
-            {/* Count unset optional fields */}
-            {(() => {
-              const optional = [profile!.scalp_type, profile!.climate, profile!.cgm_experience, profile!.heat_tool_usage, profile!.workout_frequency, profile!.fragrance_preference, profile!.color_treatment]
-              const unsetCount = optional.filter(v => !v).length
-              if (unsetCount === 0) return null
-              return (
-                <button
-                  onClick={() => navigate('/onboarding')}
-                  className="mt-4 text-xs text-violet-600 hover:underline cursor-pointer"
-                >
-                  + Add {unsetCount} more detail{unsetCount !== 1 ? 's' : ''} for better recommendations
-                </button>
-              )
-            })()}
+            {/* Optional detail fields — will prompt when additional wizard steps are added */}
           </div>
 
           <div className="bg-white rounded-xl border border-gray-200 p-6">
