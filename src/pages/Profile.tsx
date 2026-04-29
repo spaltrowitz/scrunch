@@ -42,7 +42,7 @@ export function ProfilePage() {
 
   if (loading) return <div className="text-center py-12 text-gray-500">Loading...</div>
 
-  const isProfileEmpty = !profile || (!profile.curl_pattern && !profile.porosity && !profile.onboarding_completed)
+  const isProfileEmpty = !profile || (!profile.porosity && !profile.curl_pattern && !profile.onboarding_completed)
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
@@ -83,6 +83,7 @@ export function ProfilePage() {
                 { label: 'Hair Length', value: profile!.hair_length?.replace(/_/g, ' ') },
                 { label: 'Scalp Type', value: profile!.scalp_type },
                 { label: 'Climate', value: profile!.climate },
+                { label: 'Water Type', value: (profile as Record<string, unknown>).water_type as string | null },
                 { label: 'CGM Experience', value: profile!.cgm_experience?.replace(/_/g, ' ') },
                 { label: 'Heat Tools', value: profile!.heat_tool_usage?.replace(/_/g, ' ') },
                 { label: 'Workout Frequency', value: profile!.workout_frequency?.replace(/_/g, ' ') },
@@ -93,7 +94,20 @@ export function ProfilePage() {
               ))}
             </div>
 
-            {/* Optional detail fields — will prompt when additional wizard steps are added */}
+            {/* Count unset optional fields */}
+            {(() => {
+              const optional = [profile!.scalp_type, profile!.climate, profile!.cgm_experience, profile!.heat_tool_usage, profile!.workout_frequency, profile!.fragrance_preference, profile!.color_treatment, (profile as Record<string, unknown>).water_type as string | null]
+              const unsetCount = optional.filter(v => !v).length
+              if (unsetCount === 0) return null
+              return (
+                <button
+                  onClick={() => navigate('/onboarding')}
+                  className="mt-4 text-xs text-violet-600 hover:underline cursor-pointer"
+                >
+                  + Add {unsetCount} more detail{unsetCount !== 1 ? 's' : ''} for better recommendations
+                </button>
+              )
+            })()}
           </div>
 
           <div className="bg-white rounded-xl border border-gray-200 p-6">

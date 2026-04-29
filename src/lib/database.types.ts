@@ -10,6 +10,7 @@ export type HeatToolUsage = 'never' | 'occasionally' | 'frequently'
 export type WorkoutFrequency = 'rarely' | 'few_times_week' | 'daily'
 export type CgmExperience = 'just_starting' | 'under_1_year' | '1_to_3_years' | '3_plus_years'
 export type FragrancePreference = 'love_it' | 'no_preference' | 'fragrance_free'
+export type WaterType = 'hard' | 'soft' | 'unknown'
 
 export type ProductCategory =
   | 'clarifying_shampoo' | 'low_poo' | 'co_wash'
@@ -38,6 +39,7 @@ export interface Profile {
   country: string | null
   zip_code: string | null
   wash_frequency: string | null
+  water_type: WaterType | null
   heat_tool_usage: HeatToolUsage | null
   workout_frequency: WorkoutFrequency | null
   cgm_experience: CgmExperience | null

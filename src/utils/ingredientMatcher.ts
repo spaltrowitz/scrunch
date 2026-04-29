@@ -15,6 +15,8 @@ export interface IngredientScore {
 }
 
 // Filler ingredients that appear in almost every product — ignore for matching
+// Note: glycerin, aloe, and panthenol are intentionally NOT in this list
+// because they are beneficial humectants that differentiate product quality
 const FILLER_INGREDIENTS = new Set([
   'water', 'aqua', 'eau',
   'phenoxyethanol',
@@ -24,7 +26,6 @@ const FILLER_INGREDIENTS = new Set([
   'potassium sorbate',
   'disodium edta', 'tetrasodium edta', 'edta',
   'sodium chloride',
-  'xanthan gum',
   'carbomer',
   'tocopherol',
   'sodium hydroxide',
@@ -41,7 +42,10 @@ const SENSITIVITY_MAP: Record<string, RegExp[]> = {
     /\bhydrolyzed\b.*\bprotein\b/i, /\bkeratin\b/i,
     /\bsilk amino acid/i, /\bcollagen\b/i, /\bwheat protein\b/i,
     /\brice protein\b/i, /\bsoy protein\b/i, /\bquinoa protein\b/i,
-    /\bamino acid/i,
+    /\bamino acid/i, /\byeast extract\b/i,
+    /\bhydrolyzed\b.*\bkeratin\b/i, /\bhydrolyzed\b.*\bsilk\b/i,
+    /\bhydrolyzed\b.*\bwheat\b/i, /\bhydrolyzed\b.*\brice\b/i,
+    /\bhydrolyzed\b.*\bcorn\b/i, /\bhydrolyzed\b.*\boat\b/i,
   ],
   sulfate: [
     /\bsodium lauryl sulfate\b/i, /\bsodium laureth sulfate\b/i,

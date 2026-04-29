@@ -2,9 +2,20 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../lib/auth'
 import { supabase } from '../../lib/supabase'
-import { CURL_PATTERNS, POROSITY_OPTIONS, HAIR_GOALS, HAIR_GOAL_LABELS, INGREDIENT_PREFERENCES, INGREDIENT_PREFERENCE_LABELS, parseSensitivity, encodeSensitivity } from '../../lib/constants'
+import {
+  CURL_PATTERNS, POROSITY_OPTIONS, HAIR_GOALS, HAIR_GOAL_LABELS,
+  INGREDIENT_PREFERENCES, INGREDIENT_PREFERENCE_LABELS,
+  SCALP_TYPE_OPTIONS, COLOR_TREATMENT_OPTIONS, HEAT_TOOL_OPTIONS,
+  CGM_EXPERIENCE_OPTIONS, CLIMATE_OPTIONS, WORKOUT_FREQUENCY_OPTIONS,
+  FRAGRANCE_PREFERENCE_OPTIONS, WATER_TYPE_OPTIONS,
+  parseSensitivity, encodeSensitivity,
+} from '../../lib/constants'
 
-import type { CurlPattern, Porosity, HairDensity, HairWidth, ScalpType, HairLength, ColorTreatment, Climate, HeatToolUsage, WorkoutFrequency, CgmExperience, FragrancePreference } from '../../lib/database.types'
+import type {
+  CurlPattern, Porosity, HairDensity, HairWidth, ScalpType, HairLength,
+  ColorTreatment, Climate, HeatToolUsage, WorkoutFrequency, CgmExperience,
+  FragrancePreference, WaterType,
+} from '../../lib/database.types'
 
 interface OnboardingData {
   curl_pattern: CurlPattern | null
@@ -19,11 +30,12 @@ interface OnboardingData {
   workout_frequency: WorkoutFrequency | null
   cgm_experience: CgmExperience | null
   fragrance_preference: FragrancePreference | null
+  water_type: WaterType | null
   hair_goals: string[]
   sensitivities: string[]
 }
 
-const TOTAL_STEPS = 6
+const TOTAL_STEPS = 7
 
 export function OnboardingWizard() {
   const { user } = useAuth()
@@ -36,7 +48,7 @@ export function OnboardingWizard() {
     curl_pattern: null, porosity: null, hair_density: null, hair_width: null,
     scalp_type: null, hair_length: null, color_treatment: null, climate: null,
     heat_tool_usage: null, workout_frequency: null, cgm_experience: null,
-    fragrance_preference: null, hair_goals: [], sensitivities: [],
+    fragrance_preference: null, water_type: null, hair_goals: [], sensitivities: [],
   })
 
   // Load existing profile data if editing
@@ -59,6 +71,7 @@ export function OnboardingWizard() {
           workout_frequency: (profile.workout_frequency as WorkoutFrequency) || null,
           cgm_experience: (profile.cgm_experience as CgmExperience) || null,
           fragrance_preference: (profile.fragrance_preference as FragrancePreference) || null,
+          water_type: (profile.water_type as WaterType) || null,
           hair_goals: (profile.hair_goals as string[]) || [],
           sensitivities: (profile.sensitivities as string[]) || [],
         })
@@ -171,95 +184,36 @@ export function OnboardingWizard() {
           </div>
         </div>
 
-        {/* Step 1: Curl Pattern */}
+        {/* ── Step 1: POROSITY (most important per CG guide) ── */}
         {step === 1 && (
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">What's your natural, air-dried hair texture?</h2>
-            <p className="text-sm text-gray-500 mb-3">If your hair is treated, think back to its natural state. Select the closest match.</p>
-            <a
-              href="https://www.reddit.com/r/curlyhair/wiki/index/#wiki_hair_typing"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm text-violet-600 hover:text-violet-700 mb-5 font-medium"
-            >
-              📸 Not sure? See the r/curlyhair visual guide with real photos →
-            </a>
-            <div className="space-y-2">
-              <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Wavy (Type 2)</p>
-              <div className="grid grid-cols-3 gap-3 mb-4">
-                {CURL_PATTERNS.filter(cp => cp.value.startsWith('2')).map(cp => (
-                  <OptionButton key={cp.value} selected={data.curl_pattern === cp.value} onClick={() => update('curl_pattern', cp.value)}>
-                    <div className="text-center">
-                      <span className="font-bold text-base block">{cp.label}</span>
-                      <div className="text-xs text-gray-500 mt-1">{cp.description}</div>
-                    </div>
-                  </OptionButton>
-                ))}
-              </div>
-              <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Curly (Type 3)</p>
-              <div className="grid grid-cols-3 gap-3 mb-4">
-                {CURL_PATTERNS.filter(cp => cp.value.startsWith('3')).map(cp => (
-                  <OptionButton key={cp.value} selected={data.curl_pattern === cp.value} onClick={() => update('curl_pattern', cp.value)}>
-                    <div className="text-center">
-                      <span className="font-bold text-base block">{cp.label}</span>
-                      <div className="text-xs text-gray-500 mt-1">{cp.description}</div>
-                    </div>
-                  </OptionButton>
-                ))}
-              </div>
-              <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Coily (Type 4)</p>
-              <div className="grid grid-cols-3 gap-3">
-                {CURL_PATTERNS.filter(cp => cp.value.startsWith('4')).map(cp => (
-                  <OptionButton key={cp.value} selected={data.curl_pattern === cp.value} onClick={() => update('curl_pattern', cp.value)}>
-                    <div className="text-center">
-                      <span className="font-bold text-base block">{cp.label}</span>
-                      <div className="text-xs text-gray-500 mt-1">{cp.description}</div>
-                    </div>
-                  </OptionButton>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Step 2: Porosity */}
-        {step === 2 && (
-          <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">What's your hair porosity?</h2>
-            <p className="text-sm text-gray-500 mb-3">Porosity is how well your hair absorbs and holds moisture. It's the most important factor for choosing products.</p>
-            <a
-              href="https://docs.google.com/document/d/1Q6Dj9WAZxlfBhJSyS5on2rw3-if5cOV3oV-dQ3B0AHA/edit#bookmark=kix.y3l0h5s9oqk9"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm text-violet-600 hover:text-violet-700 mb-3 font-medium"
-            >
-              📖 Read the r/curlyhair porosity guide →
-            </a>
+            <p className="text-sm text-gray-500 mb-1">Porosity is the <strong>single most important factor</strong> for choosing products. It determines how your hair absorbs and retains moisture.</p>
+            <p className="text-xs text-gray-400 mb-3">Along with texture, this is how you pick products and decide on methods.</p>
 
             <details className="mb-5 bg-violet-50 border border-violet-200 rounded-lg">
               <summary className="px-4 py-2.5 text-sm text-violet-700 font-medium cursor-pointer">
-                🤔 Not sure? Try these quick tests at home
+                🤔 Not sure? Use these characteristics to identify yours
               </summary>
-              <div className="px-4 pb-4 text-xs text-gray-700 space-y-3">
-                <div>
-                  <p className="font-semibold text-gray-900 mb-1">🥤 Float Test</p>
-                  <p>Drop a clean, dry hair strand into a glass of room-temperature water. Wait 2–4 minutes.</p>
+              <div className="px-4 pb-4 text-xs text-gray-700 space-y-4">
+                {POROSITY_OPTIONS.map(p => (
+                  <div key={p.value}>
+                    <p className="font-semibold text-gray-900 mb-1">{p.label} Porosity</p>
+                    <ul className="space-y-0.5 ml-4 list-disc">
+                      {p.characteristics.map((c, i) => <li key={i}>{c}</li>)}
+                    </ul>
+                  </div>
+                ))}
+                <div className="pt-2 border-t border-violet-200">
+                  <p className="font-semibold text-gray-900 mb-1">💧 Quick Spray Test</p>
+                  <p>Mist a small section of clean, product-free, dry hair with water.</p>
                   <ul className="mt-1 space-y-0.5 ml-4 list-disc">
-                    <li><strong>Floats at the top</strong> → Low porosity</li>
-                    <li><strong>Sinks to the middle</strong> → Medium porosity</li>
-                    <li><strong>Sinks to the bottom</strong> → High porosity</li>
-                  </ul>
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-900 mb-1">💧 Spray Test</p>
-                  <p>Mist a small section of clean, dry hair with water.</p>
-                  <ul className="mt-1 space-y-0.5 ml-4 list-disc">
-                    <li><strong>Water beads up</strong> → Low porosity</li>
+                    <li><strong>Water beads up and sits</strong> → Low porosity</li>
                     <li><strong>Slowly absorbs</strong> → Medium porosity</li>
                     <li><strong>Soaks in immediately</strong> → High porosity</li>
                   </ul>
                 </div>
-                <p className="text-gray-500 italic">Tip: Use clean, product-free hair for the most accurate results.</p>
+                <p className="text-gray-500 italic">⚠️ The "float test" (hair in water) is unreliable — fine hair floats regardless of porosity, and product residue skews results. The spray test and characteristics above are more accurate.</p>
               </div>
             </details>
 
@@ -275,29 +229,21 @@ export function OnboardingWizard() {
                 onClick={() => { update('porosity', null as unknown as Porosity); setStep(s => s + 1) }}
                 className="w-full px-4 py-3 rounded-lg border border-dashed border-gray-300 text-sm text-gray-400 hover:text-gray-600 hover:border-gray-400 cursor-pointer transition text-left"
               >
-                🧪 Not sure yet — I need to do the test first
+                🧪 Not sure yet — I'll figure it out later
               </button>
             </div>
           </div>
         )}
 
-        {/* Step 3: Hair Density + Strand Width */}
-        {step === 3 && (
+        {/* ── Step 2: Density + Strand Width (texture) ── */}
+        {step === 2 && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Hair density & strand width</h2>
-            <p className="text-sm text-gray-500 mb-6">Two quick checks to understand your hair structure.</p>
+            <p className="text-sm text-gray-500 mb-6">Along with porosity, texture (strand width) is one of the most important factors for choosing products.</p>
 
             <div className="mb-6">
               <h3 className="text-sm font-semibold text-gray-800 mb-1">Density</h3>
-              <p className="text-xs text-gray-500 mb-1">Part your hair and check the mirror — the more scalp you see, the less dense.</p>
-              <a
-                href="https://docs.google.com/document/d/1Q6Dj9WAZxlfBhJSyS5on2rw3-if5cOV3oV-dQ3B0AHA/edit#bookmark=id.8igp5xhonl09"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block text-xs text-violet-600 hover:text-violet-700 font-medium mb-3"
-              >
-                📖 Learn more about density →
-              </a>
+              <p className="text-xs text-gray-500 mb-3">Part your hair and check the mirror — the more scalp you see, the less dense.</p>
               <div className="grid grid-cols-3 gap-3">
                 {(['thin', 'medium', 'thick'] as const).map(v => (
                   <OptionButton key={v} selected={data.hair_density === v} onClick={() => update('hair_density', v)}>
@@ -308,16 +254,8 @@ export function OnboardingWizard() {
             </div>
 
             <div>
-              <h3 className="text-sm font-semibold text-gray-800 mb-1">Strand Width</h3>
-              <p className="text-xs text-gray-500 mb-1">Roll a single strand between your fingers — can you feel it?</p>
-              <a
-                href="https://docs.google.com/document/d/1Q6Dj9WAZxlfBhJSyS5on2rw3-if5cOV3oV-dQ3B0AHA/edit#bookmark=id.epzf99ee7zm5"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block text-xs text-violet-600 hover:text-violet-700 font-medium mb-3"
-              >
-                📖 Learn more about strand width →
-              </a>
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">Strand Width (Texture)</h3>
+              <p className="text-xs text-gray-500 mb-3">Roll a single strand between your fingers. Compare to sewing thread — fine is thinner, coarse is thicker.</p>
               <div className="grid grid-cols-3 gap-3">
                 {(['fine', 'medium', 'coarse'] as const).map(v => (
                   <OptionButton key={v} selected={data.hair_width === v} onClick={() => update('hair_width', v)}>
@@ -329,22 +267,126 @@ export function OnboardingWizard() {
           </div>
         )}
 
-        {/* Step 4: Hair Length */}
-        {step === 4 && (
+        {/* ── Step 3: Hair History (scalp, color, heat, CGM experience) ── */}
+        {step === 3 && (
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">How long is your hair?</h2>
-            <p className="text-sm text-gray-500 mb-6">If curly, pull the curl all the way down to measure.</p>
-            <div className="grid grid-cols-2 gap-3">
-              {([['short', 'Short (above ears)'], ['medium', 'Medium (shoulders)'], ['long', 'Long (past shoulders)'], ['extra_long', 'Extra Long (waist+)']] as const).map(([v, label]) => (
-                <OptionButton key={v} selected={data.hair_length === v} onClick={() => update('hair_length', v)}>
-                  {label}
-                </OptionButton>
-              ))}
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Hair history & scalp</h2>
+            <p className="text-sm text-gray-500 mb-6">This helps us understand your hair's current condition and tailor recommendations.</p>
+
+            <div className="mb-6">
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">Scalp Type</h3>
+              <p className="text-xs text-gray-500 mb-3">How does your scalp feel between washes?</p>
+              <div className="grid grid-cols-3 gap-3">
+                {SCALP_TYPE_OPTIONS.map(s => (
+                  <OptionButton key={s.value} selected={data.scalp_type === s.value} onClick={() => update('scalp_type', s.value)}>
+                    <div className="text-center">
+                      <span className="font-medium block">{s.label}</span>
+                      <div className="text-xs text-gray-500 mt-0.5">{s.description}</div>
+                    </div>
+                  </OptionButton>
+                ))}
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">Color Treatment</h3>
+              <p className="text-xs text-gray-500 mb-3">Any chemical color processing affects porosity and product needs.</p>
+              <div className="grid grid-cols-2 gap-3">
+                {COLOR_TREATMENT_OPTIONS.map(c => (
+                  <OptionButton key={c.value} selected={data.color_treatment === c.value} onClick={() => update('color_treatment', c.value)}>
+                    {c.label}
+                  </OptionButton>
+                ))}
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">Heat Tool Usage</h3>
+              <div className="grid grid-cols-3 gap-3">
+                {HEAT_TOOL_OPTIONS.map(h => (
+                  <OptionButton key={h.value} selected={data.heat_tool_usage === h.value} onClick={() => update('heat_tool_usage', h.value)}>
+                    {h.label}
+                  </OptionButton>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">CGM Experience</h3>
+              <p className="text-xs text-gray-500 mb-3">How long have you been following the Curly Girl Method?</p>
+              <div className="grid grid-cols-2 gap-3">
+                {CGM_EXPERIENCE_OPTIONS.map(e => (
+                  <OptionButton key={e.value} selected={data.cgm_experience === e.value} onClick={() => update('cgm_experience', e.value)}>
+                    <div className="font-medium">{e.label}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">{e.description}</div>
+                  </OptionButton>
+                ))}
+              </div>
             </div>
           </div>
         )}
 
-        {/* Step 5: Hair Goals */}
+        {/* ── Step 4: Lifestyle (climate, workout, water type) ── */}
+        {step === 4 && (
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Lifestyle & environment</h2>
+            <p className="text-sm text-gray-500 mb-6">Climate, water, and activity level all affect product performance.</p>
+
+            <div className="mb-6">
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">Climate</h3>
+              <p className="text-xs text-gray-500 mb-3">Humidity affects how humectants in products behave on your hair.</p>
+              <div className="grid grid-cols-2 gap-3">
+                {CLIMATE_OPTIONS.map(c => (
+                  <OptionButton key={c.value} selected={data.climate === c.value} onClick={() => update('climate', c.value)}>
+                    <div className="font-medium">{c.label}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">{c.description}</div>
+                  </OptionButton>
+                ))}
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">Water Type</h3>
+              <p className="text-xs text-gray-500 mb-3">Hard water deposits minerals that cause buildup, dullness, and dryness. A chelating shampoo can help.</p>
+              <div className="grid grid-cols-3 gap-3">
+                {WATER_TYPE_OPTIONS.map(w => (
+                  <OptionButton key={w.value} selected={data.water_type === w.value} onClick={() => update('water_type', w.value)}>
+                    <div className="text-center">
+                      <span className="font-medium block">{w.label}</span>
+                      <div className="text-xs text-gray-500 mt-0.5">{w.description}</div>
+                    </div>
+                  </OptionButton>
+                ))}
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">Workout Frequency</h3>
+              <p className="text-xs text-gray-500 mb-3">Affects how often you need to wash.</p>
+              <div className="grid grid-cols-3 gap-3">
+                {WORKOUT_FREQUENCY_OPTIONS.map(w => (
+                  <OptionButton key={w.value} selected={data.workout_frequency === w.value} onClick={() => update('workout_frequency', w.value)}>
+                    {w.label}
+                  </OptionButton>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold text-gray-800 mb-1">Hair Length</h3>
+              <p className="text-xs text-gray-500 mb-3">If curly, pull the curl all the way down to measure.</p>
+              <div className="grid grid-cols-2 gap-3">
+                {([['short', 'Short (above ears)'], ['medium', 'Medium (shoulders)'], ['long', 'Long (past shoulders)'], ['extra_long', 'Extra Long (waist+)']] as const).map(([v, label]) => (
+                  <OptionButton key={v} selected={data.hair_length === v} onClick={() => update('hair_length', v)}>
+                    {label}
+                  </OptionButton>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Step 5: Hair Goals ── */}
         {step === 5 && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">What are your hair goals?</h2>
@@ -359,7 +401,7 @@ export function OnboardingWizard() {
           </div>
         )}
 
-        {/* Step 6: Ingredient Preferences */}
+        {/* ── Step 6: Ingredient Preferences + Fragrance ── */}
         {step === 6 && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Any ingredient preferences?</h2>
@@ -413,8 +455,76 @@ export function OnboardingWizard() {
               <strong>Prefer to avoid</strong> — we'll warn you but still show the product.
               <strong> Must avoid</strong> — we'll hide it from recommendations.
             </p>
+
+            <div className="mt-6">
+              <h3 className="text-sm font-semibold text-gray-800 mb-3">Fragrance Preference</h3>
+              <div className="grid grid-cols-3 gap-3">
+                {FRAGRANCE_PREFERENCE_OPTIONS.map(f => (
+                  <OptionButton key={f.value} selected={data.fragrance_preference === f.value} onClick={() => update('fragrance_preference', f.value)}>
+                    {f.label}
+                  </OptionButton>
+                ))}
+              </div>
+            </div>
           </div>
         )}
+
+        {/* ── Step 7: Curl Pattern (OPTIONAL — last, because porosity+texture matter more) ── */}
+        {step === 7 && (
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">What's your curl pattern? <span className="text-sm font-normal text-gray-400">(optional)</span></h2>
+            <p className="text-sm text-gray-500 mb-1">Curl type can change over time and varies across your head — that's normal!</p>
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg mb-4">
+              <p className="text-xs text-amber-800">
+                💡 <strong>Porosity and texture matter more than curl type for choosing products.</strong> This is optional — your porosity and strand width (already captured) are what drive our recommendations.
+              </p>
+            </div>
+            <a
+              href="https://www.reddit.com/r/curlyhair/wiki/index/#wiki_hair_typing"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm text-violet-600 hover:text-violet-700 mb-5 font-medium"
+            >
+              📸 See the r/curlyhair visual guide with real photos →
+            </a>
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Wavy (Type 2)</p>
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                {CURL_PATTERNS.filter(cp => cp.value.startsWith('2')).map(cp => (
+                  <OptionButton key={cp.value} selected={data.curl_pattern === cp.value} onClick={() => update('curl_pattern', cp.value)}>
+                    <div className="text-center">
+                      <span className="font-bold text-base block">{cp.label}</span>
+                      <div className="text-xs text-gray-500 mt-1">{cp.description}</div>
+                    </div>
+                  </OptionButton>
+                ))}
+              </div>
+              <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Curly (Type 3)</p>
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                {CURL_PATTERNS.filter(cp => cp.value.startsWith('3')).map(cp => (
+                  <OptionButton key={cp.value} selected={data.curl_pattern === cp.value} onClick={() => update('curl_pattern', cp.value)}>
+                    <div className="text-center">
+                      <span className="font-bold text-base block">{cp.label}</span>
+                      <div className="text-xs text-gray-500 mt-1">{cp.description}</div>
+                    </div>
+                  </OptionButton>
+                ))}
+              </div>
+              <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Coily (Type 4)</p>
+              <div className="grid grid-cols-3 gap-3">
+                {CURL_PATTERNS.filter(cp => cp.value.startsWith('4')).map(cp => (
+                  <OptionButton key={cp.value} selected={data.curl_pattern === cp.value} onClick={() => update('curl_pattern', cp.value)}>
+                    <div className="text-center">
+                      <span className="font-bold text-base block">{cp.label}</span>
+                      <div className="text-xs text-gray-500 mt-1">{cp.description}</div>
+                    </div>
+                  </OptionButton>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
 
         {/* Navigation */}
         <div className="flex justify-between mt-8">

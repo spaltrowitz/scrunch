@@ -7,6 +7,7 @@ export function Dashboard() {
   const { user } = useAuth()
   const [profileComplete, setProfileComplete] = useState<boolean | null>(null)
   const [ratingCount, setRatingCount] = useState(0)
+  const [cgmExperience, setCgmExperience] = useState<string | null>(null)
 
   const firstName = user?.user_metadata?.full_name?.split(' ')[0]
     || user?.email?.split('@')[0]
@@ -15,11 +16,12 @@ export function Dashboard() {
   useEffect(() => {
     if (!user) return
     Promise.all([
-      supabase.from('profiles').select('onboarding_completed,curl_pattern').eq('id', user.id).single(),
+      supabase.from('profiles').select('onboarding_completed,porosity,cgm_experience').eq('id', user.id).single(),
       supabase.from('product_reviews').select('id').eq('user_id', user.id),
     ]).then(([profileRes, reviewsRes]) => {
-      const p = profileRes.data as unknown as { onboarding_completed: boolean; curl_pattern: string | null } | null
-      setProfileComplete(!!p?.onboarding_completed && !!p?.curl_pattern)
+      const p = profileRes.data as unknown as { onboarding_completed: boolean; porosity: string | null; cgm_experience: string | null } | null
+      setProfileComplete(!!p?.onboarding_completed && !!p?.porosity)
+      setCgmExperience(p?.cgm_experience ?? null)
       setRatingCount((reviewsRes.data as unknown as unknown[] | null)?.length ?? 0)
     })
   }, [user])
@@ -57,6 +59,22 @@ export function Dashboard() {
       {/* Step 2: Rate some products */}
       {profileComplete && ratingCount < 5 && (
         <div className="mb-8">
+          {/* CGM beginner transition guidance */}
+          {cgmExperience === 'just_starting' && (
+            <div className="p-5 bg-amber-50 border border-amber-200 rounded-xl mb-4">
+              <h2 className="font-semibold text-gray-900 mb-2">🧴 Starting CGM? Your first step is a clarifying wash</h2>
+              <p className="text-sm text-gray-600 mb-3">
+                Before beginning the Curly Girl Method, you need to remove all product buildup with a clarifying shampoo
+                (one that contains sulfates but NO silicones). This is a one-time reset — after this, you'll switch to gentler cleansers.
+              </p>
+              <Link
+                to="/products?category=clarifying_shampoo"
+                className="inline-block px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 no-underline"
+              >
+                Browse Clarifying Shampoos →
+              </Link>
+            </div>
+          )}
           <div className="p-6 bg-emerald-50 border border-emerald-200 rounded-xl">
             <h2 className="font-semibold text-gray-900 mb-2">Now, rate products you've used</h2>
             <p className="text-sm text-gray-600 mb-4">
