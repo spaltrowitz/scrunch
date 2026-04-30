@@ -10,3 +10,11 @@
 **Why:** User request — applies to all spaltrowitz squads, not just this repo
 
 ---
+
+### 2026-04-30T17:18:00-04:00: Refined user personas — discovery-first model
+**By:** Kenickie (PM)
+**What:** 5 personas (Newbie P0, Store Scanner P0, Budget Builder P1, Ingredient Detective P1, Routine Refiner P2) with discovery-first UX lens. Browsing/categories lead, filtering is the killer feature, checking is embedded.
+**Why:** Validated with Shari that Scrunch is discovery-first with checking built in. UX should lead with categories, not search.
+**Status:** Awaiting age demographic target for design direction
+
+---
