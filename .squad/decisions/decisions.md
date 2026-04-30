@@ -269,3 +269,38 @@ A **non-modal page** (not a sheet, not a popup) with:
 4. Should the deferred prompt trigger differ by persona signal? (e.g., if they're clearly a Store Scanner via search behavior, skip the prompt entirely and just adapt?)
 5. How many behavioral sections is too many? Start with max 2, test up to 4?
 6. Do we need an explicit "turn off personalization" toggle for privacy-conscious users, or is "Clear my data" sufficient?
+
+---
+
+## Acquisition Channel Map by Persona
+
+**Author:** Kenickie (PM)  
+**Date:** 2025-07-24  
+**Priority:** P1  
+**Status:** Analysis — informs acquisition strategy
+
+### Key Finding
+
+**Mostly yes, but with different entry points.** All four personas overlap heavily on Reddit r/curlyhair and TikTok #curlyhair — but they're doing *different things* there. The Store Scanner is the outlier: they're more likely to find us via Google search mid-shopping trip than from social browsing. This means **one core community presence** (Reddit + TikTok) covers 3/4 personas, but we need a separate **SEO play** to capture Scanners.
+
+### Strategic Recommendation
+
+**Answer: One core + one supplement.**
+
+#### Core Strategy: Reddit + TikTok Community Presence
+- Covers: Newbie, Budget Builder, Optimizer (3/4 personas)
+- Tactic: Be genuinely helpful in r/curlyhair. Link Scrunch when it answers someone's question. Partner with TikTok creators for "routine builder" content.
+- Why it works: These personas are *already in community* looking for product guidance. Scrunch solves a problem they're actively discussing.
+
+#### Supplement: SEO Content Play
+- Covers: Store Scanner (+ helps all others)
+- Tactic: Create SEO-optimized product pages that rank for "[product name] curly girl approved." Every product in our database should have a landing page.
+- Why it works: Scanners Google in the moment. If Scrunch is the top result for "is Garnier Fructis Pure Clean CG approved?" — we've captured them at peak intent.
+
+### Priority Actions for Launch
+
+1. **Create 20 SEO product pages** for the most-Googled "is [X] CG approved" queries → captures Scanners
+2. **Engage authentically in r/curlyhair** for 4-6 weeks pre-launch → builds trust with Newbies, Budgets, Optimizers
+3. **Partner with 2-3 mid-tier TikTok curly creators** (10K-100K followers) for "routine builder" content → Newbies + Budget
+4. **Launch on Product Hunt** → Optimizers + tech-curious crossover audience
+5. **Post launch thread in r/curlyhair** (many apps have done this successfully — the sub loves tools)
