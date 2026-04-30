@@ -1,0 +1,5 @@
+{
+  "allowed_universes": null,
+  "max_capacity": 25,
+  "overflow_strategy": "diegetic_expansion"
+}
