@@ -10,6 +10,7 @@ import {
   CGM_EXPERIENCE_OPTIONS, CLIMATE_OPTIONS, WORKOUT_FREQUENCY_OPTIONS,
   FRAGRANCE_PREFERENCE_OPTIONS, WATER_TYPE_OPTIONS,
   parseSensitivity, encodeSensitivity,
+  CUSTOM_BRANDS, HERO_INGREDIENTS, HERO_INGREDIENT_GROUPS,
 } from '../../lib/constants'
 
 import type {
@@ -35,9 +36,11 @@ interface OnboardingData {
   water_type: WaterType | null
   hair_goals: string[]
   sensitivities: string[]
+  custom_brand: string | null
+  custom_hero_ingredients: string[]
 }
 
-const TOTAL_STEPS = 7
+const TOTAL_STEPS = 8
 
 export function OnboardingWizard() {
   const { user } = useAuth()
@@ -52,6 +55,7 @@ export function OnboardingWizard() {
     scalp_type: null, hair_length: null, color_treatment: null, climate: null,
     heat_tool_usage: null, workout_frequency: null, cgm_experience: null,
     fragrance_preference: null, water_type: null, hair_goals: [], sensitivities: [],
+    custom_brand: null, custom_hero_ingredients: [],
   })
   const loadingProfile = profileLoading && !profileError
 
@@ -75,6 +79,8 @@ export function OnboardingWizard() {
       water_type: profile.water_type as WaterType || null,
       hair_goals: profile.hair_goals || [],
       sensitivities: profile.sensitivities || [],
+      custom_brand: (profile.custom_brand as string) || null,
+      custom_hero_ingredients: (profile.custom_hero_ingredients as string[]) || [],
     })
   }, [profile, user, isEditing])
 
@@ -82,7 +88,7 @@ export function OnboardingWizard() {
     setData(d => ({ ...d, [key]: value }))
   }
 
-  const toggleArrayItem = (key: 'hair_goals' | 'sensitivities', item: string) => {
+  const toggleArrayItem = (key: 'hair_goals' | 'sensitivities' | 'custom_hero_ingredients', item: string) => {
     setData(d => ({
       ...d,
       [key]: d[key].includes(item) ? d[key].filter(i => i !== item) : [...d[key], item],
@@ -486,8 +492,77 @@ export function OnboardingWizard() {
           </div>
         )}
 
-        {/* ── Step 7: Curl Pattern (OPTIONAL — last, because porosity+texture matter more) ── */}
+        {/* ── Step 7: Custom Brand (optional) ── */}
         {step === 7 && (
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Do you use a custom haircare brand? <span className="text-sm font-normal text-gray-400">(optional)</span></h2>
+            <p className="text-sm text-gray-500 mb-4">If you use Prose, Function of Beauty, or another brand that customizes products for you, we can find you cheaper off-the-shelf alternatives with the same key ingredients.</p>
+
+            <div className="space-y-3 mb-6">
+              {CUSTOM_BRANDS.map(brand => (
+                <OptionButton key={brand.id} selected={data.custom_brand === brand.id} onClick={() => update('custom_brand', data.custom_brand === brand.id ? null : brand.id)}>
+                  <div className="font-semibold">{brand.name}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">{brand.description}</div>
+                </OptionButton>
+              ))}
+              <button
+                type="button"
+                onClick={() => { update('custom_brand', null); update('custom_hero_ingredients', []); setStep(s => s + 1) }}
+                className="w-full px-4 py-3 rounded-lg border border-dashed border-gray-300 text-sm text-gray-400 hover:text-gray-600 hover:border-gray-400 cursor-pointer transition text-left"
+              >
+                I don't use a custom brand — skip this
+              </button>
+            </div>
+
+            {data.custom_brand && (
+              <div>
+                <h3 className="text-sm font-semibold text-gray-800 mb-1">Which hero ingredients are in your formula?</h3>
+                <p className="text-xs text-gray-500 mb-4">Check your brand's dashboard or product page for your ingredient list. Select the ones that appear in your products.</p>
+
+                {Object.entries(HERO_INGREDIENT_GROUPS).map(([groupId, groupLabel]) => {
+                  const groupIngredients = HERO_INGREDIENTS.filter(i => i.group === groupId)
+                  if (groupIngredients.length === 0) return null
+                  return (
+                    <div key={groupId} className="mb-4">
+                      <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2">{groupLabel}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {groupIngredients.map(ing => {
+                          const selected = data.custom_hero_ingredients.includes(ing.id)
+                          return (
+                            <button
+                              key={ing.id}
+                              type="button"
+                              onClick={() => toggleArrayItem('custom_hero_ingredients', ing.id)}
+                              className={`px-3 py-1.5 rounded-full text-xs cursor-pointer transition-colors border ${
+                                selected
+                                  ? 'bg-violet-100 border-violet-300 text-violet-700 font-medium'
+                                  : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+                              }`}
+                            >
+                              {ing.label}
+                              {selected && ' ✓'}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+                })}
+
+                {data.custom_hero_ingredients.length > 0 && (
+                  <div className="mt-4 p-3 bg-violet-50 border border-violet-200 rounded-lg">
+                    <p className="text-xs text-violet-700">
+                      ✨ Selected {data.custom_hero_ingredients.length} ingredient{data.custom_hero_ingredients.length !== 1 ? 's' : ''} — we'll find cheaper products with these same ingredients
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Step 8: Curl Pattern (OPTIONAL — last, because porosity+texture matter more) ── */}
+        {step === 8 && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">What's your curl pattern? <span className="text-sm font-normal text-gray-400">(optional)</span></h2>
             <p className="text-sm text-gray-500 mb-1">Curl type can change over time and varies across your head — that's normal!</p>

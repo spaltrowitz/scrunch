@@ -200,6 +200,93 @@ export const WATER_TYPE_OPTIONS: { value: WaterType; label: string; description:
   { value: 'unknown', label: 'Not sure', description: 'Check with your local water utility' },
 ]
 
+// ---------------------------------------------------------------------------
+// Custom brand support (Prose, Function of Beauty, etc.)
+// ---------------------------------------------------------------------------
+
+export interface CustomBrand {
+  id: string
+  name: string
+  categories: string[]
+  description: string
+}
+
+export const CUSTOM_BRANDS: CustomBrand[] = [
+  { id: 'prose', name: 'Prose', categories: ['shampoo', 'conditioner', 'curl_cream', 'dry_shampoo', 'gel', 'leave_in', 'mask', 'oil', 'supplements'], description: 'Custom haircare based on a hair quiz' },
+  { id: 'function_of_beauty', name: 'Function of Beauty', categories: ['shampoo', 'conditioner', 'leave_in', 'mask', 'serum'], description: 'Personalized shampoo & conditioner' },
+  { id: 'custom_other', name: 'Other custom brand', categories: [], description: 'Another brand that customizes products for you' },
+]
+
+export interface HeroIngredient {
+  id: string
+  label: string
+  benefit: string
+  group: 'oils' | 'proteins' | 'humectants' | 'clays_powders' | 'botanicals'
+  /** Aliases for matching against product ingredient lists */
+  aliases: string[]
+}
+
+export const HERO_INGREDIENT_GROUPS: Record<string, string> = {
+  oils: '🫒 Oils & Butters',
+  proteins: '💪 Proteins & Amino Acids',
+  humectants: '💧 Humectants & Moisturizers',
+  clays_powders: '🧱 Clays & Powders',
+  botanicals: '🌿 Botanicals & Extracts',
+}
+
+export const HERO_INGREDIENTS: HeroIngredient[] = [
+  // ── Oils & Butters ──
+  { id: 'pequi_oil', label: 'Pequi Oil', benefit: 'Wave definition & frizz control', group: 'oils', aliases: ['pequi', 'caryocar brasiliense'] },
+  { id: 'argan_oil', label: 'Argan Oil', benefit: 'Shine & nourishment', group: 'oils', aliases: ['argan', 'argania spinosa'] },
+  { id: 'jojoba_oil', label: 'Jojoba Oil', benefit: 'Mimics natural scalp oils', group: 'oils', aliases: ['jojoba', 'simmondsia chinensis'] },
+  { id: 'coconut_oil', label: 'Coconut Oil', benefit: 'Deep moisture & softness', group: 'oils', aliases: ['coconut oil', 'cocos nucifera oil'] },
+  { id: 'marula_oil', label: 'Marula Oil', benefit: 'Lightweight moisture & repair', group: 'oils', aliases: ['marula', 'sclerocarya birrea'] },
+  { id: 'sunflower_oil', label: 'Sunflower Seed Oil', benefit: 'Antioxidant & conditioning', group: 'oils', aliases: ['sunflower', 'helianthus annuus'] },
+  { id: 'broccoli_seed_oil', label: 'Broccoli Seed Oil', benefit: 'Natural silicone alternative', group: 'oils', aliases: ['broccoli seed', 'brassica oleracea italica'] },
+  { id: 'castor_oil', label: 'Castor Oil', benefit: 'Sealing & thickness', group: 'oils', aliases: ['castor', 'ricinus communis'] },
+  { id: 'avocado_oil', label: 'Avocado Oil', benefit: 'Penetrating moisture', group: 'oils', aliases: ['avocado', 'persea gratissima'] },
+  { id: 'shea_butter', label: 'Shea Butter', benefit: 'Rich moisture & sealing', group: 'oils', aliases: ['shea', 'butyrospermum parkii'] },
+  { id: 'mango_butter', label: 'Mango Butter', benefit: 'Softening & protective', group: 'oils', aliases: ['mango butter', 'mangifera indica'] },
+  { id: 'murumuru_butter', label: 'Murumuru Butter', benefit: 'Shine & frizz taming', group: 'oils', aliases: ['murumuru', 'astrocaryum murumuru'] },
+  { id: 'baobab_oil', label: 'Baobab Oil', benefit: 'Elasticity & moisture', group: 'oils', aliases: ['baobab', 'adansonia'] },
+
+  // ── Proteins & Amino Acids ──
+  { id: 'rice_protein', label: 'Rice Protein', benefit: 'Strengthens & thickens', group: 'proteins', aliases: ['rice protein', 'hydrolyzed rice', 'oryza sativa protein'] },
+  { id: 'pea_protein', label: 'Pea Protein', benefit: 'Strengthens hair', group: 'proteins', aliases: ['pea protein', 'hydrolyzed pea', 'pisum sativum'] },
+  { id: 'quinoa_protein', label: 'Quinoa Protein', benefit: 'Repairs & protects', group: 'proteins', aliases: ['quinoa', 'hydrolyzed quinoa'] },
+  { id: 'keratin', label: 'Keratin', benefit: 'Structural repair', group: 'proteins', aliases: ['keratin', 'hydrolyzed keratin'] },
+  { id: 'silk_amino_acids', label: 'Silk Amino Acids', benefit: 'Smoothing & shine', group: 'proteins', aliases: ['silk amino', 'hydrolyzed silk'] },
+  { id: 'arginine', label: 'Arginine', benefit: 'Hair strength & vitality', group: 'proteins', aliases: ['arginine', 'l-arginine'] },
+  { id: 'wheat_protein', label: 'Wheat Protein', benefit: 'Volume & strength', group: 'proteins', aliases: ['wheat protein', 'hydrolyzed wheat', 'triticum vulgare'] },
+
+  // ── Humectants & Moisturizers ──
+  { id: 'linseed', label: 'Linseed (Flaxseed) Extract', benefit: 'Curl definition & hold', group: 'humectants', aliases: ['linseed', 'flaxseed', 'linum usitatissimum'] },
+  { id: 'aloe_vera', label: 'Aloe Vera', benefit: 'Hydration & soothing', group: 'humectants', aliases: ['aloe', 'aloe barbadensis', 'aloe vera'] },
+  { id: 'glycerin', label: 'Glycerin', benefit: 'Draws in moisture', group: 'humectants', aliases: ['glycerin', 'vegetable glycerin'] },
+  { id: 'honey', label: 'Honey', benefit: 'Natural humectant & shine', group: 'humectants', aliases: ['honey', 'mel'] },
+  { id: 'acv', label: 'Apple Cider Vinegar', benefit: 'Shine & healthy cuticle', group: 'humectants', aliases: ['apple cider vinegar', 'pyrus malus'] },
+  { id: 'panthenol', label: 'Panthenol (Vitamin B5)', benefit: 'Moisture & shine', group: 'humectants', aliases: ['panthenol', 'provitamin b5', 'pro-vitamin b5'] },
+  { id: 'hyaluronic_acid', label: 'Hyaluronic Acid', benefit: 'Deep hydration', group: 'humectants', aliases: ['hyaluronic acid', 'sodium hyaluronate'] },
+
+  // ── Clays & Powders ──
+  { id: 'hectorite', label: 'Hectorite', benefit: 'Volume & oil control', group: 'clays_powders', aliases: ['hectorite'] },
+  { id: 'kaolin_clay', label: 'Kaolin Clay', benefit: 'Gentle cleansing & absorbing', group: 'clays_powders', aliases: ['kaolin'] },
+  { id: 'rice_starch', label: 'Rice Starch', benefit: 'Oil absorption & volume', group: 'clays_powders', aliases: ['rice starch', 'oryza sativa starch'] },
+  { id: 'binchotan_charcoal', label: 'Binchotan Charcoal', benefit: 'Detoxify & absorb impurities', group: 'clays_powders', aliases: ['binchotan', 'charcoal'] },
+  { id: 'corn_starch', label: 'Corn Starch', benefit: 'Oil absorption', group: 'clays_powders', aliases: ['corn starch', 'zea mays starch'] },
+  { id: 'corn_maltodextrin', label: 'Corn Maltodextrin', benefit: 'Soft hold & anti-humidity', group: 'clays_powders', aliases: ['maltodextrin', 'corn maltodextrin'] },
+
+  // ── Botanicals & Extracts ──
+  { id: 'jujube_bark', label: 'Jujube Bark Extract', benefit: 'Scalp health & flake control', group: 'botanicals', aliases: ['jujube', 'ziziphus jujuba'] },
+  { id: 'witch_hazel', label: 'Witch Hazel', benefit: 'Oil control & soothing', group: 'botanicals', aliases: ['witch hazel', 'hamamelis virginiana'] },
+  { id: 'turmeric', label: 'Turmeric Extract', benefit: 'Scalp soothing & anti-inflammatory', group: 'botanicals', aliases: ['turmeric', 'curcuma longa'] },
+  { id: 'horsetail', label: 'Horsetail Extract', benefit: 'Hair growth & thickness', group: 'botanicals', aliases: ['horsetail', 'equisetum arvense'] },
+  { id: 'green_tea', label: 'Green Tea Extract', benefit: 'Antioxidant & scalp health', group: 'botanicals', aliases: ['green tea', 'camellia sinensis'] },
+  { id: 'tea_tree', label: 'Tea Tree Oil', benefit: 'Scalp cleansing & clarifying', group: 'botanicals', aliases: ['tea tree', 'melaleuca alternifolia'] },
+  { id: 'peppermint', label: 'Peppermint Oil', benefit: 'Scalp stimulation & freshness', group: 'botanicals', aliases: ['peppermint', 'mentha piperita'] },
+  { id: 'rosemary', label: 'Rosemary Extract', benefit: 'Hair growth & circulation', group: 'botanicals', aliases: ['rosemary', 'rosmarinus officinalis'] },
+]
+
 export const CG_STATUS_CONFIG = {
   approved: { label: 'CG Approved', color: 'text-green-600', bg: 'bg-green-50', icon: '🟢' },
   not_approved: { label: 'Not CG Approved', color: 'text-red-600', bg: 'bg-red-50', icon: '🔴' },

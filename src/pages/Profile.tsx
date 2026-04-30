@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
-import { CURL_PATTERNS, POROSITY_OPTIONS, parseSensitivity, INGREDIENT_PREFERENCE_LABELS } from '../lib/constants'
+import { CURL_PATTERNS, POROSITY_OPTIONS, parseSensitivity, INGREDIENT_PREFERENCE_LABELS, CUSTOM_BRANDS, HERO_INGREDIENTS } from '../lib/constants'
 import { useUserProfile } from '../hooks/useProducts'
 
 export function ProfilePage() {
@@ -126,6 +126,43 @@ export function ProfilePage() {
               </div>
             </div>
           </div>
+
+          {/* Custom Brand */}
+          {profile!.custom_brand && (
+            <div className="bg-white rounded-xl border border-gray-200 p-6">
+              <h2 className="font-semibold text-gray-900 mb-4">Custom Brand</h2>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-500">Currently using:</span>
+                  <span className="text-sm font-medium text-gray-900">
+                    {CUSTOM_BRANDS.find(b => b.id === profile!.custom_brand)?.name || profile!.custom_brand}
+                  </span>
+                </div>
+                {profile!.custom_hero_ingredients.length > 0 && (
+                  <div>
+                    <span className="text-sm text-gray-500">Hero Ingredients</span>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {profile!.custom_hero_ingredients.map(id => {
+                        const hero = HERO_INGREDIENTS.find(h => h.id === id)
+                        if (!hero) return null
+                        return (
+                          <span key={id} className="text-xs px-2 py-1 bg-violet-50 text-violet-700 rounded-full">
+                            {hero.label}
+                          </span>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+                <button
+                  onClick={() => navigate('/onboarding')}
+                  className="text-xs text-violet-600 hover:underline cursor-pointer"
+                >
+                  Edit my ingredients →
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div>

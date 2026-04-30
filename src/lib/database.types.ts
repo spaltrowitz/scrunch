@@ -46,6 +46,8 @@ export interface Profile {
   fragrance_preference: FragrancePreference | null
   hair_goals: string[]
   sensitivities: string[]
+  custom_brand: string | null
+  custom_hero_ingredients: string[]
   onboarding_completed: boolean
   profile_public: boolean
   created_at: string
