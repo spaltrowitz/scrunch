@@ -106,9 +106,11 @@ export interface ProductReview {
 export interface Database {
   public: {
     Tables: {
-      profiles: { Row: Profile; Insert: Partial<Profile> & { id: string }; Update: Partial<Profile> }
-      products: { Row: Product; Insert: Omit<Product, 'id' | 'created_at' | 'updated_at' | 'avg_rating' | 'review_count' | 'status_conflict'>; Update: Partial<Product> }
-      product_reviews: { Row: ProductReview; Insert: Omit<ProductReview, 'id' | 'created_at' | 'updated_at'>; Update: Partial<ProductReview> }
+      profiles: { Row: Profile; Insert: Partial<Profile> & { id: string }; Update: Partial<Profile>; Relationships: [] }
+      products: { Row: Product; Insert: Omit<Product, 'id' | 'created_at' | 'updated_at' | 'avg_rating' | 'review_count' | 'status_conflict'>; Update: Partial<Product>; Relationships: [] }
+      product_reviews: { Row: ProductReview; Insert: Omit<ProductReview, 'id' | 'created_at' | 'updated_at'>; Update: Partial<ProductReview>; Relationships: [] }
     }
+    Views: {}
+    Functions: {}
   }
 }

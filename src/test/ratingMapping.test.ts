@@ -67,7 +67,7 @@ describe('rating mapping', () => {
 
 describe('null safety', () => {
   it('handles null status in replace', () => {
-    const status: string | null = null
+    const status = null as string | null
     const display = status?.replace(/_/g, ' ') ?? 'unknown'
     expect(display).toBe('unknown')
   })

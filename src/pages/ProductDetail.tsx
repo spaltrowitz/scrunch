@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth'
 import { PRODUCT_CATEGORY_LABELS, PRODUCT_CATEGORY_DESCRIPTIONS } from '../lib/constants'
 import { ProductImage } from '../hooks/useProductImage'
-import type { Product, ProductReview, Profile } from '../lib/database.types'
+import type { ProductReview, Profile } from '../lib/database.types'
+import { useProduct } from '../hooks/useProducts'
 
 type TriedRating = 'loved' | 'liked' | 'ok' | 'disliked'
 
@@ -37,10 +39,32 @@ function formatDate(iso: string): string {
 export function ProductDetail() {
   const { id } = useParams<{ id: string }>()
   const { user } = useAuth()
-  const [product, setProduct] = useState<Product | null>(null)
-  const [reviews, setReviews] = useState<ReviewWithProfile[]>([])
-  const [myReview, setMyReview] = useState<ReviewWithProfile | null>(null)
-  const [loading, setLoading] = useState(true)
+  const queryClient = useQueryClient()
+  const { data: product, isLoading: productLoading, error: productError } = useProduct(id)
+  const { data: reviewsData = [], isLoading: reviewsLoading, error: reviewsError } = useQuery({
+    queryKey: ['product-reviews', id],
+    enabled: !!id,
+    queryFn: async () => {
+      if (!id) return []
+      const { data, error } = await supabase
+        .from('product_reviews')
+        .select('id,user_id,product_id,rating,results_notes,created_at, profile:profiles!product_reviews_user_id_fkey(display_name,curl_pattern,porosity)')
+        .eq('product_id', id)
+        .order('created_at', { ascending: false })
+      if (error) throw error
+      return (data as ReviewWithProfile[] | null) ?? []
+    },
+  })
+  const loading = (productLoading || reviewsLoading) && !(productError || reviewsError)
+  const userId = user?.id
+  const { reviews, myReview } = useMemo(() => {
+    const allReviews = reviewsData as ReviewWithProfile[]
+    if (!userId) {
+      return { reviews: allReviews, myReview: null }
+    }
+    const mine = allReviews.find(r => r.user_id === userId) ?? null
+    return { reviews: allReviews.filter(r => r.user_id !== userId), myReview: mine }
+  }, [reviewsData, userId])
 
   // Rating form state
   const [ratingPopup, setRatingPopup] = useState(false)
@@ -49,65 +73,54 @@ export function ProductDetail() {
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    if (id) loadProduct()
-  }, [id])
-
-  const loadProduct = async () => {
-    setLoading(true)
-    const [productRes, reviewsRes] = await Promise.all([
-      supabase.from('products').select('*').eq('id', id!).single(),
-      supabase
-        .from('product_reviews')
-        .select('*, profile:profiles!product_reviews_user_id_fkey(display_name, curl_pattern, porosity)')
-        .eq('product_id', id!)
-        .order('created_at', { ascending: false }),
-    ])
-    setProduct(productRes.data as unknown as Product | null)
-    const allReviews = (reviewsRes.data ?? []) as unknown as ReviewWithProfile[]
-    if (user) {
-      const mine = allReviews.find(r => r.user_id === user.id) ?? null
-      setMyReview(mine)
-      if (mine?.rating != null) {
-        setSelectedRating(numericToTriedRating(mine.rating))
-        setPersonalNote(mine.results_notes ?? '')
-      }
-      setReviews(allReviews.filter(r => r.user_id !== user.id))
+    if (myReview?.rating != null) {
+      setSelectedRating(numericToTriedRating(myReview.rating))
+      setPersonalNote(myReview.results_notes ?? '')
     } else {
-      setMyReview(null)
-      setReviews(allReviews)
+      setSelectedRating(null)
+      setPersonalNote('')
     }
-    setLoading(false)
-  }
+  }, [myReview?.rating, myReview?.results_notes])
+
+  const submitRatingMutation = useMutation({
+    mutationFn: async ({ rating, note }: { rating: TriedRating; note: string }) => {
+      if (!userId || !product) return
+      const ratingMap: Record<TriedRating, number> = { loved: 5, liked: 4, ok: 3, disliked: 1 }
+      const repurchaseMap: Record<TriedRating, string> = { loved: 'yes', liked: 'yes', ok: 'maybe', disliked: 'no' }
+      const { error } = await supabase.from('product_reviews').upsert({
+        user_id: userId,
+        product_id: product.id,
+        status: 'tried_once',
+        rating: ratingMap[rating],
+        would_repurchase: repurchaseMap[rating],
+        results_notes: note.trim() || null,
+      } as never, { onConflict: 'user_id,product_id' })
+      if (error) throw error
+    },
+    onError: (error) => {
+      console.error('Review upsert failed:', error)
+    },
+    onSuccess: () => {
+      if (id) {
+        queryClient.invalidateQueries({ queryKey: ['product', id] })
+        queryClient.invalidateQueries({ queryKey: ['product-reviews', id] })
+      }
+      if (userId) {
+        queryClient.invalidateQueries({ queryKey: ['reviews', userId] })
+      }
+    },
+  })
 
   const submitRating = async (rating: TriedRating) => {
-    if (!user || !product) return
+    if (!userId || !product) return
     setSelectedRating(rating)
     setSubmitting(true)
-    const ratingMap: Record<TriedRating, number> = { loved: 5, liked: 4, ok: 3, disliked: 1 }
-    const repurchaseMap: Record<TriedRating, string> = { loved: 'yes', liked: 'yes', ok: 'maybe', disliked: 'no' }
-    await supabase.from('product_reviews').upsert({
-      user_id: user.id,
-      product_id: product.id,
-      status: 'tried_once',
-      rating: ratingMap[rating],
-      would_repurchase: repurchaseMap[rating],
-      results_notes: personalNote.trim() || null,
-    } as never, { onConflict: 'user_id,product_id' })
-    setSubmitting(false)
-    setRatingPopup(false)
-    loadProduct()
-  }
-
-  const saveNote = async () => {
-    if (!user || !product) return
-    setSubmitting(true)
-    await supabase.from('product_reviews').upsert({
-      user_id: user.id,
-      product_id: product.id,
-      results_notes: personalNote.trim() || null,
-    } as never, { onConflict: 'user_id,product_id' })
-    setSubmitting(false)
-    loadProduct()
+    try {
+      await submitRatingMutation.mutateAsync({ rating, note: personalNote })
+    } finally {
+      setSubmitting(false)
+      setRatingPopup(false)
+    }
   }
 
   if (loading) return <div className="text-center py-12 text-gray-500">Loading…</div>
@@ -144,6 +157,7 @@ export function ProductDetail() {
           brand={product.brand}
           name={product.name}
           seedImageUrl={product.image_url}
+          category={product.category}
           className="w-28 h-28 shrink-0"
         />
         <div className="flex-1 min-w-0">

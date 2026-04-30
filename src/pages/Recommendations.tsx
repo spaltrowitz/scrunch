@@ -1,14 +1,15 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth'
 import { PRODUCT_CATEGORY_LABELS } from '../lib/constants'
 import type { Product, ProductReview, Profile, ProductCategory, CurlPattern, Porosity } from '../lib/database.types'
 import { ProductImage } from '../hooks/useProductImage'
 import { QuickRateCard } from '../components/products/QuickRateCard'
+import { useProducts, useUserProfile, useUserReviews } from '../hooks/useProducts'
 import {
   buildIngredientProfile,
-  buildIngredientRarity,
   scoreProductByIngredients,
   checkSensitivitiesWithStrictness,
   formatIngredientList,
@@ -24,15 +25,10 @@ type Tier = 1 | 2 | 2.5 | 3 | 4
 interface RecommendedProduct extends Product {
   _reason?: string
   _sensitivityWarning?: string
-  /** Only set for ingredient-based matches — a real 0–100 percentage */
-  _matchPercent?: number
+  _score?: number
 }
 
 const MIN_RATINGS_FOR_INGREDIENTS = 3
-// Ingredient match scores below this threshold are too weak to surface
-const MIN_INGREDIENT_MATCH_SCORE = 50
-// Only display the "X% match" badge when the score is clearly meaningful
-const MIN_BADGE_DISPLAY_SCORE = 60
 
 // Category priorities by POROSITY + TEXTURE (the guide says these matter most)
 const POROSITY_TEXTURE_PRIORITY: Record<string, ProductCategory[]> = {
@@ -106,36 +102,10 @@ function buildTier1(products: Product[], cgmExperience?: string | null): Product
   return result.slice(0, 5)
 }
 
-/**
- * Build a set of brands the user has had negative experiences with.
- * Used as a demotion signal, NOT a hard exclusion — a great ingredient
- * match from a disliked brand can still surface, just ranked lower.
- */
-function buildDislikedBrands(
-  reviews: (ProductReview & { products: Product })[],
-): Set<string> {
-  const disliked = new Set<string>()
-  const liked = new Set<string>()
-  for (const r of reviews) {
-    const brand = r.products.brand.toLowerCase()
-    if (r.rating != null && r.rating >= 3) liked.add(brand)
-    if (r.rating != null && r.rating <= 2) disliked.add(brand)
-  }
-  const demote = new Set<string>()
-  for (const brand of disliked) {
-    if (!liked.has(brand)) demote.add(brand)
-  }
-  return demote
-}
-
-// Score penalty applied to products from disliked brands (multiplier < 1 = demotion)
-const DISLIKED_BRAND_PENALTY = 0.5
-
 function buildTier2(
   products: Product[],
   profile: Profile,
   ratedIds: Set<string>,
-  dislikedBrands: Set<string>,
 ): RecommendedProduct[] {
   const approved = products.filter(
     p => p.cg_status === 'approved' && !ratedIds.has(p.id),
@@ -183,13 +153,6 @@ function buildTier2(
     return { ...p, _score: s, _reason: reason }
   })
 
-  // Demote disliked brands rather than excluding them
-  for (const item of scored) {
-    if (dislikedBrands.has(item.brand.toLowerCase())) {
-      item._score = Math.round(item._score * DISLIKED_BRAND_PENALTY)
-    }
-  }
-
   scored.sort((a, b) => b._score - a._score)
   return scored.slice(0, 5)
 }
@@ -198,7 +161,6 @@ function buildTier3(
   allProducts: Product[],
   reviews: (ProductReview & { products: Product })[],
   ratedIds: Set<string>,
-  dislikedBrands: Set<string>,
 ): RecommendedProduct[] {
   const loved = reviews.filter(r => r.rating != null && r.rating >= 4)
   const disliked = reviews.filter(r => r.rating != null && r.rating <= 2)
@@ -211,9 +173,7 @@ function buildTier3(
   }
   const dislikedCats = new Set(disliked.map(r => r.products.category))
 
-  const candidates = allProducts.filter(
-    p => !ratedIds.has(p.id),
-  )
+  const candidates = allProducts.filter(p => !ratedIds.has(p.id))
 
   const scored = candidates.map(p => {
     let s = 0
@@ -221,7 +181,6 @@ function buildTier3(
     if (dislikedCats.has(p.category)) s -= 10
     if (p.cg_status === 'approved') s += 3
     s += Math.min(p.review_count, 10) // popularity tiebreaker
-    if (dislikedBrands.has(p.brand.toLowerCase())) s = Math.round(s * DISLIKED_BRAND_PENALTY)
     return { ...p, _score: s, _reason: 'Based on your ratings and hair profile' }
   })
 
@@ -235,7 +194,6 @@ function buildIngredientTier(
   reviews: (ProductReview & { products: Product })[],
   ratedIds: Set<string>,
   sensitivities: string[],
-  dislikedBrands: Set<string>,
 ): { recs: RecommendedProduct[]; sensitivityFilterCount: number } {
   const loved = reviews
     .filter(r => r.rating != null && r.rating >= 4)
@@ -250,9 +208,6 @@ function buildIngredientTier(
     return { recs: [], sensitivityFilterCount: 0 }
   }
 
-  // Compute ingredient rarity from the full catalog so rare matches count more
-  const rarityWeights = buildIngredientRarity(allProducts)
-
   const candidates = allProducts.filter(
     p => p.cg_status === 'approved' && !ratedIds.has(p.id),
   )
@@ -261,8 +216,6 @@ function buildIngredientTier(
 
   const scored: (RecommendedProduct & { _score: number })[] = []
   for (const product of candidates) {
-    const brandPenalty = dislikedBrands.has(product.brand.toLowerCase()) ? DISLIKED_BRAND_PENALTY : 1
-
     // Sensitivity filter (strict = exclude, flexible = warn)
     if (sensitivities.length > 0) {
       const { strict, flexible } = checkSensitivitiesWithStrictness(product, sensitivities)
@@ -271,21 +224,20 @@ function buildIngredientTier(
         continue
       }
       if (flexible.length > 0) {
-        const { score, matchedIngredients } = scoreProductByIngredients(product, profile, rarityWeights)
-        const adjustedScore = Math.round(score * 0.7)
-        if (adjustedScore >= MIN_INGREDIENT_MATCH_SCORE && matchedIngredients.length > 0) {
+        const { score, matchedIngredients } = scoreProductByIngredients(product, profile)
+        if (score > 0 && matchedIngredients.length > 0) {
           const reason = `Contains ${formatIngredientList(matchedIngredients)} — ingredients you've loved in other products`
           const warning = `⚠️ Contains ${formatIngredientList(flexible)} (you prefer to avoid)`
-          scored.push({ ...product, _score: Math.round(adjustedScore * brandPenalty), _matchPercent: adjustedScore, _reason: reason, _sensitivityWarning: warning })
+          scored.push({ ...product, _score: score * 0.7, _reason: reason, _sensitivityWarning: warning })
         }
         continue
       }
     }
 
-    const { score, matchedIngredients } = scoreProductByIngredients(product, profile, rarityWeights)
-    if (score >= MIN_INGREDIENT_MATCH_SCORE && matchedIngredients.length > 0) {
+    const { score, matchedIngredients } = scoreProductByIngredients(product, profile)
+    if (score > 0 && matchedIngredients.length > 0) {
       const reason = `Contains ${formatIngredientList(matchedIngredients)} — ingredients you've loved in other products`
-      scored.push({ ...product, _score: Math.round(score * brandPenalty), _matchPercent: score, _reason: reason })
+      scored.push({ ...product, _score: score, _reason: reason })
     }
   }
 
@@ -306,6 +258,8 @@ const DISMISS_REASONS = [
   'Already tried — didn\'t work',
   'Not interested',
 ]
+
+const EMPTY_SET: Set<string> = new Set()
 
 // ---------------------------------------------------------------------------
 // Header / subtitle per tier
@@ -354,82 +308,82 @@ const MIN_RATINGS_FOR_ADVANCED = 5
 
 export function Recommendations() {
   const { user } = useAuth()
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const [userReviews, setUserReviews] = useState<(ProductReview & { products: Product })[]>([])
-  const [popularProducts, setPopularProducts] = useState<Product[]>([])
-  const [recommendedProducts, setRecommendedProducts] = useState<RecommendedProduct[]>([])
-  const [ingredientRecs, setIngredientRecs] = useState<RecommendedProduct[]>([])
-  const [tier, setTier] = useState<Tier>(1)
-  const [loading, setLoading] = useState(true)
-  const [ratingCount, setRatingCount] = useState(0)
+  const queryClient = useQueryClient()
+  const userId = user?.id
+  const { data: profile, isLoading: profileLoading, error: profileError } = useUserProfile(userId)
+  const { data: userReviews = [], isLoading: reviewsLoading, error: reviewsError } = useUserReviews(userId)
+  const { data: productsData, isLoading: productsLoading, error: productsError } = useProducts()
+  const products = productsData?.products ?? []
   const [showRatingPopup, setShowRatingPopup] = useState<string | null>(null)
-  const [sensitivityFilterCount, setSensitivityFilterCount] = useState(0)
   const [dismissingProduct, setDismissingProduct] = useState<string | null>(null)
   const [dismissReasons, setDismissReasons] = useState<Set<string>>(new Set())
   const [dismissNote, setDismissNote] = useState('')
 
-  const ratedProductIds = new Set(userReviews.map(r => r.product_id))
-
-  // ----- data loading -----
-
-  const loadData = useCallback(async () => {
-    if (!user) return
-    setLoading(true)
-
-    const [profileRes, reviewsRes, productsRes] = await Promise.all([
-      supabase.from('profiles').select('*').eq('id', user.id).single(),
-      supabase
-        .from('product_reviews')
-        .select('*, products(*)')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false }),
-      supabase
-        .from('products')
-        .select('*')
-        .order('review_count', { ascending: false })
-        .limit(200),
-    ])
-
-    const userProfile = profileRes.data as unknown as Profile | null
-    const reviews = (reviewsRes.data as unknown as (ProductReview & { products: Product })[]) ?? []
-    const products = (productsRes.data as unknown as Product[]) ?? []
-
-    setProfile(userProfile)
-    setUserReviews(reviews)
-    setRatingCount(reviews.length)
-    setPopularProducts(products)
-
-    const ratedIds = new Set(reviews.map(r => r.product_id))
-    const reviewsWithRating = reviews.filter(r => r.rating != null)
-    const sensitivities = userProfile?.sensitivities ?? []
-    const dislikedBrands = buildDislikedBrands(reviews)
-
-    // Determine tier & build recommendations
-    // Profile is "done" if porosity is set (the most important factor per CG guide)
-    // curl_pattern is now optional
-    const profileDone = userProfile?.onboarding_completed && !!userProfile.porosity
+  const ratedProductIds = useMemo(() => new Set(userReviews.map(r => r.product_id)), [userReviews])
+  const reviewsWithRating = useMemo(() => userReviews.filter(r => r.rating != null), [userReviews])
+  const popularProducts = useMemo(
+    () => [...products].sort((a, b) => b.review_count - a.review_count).slice(0, 200),
+    [products],
+  )
+  const profileDone = !!profile?.onboarding_completed && !!profile?.porosity
+  const sensitivities = profile?.sensitivities ?? []
+  const ratedProductIdList = useMemo(() => userReviews.map(r => r.product_id), [userReviews])
+  const dislikedCategoriesKey = useMemo(() => (
+    userReviews
+      .filter(r => r.rating != null && r.rating <= 2)
+      .map(r => r.products.category)
+      .sort()
+      .join('|')
+  ), [userReviews])
+  const shouldLoadCollab = !!user && profileDone && !!profile?.curl_pattern
+    && reviewsWithRating.length >= MIN_RATINGS_FOR_ADVANCED
+  const { data: collabData, isLoading: collabLoading, error: collabError } = useQuery({
+    queryKey: ['collab-recs', userId, profile?.curl_pattern, profile?.porosity, ratedProductIdList, dislikedCategoriesKey],
+    enabled: shouldLoadCollab,
+    queryFn: async () => {
+      const ratedIds = new Set(ratedProductIdList)
+      return await loadCollaborativeRecs(profile!, userReviews, ratedIds)
+    },
+  })
+  const baseLoading = (productsLoading || profileLoading || reviewsLoading)
+    && !(productsError || profileError || reviewsError)
+  const loading = baseLoading || (shouldLoadCollab && collabLoading && !collabError)
+  const {
+    tier,
+    recommendedProducts,
+    ingredientRecs,
+    sensitivityFilterCount,
+  } = useMemo(() => {
+    if (popularProducts.length === 0) {
+      return {
+        tier: 1 as Tier,
+        recommendedProducts: [],
+        ingredientRecs: [],
+        sensitivityFilterCount: 0,
+      }
+    }
+    const userProfile = profile ?? null
+    const ratedIds = ratedProductIds
     let currentTier: Tier = 1
     let recs: RecommendedProduct[] = []
     let ingredientResults: RecommendedProduct[] = []
     let sensitivityFiltered = 0
-
     if (!profileDone) {
       // Tier 1
       currentTier = 1
-      recs = buildTier1(products, userProfile?.cgm_experience)
+      recs = buildTier1(popularProducts, userProfile?.cgm_experience)
     } else if (reviewsWithRating.length < MIN_RATINGS_FOR_INGREDIENTS) {
       // Tier 2 — now uses porosity + texture (not curl pattern)
       currentTier = 2
-      recs = buildTier2(products, userProfile!, ratedIds, dislikedBrands)
+      recs = buildTier2(popularProducts, userProfile!, ratedIds)
     } else if (reviewsWithRating.length < MIN_RATINGS_FOR_ADVANCED) {
       // Tier 2.5 — ingredient-based
       currentTier = 2.5
-      const tier2Recs = buildTier2(products, userProfile!, ratedIds, dislikedBrands)
+      const tier2Recs = buildTier2(popularProducts, userProfile!, ratedIds)
       const { recs: ingRecs, sensitivityFilterCount: filtCount } = buildIngredientTier(
-        products, reviews, ratedIds, sensitivities, dislikedBrands,
+        popularProducts, userReviews, ratedIds, sensitivities,
       )
       sensitivityFiltered = filtCount
-
       if (ingRecs.length > 0) {
         // Blend: ingredient recs first, then hair-type fill
         const seen = new Set(ingRecs.map(p => p.id))
@@ -450,23 +404,16 @@ export function Recommendations() {
       // Tier 3 or 4 — check for similar users
       // Also build ingredient recs as a supplementary section
       const { recs: ingRecs, sensitivityFilterCount: filtCount } = buildIngredientTier(
-        products, reviews, ratedIds, sensitivities, dislikedBrands,
+        popularProducts, userReviews, ratedIds, sensitivities,
       )
       ingredientResults = ingRecs
       sensitivityFiltered = filtCount
-
-      const { collabRecs, hasSimilarUsers } = await loadCollaborativeRecs(
-        userProfile!,
-        reviews,
-        ratedIds,
-        dislikedBrands,
-      )
-      if (hasSimilarUsers && collabRecs.length > 0) {
+      if (collabData?.hasSimilarUsers && collabData.collabRecs.length > 0) {
         currentTier = 4
-        const tier3 = buildTier3(products, reviews, ratedIds, dislikedBrands)
+        const tier3 = buildTier3(popularProducts, userReviews, ratedIds)
         // Blend: collab first, then tier3 fill, dedupe
-        const seen = new Set(collabRecs.map(p => p.id))
-        const blended: RecommendedProduct[] = collabRecs.map(p => ({
+        const seen = new Set(collabData.collabRecs.map(p => p.id))
+        const blended: RecommendedProduct[] = collabData.collabRecs.map(p => ({
           ...p,
           _reason: 'Loved by people with similar hair',
         }))
@@ -479,23 +426,31 @@ export function Recommendations() {
         recs = blended.slice(0, 5)
       } else {
         currentTier = 3
-        recs = buildTier3(products, reviews, ratedIds, dislikedBrands)
+        recs = buildTier3(popularProducts, userReviews, ratedIds)
       }
     }
-
-    setTier(currentTier)
-    setRecommendedProducts(recs)
-    setIngredientRecs(ingredientResults)
-    setSensitivityFilterCount(sensitivityFiltered)
-    setLoading(false)
-  }, [user])
+    return {
+      tier: currentTier,
+      recommendedProducts: recs,
+      ingredientRecs: ingredientResults,
+      sensitivityFilterCount: sensitivityFiltered,
+    }
+  }, [
+    collabData,
+    popularProducts,
+    profile,
+    profileDone,
+    ratedProductIds,
+    reviewsWithRating.length,
+    sensitivities,
+    userReviews,
+  ])
 
   /** Collaborative filtering: find users with same curl_pattern + porosity, get their 4-5 rated products */
   const loadCollaborativeRecs = async (
     userProfile: Profile,
     reviews: (ProductReview & { products: Product })[],
     ratedIds: Set<string>,
-    dislikedBrands: Set<string>,
   ): Promise<{ collabRecs: Product[]; hasSimilarUsers: boolean }> => {
     if (!userProfile.curl_pattern || !userProfile.porosity) {
       return { collabRecs: [], hasSimilarUsers: false }
@@ -547,15 +502,12 @@ export function Recommendations() {
 
     const { data: recProducts } = await supabase
       .from('products')
-      .select('*')
+      .select('id,brand,name,category,cg_status,cruelty_free,notes,image_url')
       .in('id', rankedIds)
 
     let recs = (recProducts as unknown as Product[]) ?? []
-    // Deprioritise disliked brands and categories (demotion, not exclusion)
+    // Preserve ranking & deprioritise disliked categories
     recs.sort((a, b) => {
-      const aBrand = dislikedBrands.has(a.brand.toLowerCase()) ? 1 : 0
-      const bBrand = dislikedBrands.has(b.brand.toLowerCase()) ? 1 : 0
-      if (aBrand !== bBrand) return aBrand - bBrand
       const aDis = dislikedCats.has(a.category) ? 1 : 0
       const bDis = dislikedCats.has(b.category) ? 1 : 0
       if (aDis !== bDis) return aDis - bDis
@@ -565,41 +517,43 @@ export function Recommendations() {
     return { collabRecs: recs, hasSimilarUsers: true }
   }
 
-  useEffect(() => {
-    loadData()
-  }, [loadData])
-
   // ----- rating handler -----
 
+  const rateMutation = useMutation({
+    mutationFn: async ({ productId, rating }: { productId: string; rating: number }) => {
+      if (!userId) return
+      const { error } = await supabase
+        .from('product_reviews')
+        .upsert(
+          {
+            user_id: userId,
+            product_id: productId,
+            rating,
+            status: 'tried_once',
+            would_repurchase: rating >= 4 ? 'yes' : rating <= 2 ? 'no' : 'maybe',
+            photo_urls: [],
+          } as never,
+          { onConflict: 'user_id,product_id' },
+        )
+      if (error) throw error
+    },
+    onError: (error) => {
+      console.error('Rating upsert failed:', error)
+    },
+    onSuccess: () => {
+      if (userId) {
+        queryClient.invalidateQueries({ queryKey: ['reviews', userId] })
+      }
+    },
+  })
+
   const handleRate = async (productId: string, rating: number) => {
-    if (!user) return
-
-    await supabase
-      .from('product_reviews')
-      .upsert(
-        {
-          user_id: user.id,
-          product_id: productId,
-          rating,
-          status: 'tried_once',
-          would_repurchase: rating >= 4 ? 'yes' : rating <= 2 ? 'no' : 'maybe',
-          photo_urls: [],
-        } as never,
-        { onConflict: 'user_id,product_id' },
-      )
-
-    setRatingCount(prev => prev + 1)
-    setShowRatingPopup(null)
-
-    // Refresh reviews
-    const { data: freshReviews } = await supabase
-      .from('product_reviews')
-      .select('*, products(*)')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-
-    const reviews = (freshReviews as unknown as (ProductReview & { products: Product })[]) ?? []
-    setUserReviews(reviews)
+    if (!userId) return
+    try {
+      await rateMutation.mutateAsync({ productId, rating })
+    } finally {
+      setShowRatingPopup(null)
+    }
   }
 
   // ----- bookmark handler -----
@@ -617,33 +571,50 @@ export function Recommendations() {
 
   // ----- dismiss handler -----
 
+  const dismissMutation = useMutation({
+    mutationFn: async ({ productId, notes }: { productId: string; notes: string }) => {
+      if (!userId) return
+      const { error } = await supabase
+        .from('product_reviews')
+        .upsert(
+          {
+            user_id: userId,
+            product_id: productId,
+            rating: 1,
+            would_repurchase: 'no',
+            results_notes: notes,
+            status: 'tried_once',
+            photo_urls: [],
+          } as never,
+          { onConflict: 'user_id,product_id' },
+        )
+      if (error) throw error
+    },
+    onError: (error) => {
+      console.error('Dismiss upsert failed:', error)
+    },
+    onSuccess: () => {
+      if (userId) {
+        queryClient.invalidateQueries({ queryKey: ['reviews', userId] })
+      }
+    },
+  })
+
   const handleDismiss = async (productId: string) => {
-    if (!user || dismissReasons.size === 0) return
+    if (!userId || dismissReasons.size === 0) return
 
     const reasonText = [...dismissReasons].join(', ')
     const notes = dismissNote.trim()
       ? `${reasonText}. ${dismissNote.trim()}`
       : reasonText
 
-    await supabase
-      .from('product_reviews')
-      .upsert(
-        {
-          user_id: user.id,
-          product_id: productId,
-          rating: 1,
-          would_repurchase: 'no',
-          results_notes: notes,
-          status: 'tried_once',
-          photo_urls: [],
-        } as never,
-        { onConflict: 'user_id,product_id' },
-      )
-
-    setDismissingProduct(null)
-    setDismissReasons(new Set())
-    setDismissNote('')
-    loadData()
+    try {
+      await dismissMutation.mutateAsync({ productId, notes })
+    } finally {
+      setDismissingProduct(null)
+      setDismissReasons(new Set())
+      setDismissNote('')
+    }
   }
 
   // ----- render gates -----
@@ -671,7 +642,7 @@ export function Recommendations() {
   }
 
   const firstName = profile?.display_name?.split(' ')[0] ?? 'there'
-  const { title: recTitle, subtitle: recSubtitle } = tierHeader(tier, profile)
+  const { title: recTitle, subtitle: recSubtitle } = tierHeader(tier, profile ?? null)
 
   const lovedReviews = userReviews.filter(r => r.rating != null && r.rating >= 4 && r.rating <= 5)
   const likedReviews = userReviews.filter(r => r.rating === 3)
@@ -719,13 +690,13 @@ export function Recommendations() {
                 product={product}
                 reason={product._reason}
                 sensitivityWarning={product._sensitivityWarning}
-                matchScore={product._matchPercent}
+                matchScore={product._score}
                 showRatingPopup={showRatingPopup === product.id}
                 onOpenRating={() => setShowRatingPopup(product.id)}
                 onCloseRating={() => setShowRatingPopup(null)}
                 onRate={handleRate}
                 isDismissing={dismissingProduct === product.id}
-                dismissReasons={dismissingProduct === product.id ? dismissReasons : new Set<string>()}
+                dismissReasons={dismissingProduct === product.id ? dismissReasons : EMPTY_SET}
                 dismissNote={dismissingProduct === product.id ? dismissNote : ''}
                 onOpenDismiss={() => {
                   setDismissingProduct(product.id)
@@ -775,13 +746,12 @@ export function Recommendations() {
                   product={product}
                   reason={product._reason}
                   sensitivityWarning={product._sensitivityWarning}
-                  matchScore={product._matchPercent}
                   showRatingPopup={showRatingPopup === product.id}
                   onOpenRating={() => setShowRatingPopup(product.id)}
                   onCloseRating={() => setShowRatingPopup(null)}
                   onRate={handleRate}
                   isDismissing={dismissingProduct === product.id}
-                  dismissReasons={dismissingProduct === product.id ? dismissReasons : new Set<string>()}
+                  dismissReasons={dismissingProduct === product.id ? dismissReasons : EMPTY_SET}
                   dismissNote={dismissingProduct === product.id ? dismissNote : ''}
                   onOpenDismiss={() => {
                     setDismissingProduct(product.id)
@@ -866,7 +836,7 @@ export function Recommendations() {
                       to={product ? `/products/${product.id}` : '/products'}
                       className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-violet-300 transition no-underline"
                     >
-                      <ProductImage brand={brand} name={name} seedImageUrl={product?.image_url} className="w-10 h-10" />
+                      <ProductImage brand={brand} name={name} seedImageUrl={product?.image_url} category={product?.category} className="w-10 h-10" />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-gray-500">{brand}</p>
                         <p className="text-sm font-semibold text-gray-900 truncate">{name}</p>
@@ -984,14 +954,14 @@ function RecommendedCard({
         <ProductImage
           brand={product.brand}
           name={product.name}
-          seedImageUrl={product.image_url}
+          seedImageUrl={product.image_url} category={product.category}
           className="w-14 h-14 shrink-0"
         />
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <p className="text-xs text-gray-500">{product.brand}</p>
-            {matchScore != null && matchScore >= MIN_BADGE_DISPLAY_SCORE && (
+            {matchScore != null && matchScore > 0 && (
               <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${
                 matchScore >= 80 ? 'bg-emerald-50 text-emerald-700' :
                 matchScore >= 60 ? 'bg-green-50 text-green-700' :
@@ -1183,6 +1153,7 @@ function RatingRow({ review }: { review: ProductReview & { products: Product } }
         brand={review.products.brand}
         name={review.products.name}
         seedImageUrl={review.products.image_url}
+        category={review.products.category}
         className="w-10 h-10"
       />
       <div className="flex-1 min-w-0">

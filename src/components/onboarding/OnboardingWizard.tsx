@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../../lib/auth'
 import { supabase } from '../../lib/supabase'
 import {
@@ -16,6 +17,7 @@ import type {
   ColorTreatment, Climate, HeatToolUsage, WorkoutFrequency, CgmExperience,
   FragrancePreference, WaterType,
 } from '../../lib/database.types'
+import { useUserProfile } from '../../hooks/useProducts'
 
 interface OnboardingData {
   curl_pattern: CurlPattern | null
@@ -40,9 +42,10 @@ const TOTAL_STEPS = 7
 export function OnboardingWizard() {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const { data: profile, isLoading: profileLoading, error: profileError } = useUserProfile(user?.id)
   const [step, setStep] = useState(1)
   const [saving, setSaving] = useState(false)
-  const [loadingProfile, setLoadingProfile] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
   const [data, setData] = useState<OnboardingData>({
     curl_pattern: null, porosity: null, hair_density: null, hair_width: null,
@@ -50,35 +53,30 @@ export function OnboardingWizard() {
     heat_tool_usage: null, workout_frequency: null, cgm_experience: null,
     fragrance_preference: null, water_type: null, hair_goals: [], sensitivities: [],
   })
+  const loadingProfile = profileLoading && !profileError
 
   // Load existing profile data if editing
   useEffect(() => {
-    if (!user) { setLoadingProfile(false); return }
-    supabase.from('profiles').select('*').eq('id', user.id).single().then(({ data: rawProfile }) => {
-      const profile = rawProfile as Record<string, unknown> | null
-      if (profile && profile.onboarding_completed) {
-        setIsEditing(true)
-        setData({
-          curl_pattern: (profile.curl_pattern as CurlPattern) || null,
-          porosity: (profile.porosity as Porosity) || null,
-          hair_density: (profile.hair_density as HairDensity) || null,
-          hair_width: (profile.hair_width as HairWidth) || null,
-          scalp_type: (profile.scalp_type as ScalpType) || null,
-          hair_length: (profile.hair_length as HairLength) || null,
-          color_treatment: (profile.color_treatment as ColorTreatment) || null,
-          climate: (profile.climate as Climate) || null,
-          heat_tool_usage: (profile.heat_tool_usage as HeatToolUsage) || null,
-          workout_frequency: (profile.workout_frequency as WorkoutFrequency) || null,
-          cgm_experience: (profile.cgm_experience as CgmExperience) || null,
-          fragrance_preference: (profile.fragrance_preference as FragrancePreference) || null,
-          water_type: (profile.water_type as WaterType) || null,
-          hair_goals: (profile.hair_goals as string[]) || [],
-          sensitivities: (profile.sensitivities as string[]) || [],
-        })
-      }
-      setLoadingProfile(false)
+    if (!user || !profile?.onboarding_completed || isEditing) return
+    setIsEditing(true)
+    setData({
+      curl_pattern: profile.curl_pattern as CurlPattern || null,
+      porosity: profile.porosity as Porosity || null,
+      hair_density: profile.hair_density as HairDensity || null,
+      hair_width: profile.hair_width as HairWidth || null,
+      scalp_type: profile.scalp_type as ScalpType || null,
+      hair_length: profile.hair_length as HairLength || null,
+      color_treatment: profile.color_treatment as ColorTreatment || null,
+      climate: profile.climate as Climate || null,
+      heat_tool_usage: profile.heat_tool_usage as HeatToolUsage || null,
+      workout_frequency: profile.workout_frequency as WorkoutFrequency || null,
+      cgm_experience: profile.cgm_experience as CgmExperience || null,
+      fragrance_preference: profile.fragrance_preference as FragrancePreference || null,
+      water_type: profile.water_type as WaterType || null,
+      hair_goals: profile.hair_goals || [],
+      sensitivities: profile.sensitivities || [],
     })
-  }, [user])
+  }, [profile, user, isEditing])
 
   const update = <K extends keyof OnboardingData>(key: K, value: OnboardingData[K]) => {
     setData(d => ({ ...d, [key]: value }))
@@ -119,17 +117,36 @@ export function OnboardingWizard() {
     }))
   }
 
+  const saveProfileMutation = useMutation({
+    mutationFn: async (payload: OnboardingData) => {
+      if (!user) return
+      const { error } = await supabase.from('profiles').upsert({
+        id: user.id,
+        display_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Curly Friend',
+        ...payload,
+        onboarding_completed: true,
+      } as never)
+      if (error) throw error
+    },
+    onError: (error) => {
+      console.error('Profile upsert failed:', error)
+    },
+    onSuccess: () => {
+      if (user) {
+        queryClient.invalidateQueries({ queryKey: ['profile', user.id] })
+      }
+      navigate('/profile')
+    },
+  })
+
   const handleSave = async () => {
     if (!user) return
     setSaving(true)
-    const { error } = await supabase.from('profiles').upsert({
-      id: user.id,
-      display_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Curly Friend',
-      ...data,
-      onboarding_completed: true,
-    } as never)
-    setSaving(false)
-    if (!error) navigate('/profile')
+    try {
+      await saveProfileMutation.mutateAsync(data)
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (!user) {

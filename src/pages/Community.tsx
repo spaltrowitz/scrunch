@@ -19,33 +19,32 @@ interface CommunityQuestion {
 }
 
 async function searchReddit(query: string): Promise<RedditResult[]> {
-  const results: RedditResult[] = []
-
-  for (const sub of ['curlyhair', 'curlygirl']) {
+  const subreddits = ['curlyhair', 'curlygirl']
+  const fetches = subreddits.map(async (sub) => {
     try {
-      // Use old Reddit JSON endpoint which is more CORS-friendly
       const res = await fetch(
         `https://old.reddit.com/r/${sub}/search.json?q=${encodeURIComponent(query)}&restrict_sr=on&sort=relevance&limit=5`,
         { headers: { 'Accept': 'application/json' } }
       )
-      if (!res.ok) continue
+      if (!res.ok) return []
       const data = await res.json()
       const posts = data?.data?.children || []
-      for (const post of posts) {
+      return posts.map((post: { data: { title: string; permalink: string; score: number; num_comments: number; selftext?: string } }) => {
         const d = post.data
-        results.push({
+        return {
           title: d.title,
           url: `https://reddit.com${d.permalink}`,
           subreddit: `r/${sub}`,
           score: d.score,
           num_comments: d.num_comments,
           snippet: (d.selftext || '').slice(0, 200),
-        })
-      }
+        } as RedditResult
+      })
     } catch {
-      // Reddit blocks CORS from browsers — fall back to direct links
+      return []
     }
-  }
+  })
+  const results: RedditResult[] = (await Promise.all(fetches)).flat()
 
   // If CORS blocked all results, provide direct search links instead
   if (results.length === 0) {

@@ -1,8 +1,13 @@
 name: 📦 Product Request
-description: Request a product to be added to the Scrunch database
+description: Request a hair care product to be added to the Scrunch database
 labels: ["product-request", "from-app"]
 assignees: []
 body:
+  - type: markdown
+    attributes:
+      value: |
+        **Scrunch only tracks hair care products** (shampoos, conditioners, gels, creams, oils, treatments, etc.).
+        Requests for non-hair-care items will be automatically rejected.
   - type: input
     id: brand
     attributes:

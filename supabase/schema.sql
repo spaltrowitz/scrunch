@@ -170,13 +170,11 @@ create policy "Users can insert own profile" on profiles for insert
 create policy "Users can update own profile" on profiles for update
   using (id = auth.uid());
 
--- Products (public read, auth insert)
+-- Products (public read, service-role only for writes)
+-- Products are added exclusively through seed data PRs, not user-facing inserts.
+-- Only the Supabase service role (used by CI/admin) can insert or update products.
 alter table products enable row level security;
 create policy "Products are public" on products for select using (true);
-create policy "Auth users can submit products" on products for insert
-  with check (auth.uid() is not null);
-create policy "Auth users can update products" on products for update
-  using (auth.uid() is not null);
 
 -- Product Reviews
 alter table product_reviews enable row level security;
@@ -191,8 +189,8 @@ create policy "Users can delete own reviews" on product_reviews for delete
 -- Product Requests
 alter table product_requests enable row level security;
 create policy "Requests are public" on product_requests for select using (true);
-create policy "Anyone can submit requests" on product_requests for insert
-  with check (true);
+create policy "Authenticated users can submit requests" on product_requests for insert
+  with check (auth.uid() is not null);
 
 -- Questions
 alter table questions enable row level security;
