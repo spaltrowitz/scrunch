@@ -304,3 +304,367 @@ A **non-modal page** (not a sheet, not a popup) with:
 3. **Partner with 2-3 mid-tier TikTok curly creators** (10K-100K followers) for "routine builder" content → Newbies + Budget
 4. **Launch on Product Hunt** → Optimizers + tech-curious crossover audience
 5. **Post launch thread in r/curlyhair** (many apps have done this successfully — the sub loves tools)
+
+---
+
+## V1 Ship Definition — Scrunch
+
+**Author:** Kenickie (PM)  
+**Date:** 2025-07-24  
+**Status:** PROPOSED — awaiting Shari's approval  
+**Context:** Pre-development. No src/ exists. 108 products planned (39 images verified, 69 missing). Stack: React 19 + TypeScript + Vite + Tailwind 4 + Supabase. Deploy: GitHub Pages.
+
+### Locked Constraints (non-negotiable)
+
+1. Discovery-first with checking built in
+2. 4 personas: Newbie (P0), Store Scanner (P0), Budget Builder (P1), Optimizer (P1)
+3. Invisible onboarding — products first, no gates before value
+4. No user-uploaded images for v1 (placeholders for missing)
+5. No brand outreach for v1
+6. Age is not a differentiating axis
+7. Two acquisition funnels: community (Reddit/TikTok) + SEO
+
+### V1-ALPHA — Internal / Friends Testing
+
+> *"Can 10 friends open this and tell me if the concept makes sense?"*
+
+#### Features IN scope (must work)
+
+- [ ] Product browse grid — shows all products with images or placeholders
+- [ ] Basic filtering: by category (shampoo, conditioner, gel, etc.) and CG status (approved/not/caution)
+- [ ] Product detail page — name, brand, category, CG status, key ingredients
+- [ ] CG status badges (approved ✓ / not approved ✗ / caution ⚠️)
+- [ ] Mobile-responsive layout (friends will open on phones)
+- [ ] Deployed to GitHub Pages (shareable URL)
+
+#### Features OUT of scope (deferred)
+
+- Search bar (browse-first philosophy — add when testers ask for it)
+- Price data or budget filtering
+- Product request flow
+- Any personalization / invisible onboarding signals
+- Account creation / Supabase auth
+- SEO meta tags / individual product URLs for Google
+- Ingredient-level filtering (Optimizer persona = P1)
+
+#### Known compromises
+
+- Only ~39 products will have real images; remaining 69 use branded color placeholders
+- Product data is static JSON (no API, no Supabase yet) — that's fine for 10 users
+- No analytics — feedback is qualitative (text friends, ask what they'd change)
+- Filters may feel sparse with only 108 products — acceptable at this scale
+
+#### Ship criteria
+
+1. ✅ URL loads on mobile Safari + Chrome without errors
+2. ✅ All 108 products render (images or placeholders)
+3. ✅ Filtering by category and CG status works correctly
+4. ✅ Product detail page shows accurate CG status + ingredients
+5. ✅ A first-time user can find a CG-approved conditioner in <15 seconds
+6. ✅ Shari has sent the link to 3+ people and it didn't crash
+
+### V1-BETA — Soft Launch to r/curlyhair
+
+> *"What needs to work for the first Reddit post to not be embarrassing?"*
+
+#### Features IN scope (must work)
+
+Everything from ALPHA, plus:
+
+- [ ] Search bar (users will arrive with a specific product in mind from Reddit)
+- [ ] Product detail pages with shareable URLs (`/product/shea-moisture-coconut-hibiscus-curl-milk`)
+- [ ] "Is this CG approved?" quick-check flow (Store Scanner persona)
+- [ ] Product request form — "don't see your product? request it" (captures demand signal)
+- [ ] Ingredient list display with flagged problematic ingredients highlighted
+- [ ] Basic SEO: page titles, meta descriptions, Open Graph tags for link previews
+- [ ] Loading states and empty states that don't look broken
+- [ ] Error boundary — graceful fallback if something crashes
+- [ ] "About" or "What is CGM?" link for Newbies landing from Reddit
+
+#### Features OUT of scope (deferred)
+
+- User accounts / saved products / wishlists
+- Invisible onboarding behavior tracking
+- Price comparison or budget features
+- Advanced ingredient filtering (protein-free, silicone-free subcategories)
+- Analytics dashboard (but add Plausible or similar lightweight tracker)
+- Product comparison view
+- Routine builder
+
+#### Known compromises
+
+- Product request form submits to a simple Supabase table or even a Google Form — no admin UI yet
+- Still ~69 placeholder images — Reddit users will notice and comment (this is fine — it shows the product DB is real, images are WIP)
+- Data is still static or minimal Supabase — no real-time updates
+- No moderation on product requests — manually review
+- One community member will inevitably find an ingredient we've mis-classified — have a "report issue" escape hatch
+
+#### Ship criteria
+
+1. ✅ All ALPHA criteria still pass
+2. ✅ Shareable product URLs render correct Open Graph previews when pasted in Reddit/Discord
+3. ✅ Search returns relevant results for partial brand/product name
+4. ✅ Product request form submits successfully and data is captured
+5. ✅ Page loads in <2s on 4G connection (Lighthouse performance >70)
+6. ✅ No console errors visible to a user who opens DevTools
+7. ✅ "Is [product] CG approved?" question answerable in <5 seconds
+8. ✅ Shari can post to r/curlyhair without cringing
+
+### V1-LAUNCH — Public, GitHub Pages Live
+
+> *"This is a real product people can rely on."*
+
+#### Features IN scope (must work)
+
+Everything from BETA, plus:
+
+- [ ] Full product browse + all filters working (category, CG status, brand, hair type suitability)
+- [ ] CG status checking with ingredient-level explanations ("contains dimethicone → not CG approved because...")
+- [ ] Product request flow with confirmation email/message and status tracking
+- [ ] All 108 product images resolved — real images where found, polished branded placeholders where not
+- [ ] Individual SEO-optimized product pages (target: "[product name] curly girl approved" keywords)
+- [ ] Lightweight analytics (Plausible/Fathom) — page views, top searches, product request volume
+- [ ] "Report incorrect info" flow on every product
+- [ ] Mobile-first responsive design polished (not just functional)
+- [ ] Accessibility basics: keyboard navigation, alt text, color contrast
+- [ ] Performance: Lighthouse >85 across all metrics
+- [ ] Proper 404 page for dead links
+- [ ] Favicon, Open Graph images, polished meta tags
+
+#### Features OUT of scope (deferred to post-launch)
+
+- User accounts and authentication
+- Saved products / wishlists / personal routines
+- Invisible onboarding personalization engine
+- Price data integration
+- Product comparison tool
+- Push notifications or email digest
+- Admin dashboard for product management
+- Community features (reviews, ratings, tips)
+- Brand partnerships or affiliate links
+- Native mobile app
+
+#### Known compromises
+
+- Static site on GitHub Pages — no server-side rendering, limited dynamic capability
+- Product data updates require a code deploy (acceptable at 108 products)
+- No admin UI — Shari manually manages product DB in code/Supabase
+- Placeholder images for ~20-30% of products (acceptable — branded and intentional-looking)
+- Product requests go to a queue with no SLA — "we'll review it" messaging
+
+#### Ship criteria
+
+1. ✅ All BETA criteria still pass
+2. ✅ Every product page is indexable by Google (test with Google Search Console)
+3. ✅ At least 80% of products have real images (≥86 of 108)
+4. ✅ Zero broken images or layout shifts from missing assets
+5. ✅ All CG classifications have ingredient-level justification
+6. ✅ Product request flow works end-to-end (submit → confirmation → appears in queue)
+7. ✅ Lighthouse scores: Performance >85, Accessibility >90, SEO >90
+8. ✅ Site works offline-ish (service worker caches product data for Store Scanner in-aisle use)
+9. ✅ "Report incorrect info" submissions are captured and retrievable
+10. ✅ Shari would put this link in her Twitter/LinkedIn bio
+
+### Timeline Estimate (Kenickie's read)
+
+| Tier | Effort | Realistic Timeline |
+|------|--------|-------------------|
+| ALPHA | ~2-3 days of focused dev | Week 1 |
+| BETA | ~1-2 weeks additional | Weeks 2-3 |
+| LAUNCH | ~2-3 weeks additional | Weeks 4-6 |
+
+**Total to public launch: ~6 weeks** from first commit, assuming:
+- 1 developer (Shari + Copilot squad)
+- Product data already exists (108 products seeded)
+- Image sourcing runs in parallel with dev
+
+### Key Risks
+
+1. **Image coverage** — Currently at 36%. Need 80%+ for LAUNCH. Image sourcing must start NOW in parallel with dev.
+2. **CG classification accuracy** — One wrong classification on Reddit = credibility hit. Need ingredient-level source of truth, not manual tagging.
+3. **Scope creep** — The temptation to add "just one more filter" before shipping ALPHA. Resist. Ship ugly, get feedback.
+4. **SEO timeline** — Google indexing takes weeks. Product pages should exist by BETA even if not fully polished, so they start accruing authority.
+
+### Decision Requested
+
+Shari: Does this scope feel right? Specifically:
+1. Is ALPHA minimal enough to ship this week?
+2. Is there anything in BETA that should move to LAUNCH (or vice versa)?
+3. Is the 80% image threshold for LAUNCH correct, or would you ship at 70%?
+4. Service worker for offline Store Scanner — LAUNCH or post-launch?
+
+---
+
+## Ship-Readiness Audit — Scrunch
+
+**Date:** 2026-04-30  
+**By:** Sandy (Lead)  
+**Requested by:** Shari Paltrowitz
+
+### Executive Summary
+
+**Overall verdict: 🟡 CLOSE but NOT shippable today.**
+
+The app has strong bones — 14 pages, auth, product browsing, recommendations, onboarding, ingredient checker — but TypeScript errors block the build on the PR branch, ~109 of 280 products lack images, and the homepage still leads with ingredient checking rather than the decided "discovery-first" browse experience. Fixing the TS errors + merging PR #13 + image sourcing gets you to a soft launch.
+
+### Feature Scorecard
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| **F1: User Profiles & Hair Quiz** | 🟡 Partial | 571-line OnboardingWizard exists with curl pattern, porosity, density, goals. Missing: environmental dashboard (zip code → stressor scores), ~20 of 30 planned quiz questions, visual aids per question. Good enough for V1. |
+| **F2: Product Database** | 🟡 Partial | 280 products seeded. Supabase table live with RLS. Missing: 109 products have `null` images. Categories, CG status, and region filters work. |
+| **F3: Product Logging & Reviews** | ✅ Done | Users can rate (loved/liked/ok/disliked), bookmark, add notes. Persists to Supabase `product_reviews` for logged-in users, localStorage for guests. |
+| **F3.5: Request a Missing Product** | ✅ Done | `RequestProductForm` component + GitHub Actions workflow + spam validation (PR #13). |
+| **F3.6: AI Product Ingestion Pipeline** | ❌ Missing | REQUIREMENTS describe Copilot-powered auto-research on product requests. Not built yet. |
+| **F3.7: Product Removal & Data Quality** | ❌ Missing | No admin tooling for removing/editing products. |
+| **F4: Personalized Recommendations** | ✅ Done | 4-tier engine: curl-match → porosity/texture priority → ingredient affinity → community popular. QuickRateCard for cold-start. |
+| **F5: Community Q&A** | 🟡 Partial | Reddit search integration exists. Supabase schema has `questions` + `answers` tables. But no community posting UI — it's read-only from Reddit. |
+| **F6: Ingredient Checker** | ✅ Done | Paste-and-check with silicone/sulfate/drying alcohol detection. Works without auth. Hero feature on homepage. |
+| **F7: Routine Builder** | ❌ Missing | Schema exists (`routines` table) but no UI. |
+| **F8: Education Hub** | ❌ Missing | No content pages beyond About/Terms. |
+| **Auth (Email + Google)** | ✅ Done | Email/password + Google OAuth via Supabase. Apple Sign-In NOT implemented. |
+| **Deployment (GitHub Pages)** | ✅ Done | CI/CD workflow deploys on push to main. Last deploy succeeded. Live at spaltrowitz.github.io/scrunch. |
+| **Product Detail Page** | ✅ Done | Individual product pages with ingredient lists, CG status badge, related products. |
+| **My Products (Saved/Rated)** | ✅ Done | Authenticated users see their rated and saved products. |
+
+### Code Quality
+
+| Check | Result | Details |
+|-------|--------|---------|
+| **Build (`tsc`)** | ❌ FAILS | 16 TypeScript errors on PR branch (Products.tsx, Profile.tsx, Recommendations.tsx, vite.config.ts). Main branch deploys fine (CI passes). |
+| **Tests (`vitest`)** | ✅ PASS | 26 tests across 3 files, all green. |
+| **Lint (`eslint`)** | ❌ 17 errors | setState-in-effect (5), fast-refresh violations (2), unused vars (2), JSX-in-try/catch (3), undeclared variable access (4), prefer-const (1). |
+| **Deployed main** | ✅ Works | CI/CD succeeds; gh-pages branch has latest build artifacts. |
+
+**Key TS errors (PR branch only):**
+- `Products.tsx`: Supabase query result typed as `never` — likely a `database.types.ts` mismatch
+- `Recommendations.tsx`: unused var + wrong arg count in function call + missing `_score` property
+- `vite.config.ts`: `test` property not recognized (needs `/// <reference types="vitest" />`)
+
+### Infrastructure
+
+| Area | Status | Notes |
+|------|--------|-------|
+| **Supabase** | ✅ Configured | Real project URL + anon key hardcoded (not ideal but functional). RLS policies correct. |
+| **GitHub Pages** | ✅ Working | HashRouter for SPA compatibility. Base path `/scrunch/` set correctly. |
+| **Environment Variables** | 🟡 Hardcoded | Supabase URL + anon key are in source code as fallback defaults. Should use env vars in CI but won't break. |
+| **Product Request Workflow** | ✅ Built (PR #13) | GitHub Actions validates + labels spam, Copilot instructions for research. Not yet merged. |
+| **Image Strategy** | 🟡 In Progress | OpenBeautyFacts fallback + brand-owned URLs. 109/280 products still have no image. CDN compliance audit done (retailer URLs removed). |
+
+### Blockers for V1 Launch
+
+#### Must-fix (P0 — can't ship without these)
+
+1. **Merge PR #13** — product request validation is ready, `mergeable_state: clean`. Just needs merge.
+2. **Fix TypeScript errors** — 16 errors prevent build on the PR branch. The deployed main works, but any new merge will break CI.
+3. **Product images** — 109 of 280 products show no image. Users will see a placeholder grid. Minimum: top 50 products should have images.
+
+#### Should-fix (P1 — ship with caveats)
+
+4. **Homepage doesn't match "discovery-first" decision** — Current homepage is ingredient-checker-forward. Decision says: "Homepage should show products immediately — zero friction before first value." Need to redesign hero to lead with browse/categories.
+5. **Lint errors** — 17 lint errors include actual bugs (setState-in-effect can cause render loops). Fix at least the functional ones.
+6. **Hardcoded Supabase credentials** — anon key in source is acceptable for public-facing apps, but URL should be env-var-only for flexibility.
+
+#### Nice-to-have (P2 — ship without)
+
+7. **Apple Sign-In** — Not built. Google + email is sufficient for V1.
+8. **Routine Builder (F7)** — Schema ready, no UI.
+9. **Education Hub (F8)** — Not started.
+10. **Environmental stressor dashboard** — Cool feature from REQUIREMENTS but complex (needs API keys). Defer.
+11. **Full 30-question onboarding** — Current wizard covers essentials. The full Prose-level quiz is P2.
+12. **Community posting UI (F5)** — Reddit search works. Full Q&A board is P2.
+
+### Ship-Readiness Score
+
+| Category | Score | Pass? |
+|----------|-------|-------|
+| Core features working | 7/10 | ✅ |
+| Build passing | 0/1 | ❌ |
+| Tests passing | 1/1 | ✅ |
+| Lint clean | 0/1 | ❌ |
+| Product data complete | 6/10 | 🟡 |
+| Infrastructure | 9/10 | ✅ |
+| UX matches decisions | 5/10 | 🟡 |
+
+**Total: 28/43 — NOT SHIP-READY**
+
+### Recommended Path to Ship
+
+1. **Fix TS errors on PR branch** (~1 hour) → merge PR #13
+2. **Fix lint errors** (~30 min) — especially setState-in-effect bugs
+3. **Source images for top 50 products** (~Danny's task, in progress)
+4. **Redesign homepage** to lead with category browsing per decision (half day)
+5. **Soft launch** to beta testers (r/curlyhair priority list from outreach PR #5)
+
+**Estimated time to shippable: 1–2 days of focused work.**
+
+---
+
+## Image Sourcing Strategy — Audit Results
+
+**Author:** Danny (Backend Dev)  
+**Date:** 2025-07-24  
+**Context:** Product database: 108 products total. 280 in current codebase (expanded scope).
+
+### Phase 1: Open Beauty Facts + Brand CDNs
+
+**Results:**
+- Open Beauty Facts match: 23 products (21%)
+- Brand Shopify CDNs: 14 products (13%)
+- **Subtotal: 37 products (34%)**
+
+### Phase 2: Deep Scan — Shopify products.json API
+
+**Results:**
+- Additional matches from Shopify product data: 22 products
+- **Cumulative total: 61 products (56.5%)**
+- **Remaining unfindable: 47 products (43.5%)**
+
+### Sourcing Recommendations
+
+For the 47 remaining products, options:
+
+1. **Branded placeholder images** (recommended for V1) — brand color + product name + "image pending" badge
+2. **Manual browser lookup** for high-priority products (top 20 by search volume):
+   - SheaMoisture product line (popular, many have public product pages)
+   - Giovanni lines (Websites often have product imagery)
+   - Mizani products (Professional line, better CDN availability)
+3. **Community contribution** (V2+) — user-submitted photos with moderation
+
+### Key Findings
+
+- **L'Oréal portfolio products** are hardest to source (proprietary CDN, no public Shopify)
+- **Mass-market drugstore brands** often lack official CDN imagery (Sally's, CVS store brands)
+- **Professional/salon brands** have better coverage (SheaMoisture, Carol's Daughter, Cantu)
+- **DIY/indie brands** (Kinky-Curly, Miss Jessie's) have product imagery available but require manual lookup
+
+### Strategy for Launch
+
+- Use 61 real images (56.5%) for top-priority products
+- Fallback to branded placeholders for 47 (43.5%)
+- Flag placeholder products in DB for future manual sourcing
+- Post-launch: community sourcing + occasional manual updates
+
+---
+
+## User Directives Captured (2026-04-30)
+
+### No Brand Outreach for Images
+
+**By:** Shari Paltrowitz (via Copilot)  
+**Date:** 2026-04-30T14:46:00-04:00
+
+**Decision:** DO NOT pursue direct brand outreach for product images. Phase 3 (emailing brands for image permission) is off the table.
+
+**Rationale:** User preference — Shari does not want to pursue proactive brand contact as an image sourcing strategy.
+
+### No User Uploads for V1 — Placeholders + Deferred Moderation
+
+**By:** Shari Paltrowitz (via Copilot)  
+**Date:** 2026-04-30T14:47:00-04:00
+
+**Decision:** No user-uploaded images for v1. Use branded placeholders for products without images. Community upload feature is deferred to v2+ when moderation is in place.
+
+**Risk Identified:** Users would screenshot retailer product pages without knowing about ToS/copyright restrictions. Hosting screenshotted retail imagery on our storage is a liability risk (copyrighted content).
+
+**Rationale:** Legal risk mitigation — screenshots of retailer product pages would be copyrighted material hosted on our storage without permission.
