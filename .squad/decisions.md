@@ -11,10 +11,10 @@
 
 ---
 
-### 2026-04-30T17:18:00-04:00: Refined user personas — discovery-first model
-**By:** Kenickie (PM)
-**What:** 5 personas (Newbie P0, Store Scanner P0, Budget Builder P1, Ingredient Detective P1, Routine Refiner P2) with discovery-first UX lens. Browsing/categories lead, filtering is the killer feature, checking is embedded.
-**Why:** Validated with Shari that Scrunch is discovery-first with checking built in. UX should lead with categories, not search.
-**Status:** Awaiting age demographic target for design direction
+### 2026-04-30T13:41:00-04:00: User persona finalization
+**By:** Shari Paltrowitz + Kenickie (PM)
+**What:** Final 4 user personas for Scrunch: (1) The Newbie (P0) — CGM beginner, needs safe products with clear badges; (2) The Store Scanner (P0) — in-aisle checker, instant pass/fail + alternatives; (3) The Budget Builder (P1) — cost-conscious, drugstore-first, price filters; (4) The Optimizer (P1) — experienced, filters by ingredients, experiments with new products (merged from Ingredient Detective + Routine Refiner).
+**Key decisions:** Scrunch is discovery-first with checking built in. Homepage leads with browsing/categories, not a search bar. Filters are the killer feature. Age is NOT a differentiating axis — it correlates with persona (younger → Newbie/Budget) but doesn't change app behavior or UX.
+**Why:** Product strategy — these personas drive feature prioritization and UX decisions
 
 ---
