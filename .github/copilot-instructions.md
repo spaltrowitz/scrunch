@@ -104,3 +104,40 @@ A product request should be rejected if ANY of the following are true:
 - The brand/product name is gibberish or clearly a joke
 - You cannot find evidence the product exists from any retailer or brand website
 - The product has already been added to `seedProducts.ts`
+
+---
+
+# Brand Scan Issues
+
+When assigned a GitHub Issue with the `brand-scan` label, follow this process to find and add all missing curly hair products from the brand:
+
+## Step 1: Parse the issue
+Extract the brand name from the issue body.
+
+## Step 2: Identify existing products
+Read `src/data/seedProducts.ts` and list all products already in the database for this brand.
+
+## Step 3: Research the brand's full product line
+1. Search the brand's official website for their complete curly/textured hair product line
+2. Also search Target, Ulta, and Walmart for products from this brand in hair care categories
+3. Focus on products relevant to curly hair: shampoos, conditioners, styling products, treatments
+4. Skip products clearly not for curly hair (e.g., straight-hair specific products, tools, accessories)
+
+## Step 4: Identify missing products
+Compare the brand's full product line against what's already in the database. For each missing product that is relevant to curly hair care:
+
+1. Create a new GitHub issue with:
+   - Title: `[Product Request] {Brand} — {Product Name}`
+   - Labels: `product-request`, `from-brand-scan`
+   - Body with brand, product name, category, and product link
+2. This will trigger the standard product-request workflow for each product
+
+## Step 5: Comment on the brand-scan issue
+Comment with a summary:
+- Total products found for the brand
+- Products already in the database
+- New product request issues created (with links)
+- Any products skipped and why (discontinued, not curl-relevant, etc.)
+
+## Step 6: Close the brand-scan issue
+Close the issue after all product request issues have been created.
