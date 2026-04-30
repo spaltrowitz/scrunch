@@ -8,6 +8,7 @@ import { ProductImage } from '../hooks/useProductImage'
 import { QuickRateCard } from '../components/products/QuickRateCard'
 import {
   buildIngredientProfile,
+  buildIngredientRarity,
   scoreProductByIngredients,
   checkSensitivitiesWithStrictness,
   formatIngredientList,
@@ -238,6 +239,9 @@ function buildIngredientTier(
     return { recs: [], sensitivityFilterCount: 0 }
   }
 
+  // Compute ingredient rarity from the full catalog so rare matches count more
+  const rarityWeights = buildIngredientRarity(allProducts)
+
   const candidates = allProducts.filter(
     p => p.cg_status === 'approved' && !ratedIds.has(p.id)
       && !dislikedBrands.has(p.brand.toLowerCase()),
@@ -255,7 +259,7 @@ function buildIngredientTier(
         continue
       }
       if (flexible.length > 0) {
-        const { score, matchedIngredients } = scoreProductByIngredients(product, profile)
+        const { score, matchedIngredients } = scoreProductByIngredients(product, profile, rarityWeights)
         const adjustedScore = Math.round(score * 0.7)
         if (adjustedScore >= MIN_INGREDIENT_MATCH_SCORE && matchedIngredients.length > 0) {
           const reason = `Contains ${formatIngredientList(matchedIngredients)} — ingredients you've loved in other products`
@@ -266,7 +270,7 @@ function buildIngredientTier(
       }
     }
 
-    const { score, matchedIngredients } = scoreProductByIngredients(product, profile)
+    const { score, matchedIngredients } = scoreProductByIngredients(product, profile, rarityWeights)
     if (score >= MIN_INGREDIENT_MATCH_SCORE && matchedIngredients.length > 0) {
       const reason = `Contains ${formatIngredientList(matchedIngredients)} — ingredients you've loved in other products`
       scored.push({ ...product, _score: score, _matchPercent: score, _reason: reason })

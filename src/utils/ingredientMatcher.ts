@@ -14,6 +14,9 @@ export interface IngredientScore {
   matchedIngredients: string[] // which loved ingredients matched
 }
 
+/** Map of normalized ingredient → rarity weight (≥1.0; higher = rarer) */
+export type IngredientRarityMap = Map<string, number>
+
 // Filler ingredients that appear in almost every product — ignore for matching
 // Note: glycerin, aloe, and panthenol are intentionally NOT in this list
 // because they are beneficial humectants that differentiate product quality
@@ -113,14 +116,49 @@ function countIngredients(
 }
 
 /**
+ * Build a rarity weight map from a product catalog using IDF.
+ * Rare ingredients get higher weights (~2–4×), ubiquitous ones stay near 1.0.
+ * This makes matching on a distinctive ingredient like "babassu oil" worth
+ * far more than matching on "glycerin" which appears in most products.
+ */
+export function buildIngredientRarity(
+  products: { ingredients: string[] }[],
+): IngredientRarityMap {
+  const docCount = products.length
+  if (docCount === 0) return new Map()
+
+  // Count how many products contain each non-filler ingredient
+  const docFreq: Record<string, number> = {}
+  for (const product of products) {
+    const seen = new Set<string>()
+    for (const ing of product.ingredients) {
+      const n = normalize(ing)
+      if (!seen.has(n) && !isFiller(n)) {
+        docFreq[n] = (docFreq[n] || 0) + 1
+        seen.add(n)
+      }
+    }
+  }
+
+  const rarityMap: IngredientRarityMap = new Map()
+  for (const [ing, freq] of Object.entries(docFreq)) {
+    // IDF: log(total / freq) + 1 → minimum 1.0 for ubiquitous ingredients
+    rarityMap.set(ing, 1 + Math.log(docCount / freq))
+  }
+  return rarityMap
+}
+
+/**
  * Score a product 0–100 based on ingredient overlap with the user's profile.
  * - Ingredients in the first 5 positions get a position bonus (higher concentration)
  * - Matches with loved ingredients add points
  * - Matches with avoid ingredients subtract points
+ * - When rarityWeights are provided, rare ingredients contribute more to the score
  */
 export function scoreProductByIngredients(
   product: { ingredients: string[] },
   profile: IngredientProfile,
+  rarityWeights?: IngredientRarityMap,
 ): IngredientScore {
   if (profile.commonIngredients.length === 0) {
     return { score: 0, matchedIngredients: [] }
@@ -137,20 +175,23 @@ export function scoreProductByIngredients(
     const ing = normalizedIngredients[i]
     // Position weight: first 5 ingredients get a bonus
     const positionWeight = i < 5 ? 2 : 1
+    const rarityWeight = rarityWeights?.get(ing) ?? 1
 
     if (commonSet.has(ing)) {
-      rawScore += 10 * positionWeight
+      rawScore += 10 * positionWeight * rarityWeight
       matchedIngredients.push(ing)
     }
 
     if (avoidSet.has(ing)) {
-      rawScore -= 5 * positionWeight
+      rawScore -= 5 * positionWeight * rarityWeight
     }
   }
 
-  // Normalize to 0-100
-  // Max possible ≈ loved-ingredient count × 20 (all in top 5) — cap at 100
-  const maxPossible = Math.max(profile.commonIngredients.length * 15, 1)
+  // Normalize to 0-100 accounting for rarity weights of the user's loved ingredients
+  const maxPossible = profile.commonIngredients.reduce((sum, ing) => {
+    const rw = rarityWeights?.get(ing) ?? 1
+    return sum + 15 * rw
+  }, 0) || 1
   const score = Math.max(0, Math.min(100, Math.round((rawScore / maxPossible) * 100)))
 
   return { score, matchedIngredients }
