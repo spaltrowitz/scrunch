@@ -259,6 +259,8 @@ const DISMISS_REASONS = [
   'Not interested',
 ]
 
+const EMPTY_SET: Set<string> = new Set()
+
 // ---------------------------------------------------------------------------
 // Header / subtitle per tier
 // ---------------------------------------------------------------------------
@@ -693,7 +695,7 @@ export function Recommendations() {
                 onCloseRating={() => setShowRatingPopup(null)}
                 onRate={handleRate}
                 isDismissing={dismissingProduct === product.id}
-                dismissReasons={dismissingProduct === product.id ? dismissReasons : new Set<string>()}
+                dismissReasons={dismissingProduct === product.id ? dismissReasons : EMPTY_SET}
                 dismissNote={dismissingProduct === product.id ? dismissNote : ''}
                 onOpenDismiss={() => {
                   setDismissingProduct(product.id)
@@ -748,7 +750,7 @@ export function Recommendations() {
                   onCloseRating={() => setShowRatingPopup(null)}
                   onRate={handleRate}
                   isDismissing={dismissingProduct === product.id}
-                  dismissReasons={dismissingProduct === product.id ? dismissReasons : new Set<string>()}
+                  dismissReasons={dismissingProduct === product.id ? dismissReasons : EMPTY_SET}
                   dismissNote={dismissingProduct === product.id ? dismissNote : ''}
                   onOpenDismiss={() => {
                     setDismissingProduct(product.id)
