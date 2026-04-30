@@ -83,3 +83,39 @@ Applied to Scrunch: Do NOT put a journey question before the product browse. Eit
 **Enforcement:** Code review checklist during PR review.
 
 ---
+
+### 2026-04-30T20:00:00-04:00: Component decomposition — Products.tsx structure
+**By:** Frenchy (Frontend Dev)
+**What:** Products.tsx decomposed into reusable sub-components with memo boundaries and smart pagination:
+- `src/components/products/SearchBar.tsx` — search input with autocomplete dropdown
+- `src/components/products/FilterPanel.tsx` — category chips, brand/region selects, toggle filters
+- `src/components/products/ProductCard.tsx` — individual product card (wrapped in React.memo)
+- Products.tsx orchestrates state and renders at 280 lines (down from 661)
+
+**Pagination Pattern:** Show More (20 items per load) instead of rendering 200+ products immediately. State reset on filter change.
+
+**Key Benefits:** Memo boundaries eliminate sibling re-renders on state changes. Decomposed structure improves testability and maintainability.
+
+**Why:** Performance Round 2 deliverable. Monolithic components defeat React optimization and reduce code clarity.
+
+---
+
+### 2026-04-30T20:00:00-04:00: Query optimization patterns — count, dedup, parallelization
+**By:** Danny (Backend Dev)
+**What:** Three core patterns for efficient backend operations:
+
+1. **Count-Only Queries:** Use `select('id', { count: 'exact', head: true })` instead of fetching rows and calling `.length`. Transfers zero rows — count lives in metadata.
+
+2. **Deduplication:** Replace O(n²) `filter + findIndex` with Map-based O(n):
+   ```ts
+   const seen = new Map()
+   return products.filter(p => !seen.has(key) && seen.set(key, true))
+   ```
+
+3. **Parallel Independent Fetches:** Use `Promise.all([fetchA(), fetchB()])` for independent API calls instead of sequential awaits.
+
+**Why:** Performance Round 2 audit found these patterns drive measurable speedup on counting, dedup, and API parallelization operations.
+
+**Enforcement:** Code review checklist for any count operation, array dedup, or parallel fetch decision.
+
+---

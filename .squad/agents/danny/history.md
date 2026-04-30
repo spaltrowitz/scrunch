@@ -33,3 +33,11 @@
 - Sources: Shopify /products.json (12 URLs: DevaCurl, Innersense, Ouai, Pattern, Mielle), OBF API (8 URLs: SheaMoisture, Cantu, Garnier, Aussie, Herbal Essences), og:image extraction (4 URLs).
 - Remaining blockers for 56 null entries: L'Oréal family (proprietary CDNs), Curls/Kristin Ess (dynamic rendering), Giovanni (Shopify blocks extraction), retailer-only brands (no brand CDNs).
 - Recommendation: Manual sourcing for L'Oréal family, brand outreach for indie blockers, retailer partnerships for mass-market bottlenecks.
+
+### 2026-04-30: Backend/Data Performance Fixes
+- **Dashboard count query**: Created `useUserReviewCount` hook using `select('id', { count: 'exact', head: true })` — transfers zero rows instead of all review rows. Dashboard only needs the count, not the data.
+- **Product dedup**: Replaced O(n²) `filter+findIndex` approach in `dedupeProducts()` with O(n) Map-based dedup. Used in `useProducts` hook shared by Home and Products pages.
+- **Reddit API parallelization**: Converted sequential `for` loop over subreddits to `Promise.all()` in Community.tsx `searchReddit()`. Both subreddit fetches now run concurrently.
+- **Already fixed (no changes needed)**: Recommendations `rateMutation` and ProductDetail `submitRatingMutation` both already use `queryClient.invalidateQueries()` with proper query keys — no manual re-fetch happening.
+- **Collaborative filtering**: Confirmed the 3 sequential queries (profiles → reviews → products) have true data dependencies — each query's parameters depend on the previous result. Cannot be parallelized without restructuring the algorithm.
+- **Pattern established**: For count-only use cases, always use `select('id', { count: 'exact', head: true })` and read the `count` from the response instead of fetching rows and using `.length`.
