@@ -98,7 +98,7 @@ export function ProductDetail() {
     loadProduct()
   }
 
-  const saveNote = async () => {
+  const _saveNote = async () => {
     if (!user || !product) return
     setSubmitting(true)
     await supabase.from('product_reviews').upsert({
@@ -109,6 +109,7 @@ export function ProductDetail() {
     setSubmitting(false)
     loadProduct()
   }
+  void _saveNote
 
   if (loading) return <div className="text-center py-12 text-gray-500">Loading…</div>
   if (!product) return <div className="text-center py-12 text-gray-500">Product not found</div>
@@ -144,6 +145,7 @@ export function ProductDetail() {
           brand={product.brand}
           name={product.name}
           seedImageUrl={product.image_url}
+          category={product.category}
           className="w-28 h-28 shrink-0"
         />
         <div className="flex-1 min-w-0">

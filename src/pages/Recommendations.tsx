@@ -808,7 +808,7 @@ export function Recommendations() {
                       to={product ? `/products/${product.id}` : '/products'}
                       className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-violet-300 transition no-underline"
                     >
-                      <ProductImage brand={brand} name={name} seedImageUrl={product?.image_url} className="w-10 h-10" />
+                      <ProductImage brand={brand} name={name} seedImageUrl={product?.image_url} category={product?.category} className="w-10 h-10" />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-gray-500">{brand}</p>
                         <p className="text-sm font-semibold text-gray-900 truncate">{name}</p>
@@ -926,7 +926,7 @@ function RecommendedCard({
         <ProductImage
           brand={product.brand}
           name={product.name}
-          seedImageUrl={product.image_url}
+          seedImageUrl={product.image_url} category={product.category}
           className="w-14 h-14 shrink-0"
         />
 
@@ -1125,6 +1125,7 @@ function RatingRow({ review }: { review: ProductReview & { products: Product } }
         brand={review.products.brand}
         name={review.products.name}
         seedImageUrl={review.products.image_url}
+        category={review.products.category}
         className="w-10 h-10"
       />
       <div className="flex-1 min-w-0">

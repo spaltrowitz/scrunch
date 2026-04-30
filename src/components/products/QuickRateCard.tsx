@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ProductImage } from '../../hooks/useProductImage'
+import type { ProductCategory } from '../../lib/database.types'
 
 interface QuickRateCardProps {
   product: {
@@ -7,6 +8,7 @@ interface QuickRateCardProps {
     brand: string
     name: string
     image_url?: string | null
+    category?: ProductCategory | null
   }
   onRate: (productId: string, rating: number) => Promise<void>
   currentRating?: number | null
@@ -31,7 +33,7 @@ export function QuickRateCard({ product, onRate, currentRating }: QuickRateCardP
   return (
     <div className={`p-4 bg-white rounded-xl border transition ${rated != null ? 'border-violet-200 bg-violet-50/30' : 'border-gray-200'}`}>
       <div className="flex flex-col items-center text-center gap-3 mb-3">
-        <ProductImage brand={product.brand} name={product.name} seedImageUrl={product.image_url} className="w-20 h-20" />
+        <ProductImage brand={product.brand} name={product.name} seedImageUrl={product.image_url} category={product.category} className="w-20 h-20" />
         <div className="min-w-0">
           <p className="text-xs text-gray-500">{product.brand}</p>
           <p className="text-sm font-semibold text-gray-900">{product.name}</p>

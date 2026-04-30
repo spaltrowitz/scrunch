@@ -508,6 +508,7 @@ export function Products() {
                       brand={product.brand}
                       name={product.name}
                       seedImageUrl={product.image_url}
+                      category={product.category}
                       className="w-16 h-16 shrink-0"
                     />
                     <div className="min-w-0 flex-1">
@@ -533,6 +534,7 @@ export function Products() {
                       brand={product.brand}
                       name={product.name}
                       seedImageUrl={product.image_url}
+                      category={product.category}
                       className="w-16 h-16 shrink-0"
                     />
                     <div className="min-w-0 flex-1">
