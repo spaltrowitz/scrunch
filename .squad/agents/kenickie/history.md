@@ -21,3 +21,6 @@
 - 2025-07-24: Refined to 5 personas: The Newbie (CGM beginner), The Ingredient Detective (informed switcher), The Budget Builder (cost-conscious), The Routine Refiner (experienced), The Store Scanner (in-aisle checker).
 - P0 personas: Newbie + Store Scanner. P1: Budget Builder + Ingredient Detective. P2: Routine Refiner.
 - UX implication: Homepage should lead with browsing/categories, not a search bar. Filters are the killer feature.
+- 2025-07-24: Shari confirmed Ingredient Detective and Routine Refiner overlap significantly — merged into "The Optimizer" (P1). Final persona count: 4.
+- The Optimizer combines: granular ingredient filtering (from Detective) + ongoing experimentation and tracking (from Refiner). Unified by the behavior of an experienced user who actively tweaks.
+- Age demographic question still open — critical for visual tone, copy voice, and platform assumptions.
