@@ -17,7 +17,68 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Basic spam check
+        id: spam_check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = context.payload.issue.title || '';
+            const body = context.payload.issue.body || '';
+            const combined = (title + ' ' + body).toLowerCase();
+
+            // Valid hair care category keywords from the issue template
+            const validCategories = [
+              'shampoo', 'conditioner', 'co-wash', 'deep conditioner', 'hair mask',
+              'leave-in', 'curl cream', 'styling cream', 'gel', 'mousse', 'foam',
+              'custard', 'pudding', 'oil', 'serum', 'spray', 'refresher',
+              'protein treatment', 'scalp treatment', 'low-poo', 'clarifying',
+              'not sure'
+            ];
+            const hasValidCategory = validCategories.some(cat => combined.includes(cat));
+
+            // Check for minimum content quality
+            const brand = body.match(/### Brand\s*\n(.+)/i)?.[1]?.trim() || '';
+            const productName = body.match(/### Product Name\s*\n(.+)/i)?.[1]?.trim() || '';
+            const hasBrand = brand.length >= 2 && brand.length <= 100;
+            const hasProductName = productName.length >= 2 && productName.length <= 200;
+
+            // Check for suspicious patterns
+            const suspiciousPatterns = [
+              /(.)\1{9,}/,  // 10+ repeated characters
+              /\b(test|asdf|qwerty|lorem|ipsum|foo|bar|baz)\b/i,
+            ];
+            const isSuspicious = suspiciousPatterns.some(p => p.test(combined));
+
+            const isValid = hasBrand && hasProductName && !isSuspicious;
+
+            if (!isValid) {
+              const reasons = [];
+              if (!hasBrand) reasons.push('missing or invalid brand name');
+              if (!hasProductName) reasons.push('missing or invalid product name');
+              if (isSuspicious) reasons.push('contains suspicious content');
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `⚠️ **Scrunch Bot**: This product request didn't pass our validation checks (${reasons.join(', ')}).\n\nIf this is a legitimate hair care product, please edit the issue to include a valid brand name and product name, and a maintainer will re-review it.`
+              });
+
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: ['needs-review']
+              });
+
+              core.setOutput('valid', 'false');
+              return;
+            }
+
+            core.setOutput('valid', 'true');
+
       - name: Assign to Copilot
+        if: steps.spam_check.outputs.valid == 'true'
         uses: actions/github-script@v7
         with:
           script: |

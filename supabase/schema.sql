@@ -191,8 +191,8 @@ create policy "Users can delete own reviews" on product_reviews for delete
 -- Product Requests
 alter table product_requests enable row level security;
 create policy "Requests are public" on product_requests for select using (true);
-create policy "Anyone can submit requests" on product_requests for insert
-  with check (true);
+create policy "Authenticated users can submit requests" on product_requests for insert
+  with check (auth.uid() is not null);
 
 -- Questions
 alter table questions enable row level security;

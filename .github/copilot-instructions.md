@@ -1,5 +1,21 @@
 When assigned a GitHub Issue with the `product-request` label, follow this process to add the product to the Scrunch database:
 
+## Step 0: Validate the request
+
+Before doing any research, verify that the request is for a legitimate hair care product:
+
+1. **Check that the product is a hair care product.** Scrunch only tracks hair care products (shampoos, conditioners, gels, creams, oils, treatments, etc.). If the submitted brand/product name clearly refers to a non-hair-care item (e.g., household goods, food, clothing, electronics, skincare-only products, body wash, etc.), **reject the request immediately**.
+2. **Check for spam or joke submissions.** Reject requests that contain nonsensical text, profanity, obvious trolling, or product names that don't correspond to any real product.
+3. **Check for duplicates.** Search `src/data/seedProducts.ts` for the brand + product name. If it already exists, close the issue as a duplicate.
+
+**How to reject:**
+- Add a comment explaining why (e.g., "This doesn't appear to be a hair care product" or "This looks like a duplicate of an existing product")
+- Add the `invalid` label to the issue
+- Close the issue
+- Do NOT create a PR or modify any code
+
+Only proceed to Step 1 if the request passes all validation checks.
+
 ## Step 1: Parse the issue
 Extract the brand name, product name, category, and any product link from the issue body.
 
@@ -49,3 +65,10 @@ Comment on the original issue with:
 - If the product appears to be discontinued, comment noting this and label the issue `discontinued`
 - Always include an image_url — use the image waterfall: Target > Ulta > Walmart > brand site > Open Beauty Facts > null
 - The notes field should include cruelty-free certification (PETA, LB, CFK) and any relevant warnings (fragrance-free, sample sizes available, etc.)
+
+## Rejection criteria (Step 0 detail)
+A product request should be rejected if ANY of the following are true:
+- The product is not designed for use on hair (e.g., body lotion, face wash, laundry detergent, blankets, food)
+- The brand/product name is gibberish or clearly a joke
+- You cannot find evidence the product exists from any retailer or brand website
+- The product has already been added to `seedProducts.ts`

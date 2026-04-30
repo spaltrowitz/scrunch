@@ -9,12 +9,39 @@ interface ProductRequest {
   link: string
 }
 
+// Basic client-side validation for hair care product submissions
+function validateProductRequest(request: ProductRequest): string | null {
+  const brand = request.brand.trim()
+  const name = request.name.trim()
+
+  if (brand.length < 2 || brand.length > 100) return 'Brand name must be between 2 and 100 characters.'
+  if (name.length < 2 || name.length > 200) return 'Product name must be between 2 and 200 characters.'
+
+  const repeatedChars = /(.)\1{9,}/
+  if (repeatedChars.test(brand) || repeatedChars.test(name)) return 'Brand or product name contains invalid repeated characters.'
+
+  const suspicious = /^(test|asdf|qwerty|lorem|ipsum|foo|bar|baz|xxx|aaa)$/i
+  if (suspicious.test(brand) || suspicious.test(name)) return 'Please enter a real brand and product name.'
+
+  return null
+}
+
 export function RequestProductForm({ onClose }: { onClose: () => void }) {
   const [request, setRequest] = useState<ProductRequest>({ brand: '', name: '', category: '', link: '' })
+  const [confirmed, setConfirmed] = useState(false)
+  const [validationError, setValidationError] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+
+    const error = validateProductRequest(request)
+    if (error) {
+      setValidationError(error)
+      return
+    }
+    setValidationError(null)
+
     // Create GitHub Issue with product-request label → triggers Copilot auto-add workflow
     const issueBody = [
       `### Brand\n${request.brand}`,
@@ -108,9 +135,21 @@ export function RequestProductForm({ onClose }: { onClose: () => void }) {
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
           />
         </div>
+        <label className="flex items-start gap-2 text-xs text-gray-600 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={confirmed}
+            onChange={(e) => setConfirmed(e.target.checked)}
+            className="mt-0.5 accent-violet-600"
+          />
+          <span>I confirm this is a <strong>hair care product</strong> for curly or wavy hair (shampoo, conditioner, gel, cream, oil, treatment, etc.)</span>
+        </label>
+        {validationError && (
+          <p className="text-xs text-red-600 bg-red-50 px-3 py-2 rounded-lg">{validationError}</p>
+        )}
         <button
           type="submit"
-          disabled={!request.brand.trim() || !request.name.trim()}
+          disabled={!request.brand.trim() || !request.name.trim() || !confirmed}
           className="w-full py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 disabled:opacity-50 cursor-pointer"
         >
           Submit Request
