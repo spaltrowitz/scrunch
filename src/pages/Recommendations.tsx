@@ -107,8 +107,9 @@ function buildTier1(products: Product[], cgmExperience?: string | null): Product
 }
 
 /**
- * Build a set of brands the user has only negative experiences with.
- * If a brand has at least one product rated ≥ 3, it stays eligible.
+ * Build a set of brands the user has had negative experiences with.
+ * Used as a demotion signal, NOT a hard exclusion — a great ingredient
+ * match from a disliked brand can still surface, just ranked lower.
  */
 function buildDislikedBrands(
   reviews: (ProductReview & { products: Product })[],
@@ -120,12 +121,15 @@ function buildDislikedBrands(
     if (r.rating != null && r.rating >= 3) liked.add(brand)
     if (r.rating != null && r.rating <= 2) disliked.add(brand)
   }
-  const avoid = new Set<string>()
+  const demote = new Set<string>()
   for (const brand of disliked) {
-    if (!liked.has(brand)) avoid.add(brand)
+    if (!liked.has(brand)) demote.add(brand)
   }
-  return avoid
+  return demote
 }
+
+// Score penalty applied to products from disliked brands (multiplier < 1 = demotion)
+const DISLIKED_BRAND_PENALTY = 0.5
 
 function buildTier2(
   products: Product[],
@@ -134,8 +138,7 @@ function buildTier2(
   dislikedBrands: Set<string>,
 ): RecommendedProduct[] {
   const approved = products.filter(
-    p => p.cg_status === 'approved' && !ratedIds.has(p.id)
-      && !dislikedBrands.has(p.brand.toLowerCase()),
+    p => p.cg_status === 'approved' && !ratedIds.has(p.id),
   )
   const porosity = profile.porosity || 'medium'
   const width = profile.hair_width || 'medium'
@@ -180,6 +183,13 @@ function buildTier2(
     return { ...p, _score: s, _reason: reason }
   })
 
+  // Demote disliked brands rather than excluding them
+  for (const item of scored) {
+    if (dislikedBrands.has(item.brand.toLowerCase())) {
+      item._score = Math.round(item._score * DISLIKED_BRAND_PENALTY)
+    }
+  }
+
   scored.sort((a, b) => b._score - a._score)
   return scored.slice(0, 5)
 }
@@ -202,7 +212,7 @@ function buildTier3(
   const dislikedCats = new Set(disliked.map(r => r.products.category))
 
   const candidates = allProducts.filter(
-    p => !ratedIds.has(p.id) && !dislikedBrands.has(p.brand.toLowerCase()),
+    p => !ratedIds.has(p.id),
   )
 
   const scored = candidates.map(p => {
@@ -211,6 +221,7 @@ function buildTier3(
     if (dislikedCats.has(p.category)) s -= 10
     if (p.cg_status === 'approved') s += 3
     s += Math.min(p.review_count, 10) // popularity tiebreaker
+    if (dislikedBrands.has(p.brand.toLowerCase())) s = Math.round(s * DISLIKED_BRAND_PENALTY)
     return { ...p, _score: s, _reason: 'Based on your ratings and hair profile' }
   })
 
@@ -243,14 +254,15 @@ function buildIngredientTier(
   const rarityWeights = buildIngredientRarity(allProducts)
 
   const candidates = allProducts.filter(
-    p => p.cg_status === 'approved' && !ratedIds.has(p.id)
-      && !dislikedBrands.has(p.brand.toLowerCase()),
+    p => p.cg_status === 'approved' && !ratedIds.has(p.id),
   )
 
   let sensitivityFilterCount = 0
 
   const scored: (RecommendedProduct & { _score: number })[] = []
   for (const product of candidates) {
+    const brandPenalty = dislikedBrands.has(product.brand.toLowerCase()) ? DISLIKED_BRAND_PENALTY : 1
+
     // Sensitivity filter (strict = exclude, flexible = warn)
     if (sensitivities.length > 0) {
       const { strict, flexible } = checkSensitivitiesWithStrictness(product, sensitivities)
@@ -264,7 +276,7 @@ function buildIngredientTier(
         if (adjustedScore >= MIN_INGREDIENT_MATCH_SCORE && matchedIngredients.length > 0) {
           const reason = `Contains ${formatIngredientList(matchedIngredients)} — ingredients you've loved in other products`
           const warning = `⚠️ Contains ${formatIngredientList(flexible)} (you prefer to avoid)`
-          scored.push({ ...product, _score: adjustedScore, _matchPercent: adjustedScore, _reason: reason, _sensitivityWarning: warning })
+          scored.push({ ...product, _score: Math.round(adjustedScore * brandPenalty), _matchPercent: adjustedScore, _reason: reason, _sensitivityWarning: warning })
         }
         continue
       }
@@ -273,7 +285,7 @@ function buildIngredientTier(
     const { score, matchedIngredients } = scoreProductByIngredients(product, profile, rarityWeights)
     if (score >= MIN_INGREDIENT_MATCH_SCORE && matchedIngredients.length > 0) {
       const reason = `Contains ${formatIngredientList(matchedIngredients)} — ingredients you've loved in other products`
-      scored.push({ ...product, _score: score, _matchPercent: score, _reason: reason })
+      scored.push({ ...product, _score: Math.round(score * brandPenalty), _matchPercent: score, _reason: reason })
     }
   }
 
@@ -539,9 +551,11 @@ export function Recommendations() {
       .in('id', rankedIds)
 
     let recs = (recProducts as unknown as Product[]) ?? []
-    // Exclude disliked brands, preserve ranking & deprioritise disliked categories
-    recs = recs.filter(p => !dislikedBrands.has(p.brand.toLowerCase()))
+    // Deprioritise disliked brands and categories (demotion, not exclusion)
     recs.sort((a, b) => {
+      const aBrand = dislikedBrands.has(a.brand.toLowerCase()) ? 1 : 0
+      const bBrand = dislikedBrands.has(b.brand.toLowerCase()) ? 1 : 0
+      if (aBrand !== bBrand) return aBrand - bBrand
       const aDis = dislikedCats.has(a.category) ? 1 : 0
       const bDis = dislikedCats.has(b.category) ? 1 : 0
       if (aDis !== bDis) return aDis - bDis
