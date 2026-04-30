@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { ProductCategory } from '../../lib/database.types'
 
 interface ProductPlaceholderProps {
@@ -26,22 +27,62 @@ const CATEGORY_CONFIG: Record<string, { icon: string; accent: string }> = {
 
 const DEFAULT_CONFIG = { icon: '🌀', accent: 'from-violet-100 to-violet-50' }
 
+const TOOLTIP_TEXT =
+  '📸 No product image yet — we only use photos from approved sources to respect copyright.'
+
 export function ProductPlaceholder({ brand, name, category, className = 'w-16 h-16' }: ProductPlaceholderProps) {
+  const [showMobileTooltip, setShowMobileTooltip] = useState(false)
   const config = (category && CATEGORY_CONFIG[category]) || DEFAULT_CONFIG
 
   return (
-    <div
-      className={`${className} bg-gradient-to-br ${config.accent} rounded-lg flex flex-col items-center justify-center gap-0.5 px-1.5 py-1 shrink-0 border border-gray-200/60`}
-    >
-      <span className="text-base leading-none" aria-hidden="true">
-        {config.icon}
-      </span>
-      <span className="text-[9px] font-semibold text-gray-700 leading-tight text-center line-clamp-1">
-        {brand}
-      </span>
-      <span className="text-[8px] text-gray-500 leading-tight text-center line-clamp-1">
-        {name}
-      </span>
+    <div className="relative group">
+      <div
+        className={`${className} bg-gradient-to-br ${config.accent} rounded-lg flex flex-col items-center justify-center gap-0.5 px-1.5 py-1 shrink-0 border border-gray-200/60 relative`}
+      >
+        <span className="text-base leading-none" aria-hidden="true">
+          {config.icon}
+        </span>
+        <span className="text-[9px] font-semibold text-gray-700 leading-tight text-center line-clamp-1">
+          {brand}
+        </span>
+        <span className="text-[8px] text-gray-500 leading-tight text-center line-clamp-1">
+          {name}
+        </span>
+        <span className="text-[7px] text-violet-400 leading-tight italic">
+          Image coming soon
+        </span>
+
+        {/* Mobile info icon */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            setShowMobileTooltip((prev) => !prev)
+          }}
+          className="absolute top-0.5 right-0.5 w-3.5 h-3.5 flex items-center justify-center rounded-full bg-violet-200/70 text-[8px] leading-none md:hidden"
+          aria-label="Image info"
+        >
+          ℹ️
+        </button>
+      </div>
+
+      {/* Desktop hover tooltip */}
+      <div className="hidden group-hover:md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 pointer-events-none">
+        <div className="bg-violet-800 text-white text-[10px] leading-snug rounded-lg px-3 py-2 max-w-[200px] text-center shadow-lg whitespace-normal">
+          {TOOLTIP_TEXT}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-violet-800" />
+        </div>
+      </div>
+
+      {/* Mobile tap tooltip */}
+      {showMobileTooltip && (
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 md:hidden">
+          <div className="bg-violet-800 text-white text-[10px] leading-snug rounded-lg px-3 py-2 max-w-[200px] text-center shadow-lg whitespace-normal">
+            {TOOLTIP_TEXT}
+            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-violet-800" />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
