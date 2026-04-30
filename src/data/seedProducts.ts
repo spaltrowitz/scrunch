@@ -343,4 +343,44 @@ export const SEED_PRODUCTS: SeedProduct[] = [
 
   // ── SPRAY REFRESHER (Reddit) ────────────────────────────────────────
   { brand: 'DevaCurl', name: 'Mist of Wonders Multi-Benefit Spray', category: 'spray_refresher', cg_status: 'approved', cruelty_free: 'yes', notes: 'PETA. Multi-benefit hydration and refresh spray', image_url: 'https://media.ulta.com/i/ulta/2240512' },
+
+  // ── SEPHORA: LOW POO ──────────────────────────────────────────────────
+  { brand: 'Pattern', name: 'Hydration Shampoo', category: 'low_poo', cg_status: 'approved', cruelty_free: 'yes', notes: 'PETA. By Tracee Ellis Ross. Sulfate-free gentle cleanser', image_url: 'https://media.ulta.com/i/ulta/2571724' },
+  { brand: 'Fable & Mane', name: 'HoliRoots Hydrating Shampoo', category: 'low_poo', cg_status: 'approved', cruelty_free: 'yes', notes: 'PETA. Sulfate-free with plant oils and botanical extracts', image_url: 'https://media.ulta.com/i/ulta/2596211' },
+  { brand: 'Moroccanoil', name: 'Hydrating Shampoo', category: 'low_poo', cg_status: 'not_approved', cruelty_free: 'no', notes: 'Contains SLS/SLES (harsh sulfate) and silicone', image_url: 'https://media.ulta.com/i/ulta/2268339' },
+  { brand: 'JVN', name: 'Embody Daily Volumizing Shampoo', category: 'low_poo', cg_status: 'not_approved', cruelty_free: 'unclear', notes: 'Contains SLES and dimethicone (non-water-soluble silicone)', image_url: 'https://media.ulta.com/i/ulta/2580671' },
+  { brand: 'Pureology', name: 'Hydrate Shampoo', category: 'low_poo', cg_status: 'caution', cruelty_free: 'no', notes: 'L\'Oreal-owned (not cruelty-free). Contains PEG-modified silicones (water-soluble)', image_url: 'https://media.ulta.com/i/ulta/2305455' },
+
+  // ── SEPHORA: RINSE-OUT CONDITIONER ────────────────────────────────────
+  { brand: 'Pattern', name: 'Lightweight Conditioner', category: 'rinse_out_conditioner', cg_status: 'approved', cruelty_free: 'yes', notes: 'PETA. By Tracee Ellis Ross. Silicone-free, lightweight formula', image_url: 'https://media.ulta.com/i/ulta/2571725' },
+  { brand: 'Fable & Mane', name: 'HoliRoots Hydrating Conditioner', category: 'rinse_out_conditioner', cg_status: 'approved', cruelty_free: 'yes', notes: 'PETA. Plant-based conditioning, no silicones', image_url: 'https://media.ulta.com/i/ulta/2596212' },
+  { brand: 'Moroccanoil', name: 'Hydrating Conditioner', category: 'rinse_out_conditioner', cg_status: 'not_approved', cruelty_free: 'no', notes: 'Contains non-water-soluble silicones (cyclopentasiloxane, dimethicone)', image_url: 'https://media.ulta.com/i/ulta/2268340' },
+  { brand: 'JVN', name: 'Embody Daily Volumizing Conditioner', category: 'rinse_out_conditioner', cg_status: 'not_approved', cruelty_free: 'unclear', notes: 'Contains dimethicone (non-water-soluble silicone)', image_url: 'https://media.ulta.com/i/ulta/2580672' },
+  { brand: 'Pureology', name: 'Hydrate Conditioner', category: 'rinse_out_conditioner', cg_status: 'caution', cruelty_free: 'no', notes: 'L\'Oreal-owned (not cruelty-free). Contains PEG-modified silicones (water-soluble)', image_url: 'https://media.ulta.com/i/ulta/2305456' },
+
+  // ── SEPHORA: DEEP CONDITIONER ─────────────────────────────────────────
+  { brand: 'Pattern', name: 'Treatment Mask', category: 'deep_conditioner', cg_status: 'approved', cruelty_free: 'yes', notes: 'PETA. By Tracee Ellis Ross. Protein-rich rice water formula', image_url: 'https://media.ulta.com/i/ulta/2571727' },
+  { brand: 'Moroccanoil', name: 'Intense Hydrating Mask', category: 'deep_conditioner', cg_status: 'not_approved', cruelty_free: 'no', notes: 'Contains non-water-soluble silicones (dimethicone, cyclopentasiloxane)', image_url: 'https://media.ulta.com/i/ulta/2268341' },
+  { brand: 'Mizani', name: 'Moisture Fusion Deep Conditioning Mask', category: 'deep_conditioner', cg_status: 'not_approved', cruelty_free: 'no', notes: 'Contains dimethicone (non-water-soluble silicone). L\'Oreal-owned', image_url: 'https://media.ulta.com/i/ulta/2534139' },
+
+  // ── SEPHORA: LEAVE-IN CONDITIONER ─────────────────────────────────────
+  { brand: 'adwoa beauty', name: 'Baomint Leave In Conditioning Styler', category: 'leave_in_conditioner', cg_status: 'approved', cruelty_free: 'yes', notes: 'Silicone-free, plant-based. Baobab oil, aloe, and peppermint', image_url: 'https://media.ulta.com/i/ulta/2567490' },
+  { brand: 'Gisou', name: 'Honey Infused Leave-In Conditioner', category: 'leave_in_conditioner', cg_status: 'approved', cruelty_free: 'yes', notes: 'LB. Honey and argan oil based, no silicones', image_url: 'https://media.ulta.com/i/ulta/2599024' },
+  { brand: 'Melanin Haircare', name: 'Multi-Use Softening Leave-In Conditioner', category: 'leave_in_conditioner', cg_status: 'approved', cruelty_free: 'yes', notes: 'PETA. Plant-based, silicone-free and sulfate-free', image_url: 'https://media.ulta.com/i/ulta/2587027' },
+  { brand: 'Mizani', name: '25 Miracle Milk Leave-In Conditioner', category: 'leave_in_conditioner', cg_status: 'not_approved', cruelty_free: 'no', notes: 'Contains dimethicone (non-water-soluble silicone). L\'Oreal-owned', image_url: 'https://media.ulta.com/i/ulta/2242645' },
+
+  // ── SEPHORA: CURL CREAM ───────────────────────────────────────────────
+  { brand: 'Moroccanoil', name: 'Curl Defining Cream', category: 'curl_cream', cg_status: 'not_approved', cruelty_free: 'no', notes: 'Contains non-water-soluble silicones (dimethicone, cyclopentasiloxane) and drying alcohol', image_url: 'https://media.ulta.com/i/ulta/2644247' },
+  { brand: 'Fenty Hair', name: 'The Homecurl Curl-Defining Styling Cream', category: 'curl_cream', cg_status: 'not_approved', cruelty_free: 'unclear', notes: 'Contains cyclopentasiloxane (non-water-soluble silicone). LVMH-owned', image_url: 'https://media.ulta.com/i/ulta/2610023' },
+  { brand: 'amika', name: 'Curl Corps Defining Cream', category: 'curl_cream', cg_status: 'approved', cruelty_free: 'yes', notes: 'LB/PETA. Silicone-free formula with sea buckthorn and oat peptides', image_url: 'https://media.ulta.com/i/ulta/2647435' },
+  { brand: 'Mizani', name: 'True Textures Curl Enhancing Cream', category: 'curl_cream', cg_status: 'not_approved', cruelty_free: 'no', notes: 'Contains dimethicone and petrolatum. L\'Oreal-owned', image_url: 'https://media.ulta.com/i/ulta/2534140' },
+
+  // ── SEPHORA: SPRAY REFRESHER ──────────────────────────────────────────
+  { brand: 'Pattern', name: 'Hydrating Hair Mist', category: 'spray_refresher', cg_status: 'approved', cruelty_free: 'yes', notes: 'PETA. By Tracee Ellis Ross. Alcohol-free curl refresher', image_url: 'https://media.ulta.com/i/ulta/2571728' },
+
+  // ── SEPHORA: CLARIFYING SHAMPOO ───────────────────────────────────────
+  { brand: 'Melanin Haircare', name: 'African Black Soap Reviving Shampoo', category: 'clarifying_shampoo', cg_status: 'caution', cruelty_free: 'yes', notes: 'PETA. Potentially drying cleansers, use with deep conditioning', image_url: 'https://media.ulta.com/i/ulta/2587026' },
+
+  // ── SEPHORA: OIL / SERUM ──────────────────────────────────────────────
+  { brand: 'COLOR WOW', name: 'Dream Coat Anti-Frizz Treatment for Curly Hair', category: 'oil_serum', cg_status: 'not_approved', cruelty_free: 'unclear', notes: 'Contains non-water-soluble silicones (amodimethicone, dimethicone)', image_url: 'https://media.ulta.com/i/ulta/2593283' },
 ]
