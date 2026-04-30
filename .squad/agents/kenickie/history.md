@@ -32,3 +32,10 @@
 - Key learning: behavior signals are more honest than self-reporting. A Newbie often can't self-identify, but their click patterns (browsing categories, tapping "What is CGM?") reveal them clearly.
 - Inference-only may be sufficient — recommendation is to ship without explicit question first, add it only if data shows too many users stuck in generic bucket after 2+ sessions.
 - The app must work great with ZERO personalization. Personalization is enhancement, not dependency. This aligns with "validate core loop before adding features" principle.
+- 2025-07-24: Acquisition channel analysis complete. Key finding: 3/4 personas (Newbie, Budget, Optimizer) overlap on Reddit r/curlyhair + TikTok. The Store Scanner is the outlier — they arrive via Google SEO ("is [product] CG approved?"), not social browsing.
+- Marketing implication: ONE core strategy (Reddit + TikTok community presence) plus ONE supplement (SEO product pages) covers all 4 personas. No need for 4 separate channel strategies.
+- Store Scanner = SEO persona. They Google mid-shopping-trip. Every product in our DB should have a rankable landing page for "[product name] curly girl approved."
+- Reddit r/curlyhair is the single highest-overlap channel. All 4 personas visit it, though for different reasons (Newbies ask questions, Optimizers debate ingredients, Budget asks for dupes, Scanners ask "is X approved?").
+- TikTok skews younger/newer — strong for Newbies and Budget Builders, weak for Optimizers who prefer long-form content (YouTube, forums).
+- Product Hunt and Naturally Curly forums are niche channels primarily relevant to the Optimizer persona.
+- NOT worth early investment: Instagram (low intent), Pinterest (slow burn), Facebook groups (hard to market in), paid ads (premature).
