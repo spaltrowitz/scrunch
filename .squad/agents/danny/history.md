@@ -26,3 +26,10 @@
 - **Giovanni Cosmetics** redirects all product pages to the same og:image (banner) — only the L.A. Hold Gel had a unique product-specific CDN file.
 - Many brands (Mizani, Redken, Pureology, Aveda, Bumble and Bumble) block all automated access — need manual sourcing or brand outreach.
 - 80 products remain with null images. Next steps: manual sourcing for L'Oréal family, brand outreach for indie brands, deeper OBF barcode search.
+
+### 2026-04-30: Image URL Recovery (Phase 2)
+- Recovered 24 additional product image URLs from Shopify CDNs and Open Beauty Facts.
+- Current coverage: **80% (224/280 products)** — up from 73% (204/280).
+- Sources: Shopify /products.json (12 URLs: DevaCurl, Innersense, Ouai, Pattern, Mielle), OBF API (8 URLs: SheaMoisture, Cantu, Garnier, Aussie, Herbal Essences), og:image extraction (4 URLs).
+- Remaining blockers for 56 null entries: L'Oréal family (proprietary CDNs), Curls/Kristin Ess (dynamic rendering), Giovanni (Shopify blocks extraction), retailer-only brands (no brand CDNs).
+- Recommendation: Manual sourcing for L'Oréal family, brand outreach for indie blockers, retailer partnerships for mass-market bottlenecks.
