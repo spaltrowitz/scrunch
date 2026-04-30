@@ -88,3 +88,15 @@
 - Replaced all Supabase `useEffect` fetches with `useQuery` across Home, Products, Recommendations, ProductDetail, Profile, MyProducts, Dashboard, and OnboardingWizard.
 - Converted write paths (ratings, dismissals, notes, profile save) to `useMutation` with query invalidation.
 - QueryClient defaults now set: `staleTime` 5 min, `gcTime` 10 min.
+
+### 2025-07-26 — Regression Check (branch: spaltrowitz/add-product-request-validation)
+
+**Scope:** Full regression audit of all 22 fixes from the performance optimization rounds.
+
+**Findings:**
+- **2 `select('*')` regressions found and fixed** in shared hooks (`useUserReviews` and `useUserProfile`). Root cause: when Quick Win #1 consolidated per-page queries into shared hooks, the column-specific selects from individual pages weren't carried forward. Both hooks defaulted to `select('*')`.
+- **Fix applied:** `useUserReviews` → 8 review cols + 4 product join cols. `useUserProfile` → 18 named profile cols (dropped id, avatar_url, country, zip_code, wash_frequency, timestamps).
+- **Everything else clean:** React Query migration complete (zero raw useEffect fetches), all query keys consistent, all `enabled` guards in place, seedProducts dynamically imported, all routes lazy loaded, ProductCard memo-wrapped, pagination properly limiting renders, no circular dependencies, no memory leaks.
+- **Future opportunity:** SearchBar and FilterPanel extracted components are not memo-wrapped — functional but could reduce re-renders if Products page performance becomes an issue.
+
+**Commit:** `e797818`
