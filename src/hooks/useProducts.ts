@@ -94,7 +94,7 @@ export function useUserReviews(userId?: string) {
       if (!userId) return []
       const { data, error } = await supabase
         .from('product_reviews')
-        .select('*, products(*)')
+        .select('id,user_id,product_id,rating,status,would_repurchase,results_notes,created_at, products(brand,name,category,cg_status)')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
       if (error) throw error
@@ -127,7 +127,7 @@ export function useUserProfile(userId?: string) {
       if (!userId) return null
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('display_name,curl_pattern,porosity,hair_density,hair_width,scalp_type,hair_length,color_treatment,climate,heat_tool_usage,workout_frequency,cgm_experience,fragrance_preference,water_type,hair_goals,sensitivities,onboarding_completed,profile_public')
         .eq('id', userId)
         .single()
       if (error) throw error
