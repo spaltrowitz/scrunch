@@ -32,3 +32,20 @@ flowchart TD
 Products are **never written by end users**. The `products` table has no client-side insert/update RLS policies — only the Supabase service role (used by admin/CI) can write to it. All products enter through seed data PRs.
 
 The `product_requests` table requires authentication for inserts, in case a native in-app request queue is built in the future.
+
+## Image sourcing policy
+
+Product images must come from approved sources to avoid copyright and Terms of Service violations.
+
+| Source | Status | Notes |
+|--------|--------|-------|
+| Brand's own website | ✅ Allowed | Preferred source — brand owns the copyright |
+| Open Beauty Facts | ✅ Allowed | Open license, community-contributed |
+| Amazon CDN | ❌ Prohibited | Aggressive ToS enforcement |
+| Target CDN (`target.scene7.com`) | ❌ Prohibited | Hotlinking violates ToS |
+| Ulta CDN (`media.ulta.com`) | ❌ Prohibited | Hotlinking violates ToS |
+| Walmart CDN (`walmartimages.com`) | ❌ Prohibited | Hotlinking violates ToS |
+| Walgreens CDN | ❌ Prohibited | Hotlinking violates ToS |
+| Sally Beauty CDN | ❌ Prohibited | Hotlinking violates ToS |
+
+See `.github/copilot-instructions.md` for the full image search waterfall and validation rules.

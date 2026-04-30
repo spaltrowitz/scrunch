@@ -22,7 +22,7 @@ Extract the brand name, product name, category, and any product link from the is
 ## Step 2: Research the product
 1. Search for the product on the brand's website, Target, Ulta, Walmart, or Amazon
 2. Find the full ingredient list
-3. Find a product image URL (prefer Target scene7 CDN > Ulta > Walmart > brand site)
+3. Find a product image URL — see **Image Sourcing Policy** below
 4. Determine CG status by analyzing ingredients against curly girl method rules:
    - Non-water-soluble silicones → not_approved
    - Harsh sulfates (SLS, SLES) → not_approved (unless clarifying shampoo)
@@ -63,8 +63,40 @@ Comment on the original issue with:
 ## Important notes
 - If you cannot find reliable ingredient data, comment on the issue asking the requester to provide ingredients
 - If the product appears to be discontinued, comment noting this and label the issue `discontinued`
-- Always include an image_url — use the image waterfall: Target > Ulta > Walmart > brand site > Open Beauty Facts > null
 - The notes field should include cruelty-free certification (PETA, LB, CFK) and any relevant warnings (fragrance-free, sample sizes available, etc.)
+
+## Image Sourcing Policy
+
+Product images must come from **approved sources only**. Before adding any image_url, verify the domain is allowed.
+
+### Allowed sources ✅ (in priority order)
+1. **Brand's own official website** — The brand owns the copyright and benefits from product visibility. This is the preferred source. Look for product pages on the brand's `.com` site or their Shopify CDN (e.g., `brandname.com/cdn/shop/...`).
+2. **Open Beauty Facts** (`images.openbeautyfacts.org`) — Community-contributed, open license.
+3. **Product submitted by the requester** — If the issue includes a direct image URL from an allowed source.
+
+### Prohibited sources ❌
+These retailer CDNs must **never** be used. Their Terms of Service prohibit hotlinking and their product photos are separately copyrighted.
+
+| Domain pattern | Retailer |
+|---|---|
+| `target.scene7.com` | Target |
+| `media.ulta.com` | Ulta |
+| `i5.walmartimages.com`, `walmartimages.com` | Walmart |
+| `pics.walgreens.com` | Walgreens |
+| `m.media-amazon.com`, `images-na.ssl-images-amazon.com` | Amazon |
+| `s7d9.scene7.com` | Sally Beauty |
+
+### Image search process
+When looking for a product image, follow this waterfall — **do not stop until you have exhausted all options**:
+
+1. Search the brand's own website for the product page and grab the product image URL
+2. Search Open Beauty Facts: `https://world.openbeautyfacts.org/cgi/search.pl?search_terms={brand}+{product}&json=1`
+3. Search for `{brand} {product name} site:{brand-domain}` to find the product page
+4. Check if the product link provided in the issue has a compliant image
+5. Only use `null` as an absolute last resort — and add a note explaining that no compliant image could be found
+
+### Validating image URLs on product requests
+When a user submits a product request with a product link, check the domain against the prohibited list above. If the link points to a prohibited retailer, still use it for ingredient research, but **source the image from the brand's own website instead**.
 
 ## Rejection criteria (Step 0 detail)
 A product request should be rejected if ANY of the following are true:
