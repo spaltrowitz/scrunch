@@ -24,3 +24,7 @@
 - 2025-07-24: Shari confirmed Ingredient Detective and Routine Refiner overlap significantly — merged into "The Optimizer" (P1). Final persona count: 4.
 - The Optimizer combines: granular ingredient filtering (from Detective) + ongoing experimentation and tracking (from Refiner). Unified by the behavior of an experienced user who actively tweaks.
 - Age demographic question still open — critical for visual tone, copy voice, and platform assumptions.
+- 2025-07-24: Onboarding goal capture spec written. Key insight: the real value is identifying Newbies — they're most vulnerable to overwhelm. The "I don't know" case maps to a playful "explore" mode that's actually a great default experience.
+- Onboarding should be a soft interstitial (not a gate), work for anonymous users, and persist to Supabase on account creation. P1 priority — not blocking MVP.
+- Three options is the sweet spot: new to curly care / want new products / just browsing. Avoids quiz fatigue while capturing the one signal that matters (new vs. not-new).
+- Implicit graduation > explicit re-selection. Track filter behavior to naturally evolve users from Newbie → Discover without making them re-answer.
