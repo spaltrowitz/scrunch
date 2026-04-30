@@ -37,3 +37,15 @@
 - "Show More" pagination pattern: `useState(PRODUCTS_PER_PAGE)` + `filteredProducts.slice(0, visibleCount)` — reset `visibleCount` when filters change
 - Module-level constants (like `EMPTY_SET`) avoid per-render allocations — use this pattern for any Set/Map/array passed as default props
 - `useProductImage` has an `enabled` flag + IntersectionObserver in `ProductImage` — images only fetch when scrolled into viewport
+
+### Homepage UX Polish — Jan's Recommendations (2026-05-01)
+- Implemented 10 of 13 UX recommendations from Jan's review (4 🔴 must-haves + 6 🟡 nice-to-haves)
+- `useProducts()` now returns `{ products, isFallback }` — all consumers (Home, Products, Recommendations) updated
+- Hero copy rewritten: removed all CGM jargon ("CG status" → "Curl Safety"), added emotional value prop
+- CG_BADGE labels changed: "CG ✓" → "Curl Safe ✓", "Not CG" → "Not Curl Safe"
+- Categories sorted by popularity (product count descending) via `sortedCategories` useMemo
+- Added persona quick-start pills (Newbie → ingredient checker, Scanner → curl-safe products, Optimizer → browse all)
+- Added fallback banner when Supabase is down (amber notification)
+- All filter selects and buttons now have `min-h-[44px]` for mobile touch targets
+- ProductPlaceholder text changed from "Image coming soon" to "No image" (no timeline = don't promise)
+- Build passes, 26/26 tests green
