@@ -28,3 +28,7 @@
 - Onboarding should be a soft interstitial (not a gate), work for anonymous users, and persist to Supabase on account creation. P1 priority — not blocking MVP.
 - Three options is the sweet spot: new to curly care / want new products / just browsing. Avoids quiz fatigue while capturing the one signal that matters (new vs. not-new).
 - Implicit graduation > explicit re-selection. Track filter behavior to naturally evolve users from Newbie → Discover without making them re-answer.
+- 2025-07-24: REVISED onboarding approach — "invisible onboarding." Previous interstitial spec killed. New principle: no gates before value. Three strategies replace the interstitial: (1) INFER persona from browse behavior silently, (2) DEFER any explicit question until after 3 product detail views, (3) EMBED personalization as subtle sort/filter/badge changes within the existing browse UX.
+- Key learning: behavior signals are more honest than self-reporting. A Newbie often can't self-identify, but their click patterns (browsing categories, tapping "What is CGM?") reveal them clearly.
+- Inference-only may be sufficient — recommendation is to ship without explicit question first, add it only if data shows too many users stuck in generic bucket after 2+ sessions.
+- The app must work great with ZERO personalization. Personalization is enhancement, not dependency. This aligns with "validate core loop before adding features" principle.
