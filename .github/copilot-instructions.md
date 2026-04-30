@@ -15,7 +15,7 @@ Extract the brand name, product name, category, and any product link from the is
    - Water-soluble silicones (PEG-modified) → caution
 5. Determine cruelty-free status (check Leaping Bunny, PETA, CFK databases)
 6. Map to the correct product category from this list:
-   - clarifying_shampoo, low_poo, co_wash, rinse_out_conditioner
+   - clarifying_shampoo, dry_shampoo, low_poo, co_wash, rinse_out_conditioner
    - deep_conditioner, leave_in_conditioner, curl_cream, gel
    - mousse, custard, oil_serum, spray_refresher
    - protein_treatment, scalp_treatment

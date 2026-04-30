@@ -13,7 +13,7 @@ export type FragrancePreference = 'love_it' | 'no_preference' | 'fragrance_free'
 export type WaterType = 'hard' | 'soft' | 'unknown'
 
 export type ProductCategory =
-  | 'clarifying_shampoo' | 'low_poo' | 'co_wash'
+  | 'clarifying_shampoo' | 'dry_shampoo' | 'low_poo' | 'co_wash'
   | 'rinse_out_conditioner' | 'deep_conditioner' | 'leave_in_conditioner'
   | 'curl_cream' | 'gel' | 'mousse' | 'custard'
   | 'oil_serum' | 'spray_refresher' | 'protein_treatment' | 'scalp_treatment'

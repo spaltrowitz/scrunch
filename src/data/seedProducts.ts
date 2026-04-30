@@ -286,6 +286,9 @@ export const SEED_PRODUCTS: SeedProduct[] = [
   { brand: 'Twist by Ouidad', name: 'Hit Reset Clarifying Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: null, notes: 'Contains sulfate and drying alcohol', image_url: 'https://media.ulta.com/i/ulta/2580126' },
   { brand: 'VO5', name: 'Clarifying Shampoo', category: 'clarifying_shampoo', cg_status: 'not_approved', cruelty_free: 'no', notes: 'NOT 2- or 3-in-one. Contains sulfate', image_url: null },
 
+  // ── DRY SHAMPOO ────────────────────────────────────────────────────
+  { brand: 'Acure', name: 'Dry Shampoo', category: 'dry_shampoo', cg_status: 'approved', cruelty_free: 'yes', notes: 'LB/PETA. Non-aerosol powder. Corn starch + arrowroot based, no silicones or sulfates', image_url: 'https://target.scene7.com/is/image/Target/GUEST_7a34f713-43b3-48ba-bdaa-e331900f502d' },
+
   // ── LOW POO (Reddit) ────────────────────────────────────────────────
   { brand: 'Inahsi Naturals', name: 'Soothing Mint Gentle Cleansing Shampoo', category: 'low_poo', cg_status: 'approved', cruelty_free: 'yes', notes: 'Black-owned. Sulfate-free, vegan', image_url: 'https://inahsi.com/cdn/shop/files/Soothing-Mint-Gentle-Cleansing-Shampoo-12oz_1200x1200.jpg?v=1739426592' },
   { brand: 'Curlsmith', name: 'Essential Moisture Cleanser', category: 'low_poo', cg_status: 'approved', cruelty_free: 'yes', notes: 'CFK. Deep hydration without stripping', image_url: 'https://media.ulta.com/i/ulta/2598433' },
