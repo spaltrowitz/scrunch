@@ -9,3 +9,33 @@
 
 ## Learnings
 <!-- Append new learnings below this line -->
+
+### 2025-07-25 — First Comprehensive Audit (branch: spaltrowitz/add-product-request-validation)
+
+**Critical patterns found:**
+1. **React Query installed but never used** — `QueryClient` created in `App.tsx:22`, `QueryClientProvider` wraps the app, but zero `useQuery`/`useMutation` calls exist. All fetching uses raw `useEffect` + `useState`. This means no caching, no dedup, no stale-while-revalidate, and 13KB dead weight in the bundle.
+2. **`select('*')` everywhere** — Every Supabase query fetches all columns. Products have large `ingredients[]` arrays (30-50 items each). For 200+ products this is massive over-fetching.
+3. **Duplicate product fetches** — `Home.tsx`, `Products.tsx`, and `Recommendations.tsx` all independently fetch the full products table. Navigating between them triggers 3 identical requests.
+4. **`seedProducts.ts` (80KB, 386 lines) statically imported** — Used only as Supabase fallback but always bundled. Should be `import()` on failure.
+5. **No code splitting** — All 14 page components eagerly imported in `App.tsx`. No `React.lazy()`.
+6. **N+1 image API calls** — `useProductImage` hook fires one external HTTP request per product card to Open Beauty Facts. localStorage cache helps on repeat visits, but first load can be 40-285 concurrent requests.
+
+**Key file paths:**
+- `src/App.tsx` — QueryClient setup, all route imports (no lazy loading)
+- `src/pages/Products.tsx` (661 lines) — Monolithic: search, filters, actions, ratings, notes, product cards
+- `src/pages/Recommendations.tsx` (1145 lines) — Monolithic: tiers, collab filtering, ingredient matching, dismiss, rate
+- `src/hooks/useProductImage.tsx` — Per-product image fetch, localStorage cache, no IntersectionObserver
+- `src/data/seedProducts.ts` (386 lines, ~80KB) — Static seed data, imported in Home.tsx and Products.tsx
+- `src/pages/Dashboard.tsx` — Fetches review IDs just to `.length` them (should use count)
+- `src/lib/auth.tsx` — AuthProvider recreates functions every render
+
+**Optimization opportunities (prioritized):**
+1. Migrate all fetches to React Query (already installed) — biggest single win
+2. Narrow `select()` to only needed columns per page
+3. Dynamic import for seedProducts.ts fallback
+4. Route-level code splitting with React.lazy()
+5. IntersectionObserver on useProductImage for lazy image loading
+6. Extract ProductCard, FilterPanel, RatingPopup from Products.tsx/Recommendations.tsx
+7. Use `select('id', { count: 'exact', head: true })` for Dashboard review count
+
+**Standards adopted:** See decisions.md entry 2026-04-30T19:34:00-04:00 for 6 mandatory performance patterns.

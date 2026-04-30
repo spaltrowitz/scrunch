@@ -29,3 +29,19 @@ Applied to Scrunch: Do NOT put a journey question before the product browse. Eit
 **Why:** User research — Shari's product direction based on industry best practices
 
 ---
+
+### 2026-04-30T19:34:00-04:00: Performance Standards — Team Adoption
+**By:** Cha-Cha (⚡ Performance Optimizer, via Scribe)
+**What:** 6 mandatory performance patterns for all team members:
+1. **Always use React Query for Supabase fetches** — Wrap every `supabase.from().select()` call in `useQuery`. No raw `useEffect` + `useState` for data fetching.
+2. **Never `select('*')` — always list columns** — Specify only columns each page/component uses to avoid 60% over-fetching (products have large `ingredients[]` arrays).
+3. **Route-level code splitting is mandatory** — Use `React.lazy()` + `<Suspense>` for all page components in `App.tsx`. Currently all 14 pages in initial bundle.
+4. **No static imports for fallback/seed data** — `seedProducts.ts` (80KB) and large data files must use dynamic `import()`, not static `import`.
+5. **Components > 300 lines should be decomposed** — Split monolithic pages (e.g., Products.tsx 661 lines, Recommendations.tsx 1145 lines) into smaller sub-components for maintainability and optimization.
+6. **Use count queries for counts, not fetching IDs** — When counting, use `select('id', { count: 'exact', head: true })` instead of fetching all rows and calling `.length`.
+
+**Why:** Performance audit (2026-04-30) found 26 issues: React Query unused (13KB dead weight), N+1 image API calls, monolithic components, duplicate fetches, bundle bloat. Standards prevent recurrence and establish team baseline.
+**Scope:** All team members writing Supabase queries, React components, or page logic.
+**Enforcement:** Code review checklist during PR review.
+
+---
