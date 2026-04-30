@@ -29,7 +29,9 @@ interface RecommendedProduct extends Product {
 
 const MIN_RATINGS_FOR_INGREDIENTS = 3
 // Ingredient match scores below this threshold are too weak to surface
-const MIN_INGREDIENT_MATCH_SCORE = 25
+const MIN_INGREDIENT_MATCH_SCORE = 50
+// Only display the "X% match" badge when the score is clearly meaningful
+const MIN_BADGE_DISPLAY_SCORE = 60
 
 // Category priorities by POROSITY + TEXTURE (the guide says these matter most)
 const POROSITY_TEXTURE_PRIORITY: Record<string, ProductCategory[]> = {
@@ -971,7 +973,7 @@ function RecommendedCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <p className="text-xs text-gray-500">{product.brand}</p>
-            {matchScore != null && matchScore >= 25 && (
+            {matchScore != null && matchScore >= MIN_BADGE_DISPLAY_SCORE && (
               <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${
                 matchScore >= 80 ? 'bg-emerald-50 text-emerald-700' :
                 matchScore >= 60 ? 'bg-green-50 text-green-700' :
