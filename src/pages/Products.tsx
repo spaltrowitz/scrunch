@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { PRODUCT_CATEGORY_LABELS, PRODUCT_CATEGORY_DESCRIPTIONS } from '../lib/constants'
 import type { ProductCategory, Product, ProductReview } from '../lib/database.types'
-import type { SeedProduct } from '../data/seedProducts'
 import { ProductImage } from '../hooks/useProductImage'
 import { RequestProductForm } from '../components/products/RequestProductForm'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth'
+import { useProducts, useUserReviews } from '../hooks/useProducts'
 
 type TriedRating = 'loved' | 'liked' | 'ok' | 'disliked'
 type ProductAction = 'tried' | 'bookmarked'
@@ -14,10 +15,11 @@ type ProductActions = Record<string, Set<ProductAction>>
 type ProductRatings = Record<string, TriedRating>
 type ProductNotes = Record<string, string>
 
-type DisplayProduct = SeedProduct & { id?: string; country_availability?: string[] }
+type DisplayProduct = Product
 
 function productKey(p: DisplayProduct): string {
-  return p.id || `${p.brand}::${p.name}`
+  if (!p.id || p.id.startsWith('seed-')) return `${p.brand}::${p.name}`
+  return p.id
 }
 
 function isUuid(key: string): boolean {
@@ -55,8 +57,11 @@ function storeNotes(notes: ProductNotes) {
 
 export function Products() {
   const { user } = useAuth()
-  const [products, setProducts] = useState<DisplayProduct[]>([])
-  const [loading, setLoading] = useState(true)
+  const queryClient = useQueryClient()
+  const { data: products = [], isLoading: productsLoading, error: productsError } = useProducts()
+  const { data: userReviews = [], isLoading: reviewsLoading, error: reviewsError } = useUserReviews(user?.id)
+  const loading = productsLoading && !productsError
+  const userId = user?.id
   const [search, setSearch] = useState('')
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [selectedCategories, setSelectedCategories] = useState<Set<ProductCategory>>(new Set())
@@ -74,47 +79,6 @@ export function Products() {
   const [showRequestForm, setShowRequestForm] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
 
-  // Load products from Supabase, fall back to SEED_PRODUCTS
-  useEffect(() => {
-    let cancelled = false
-    async function load() {
-      try {
-        const { data: rawData, error } = await supabase.from('products').select('id,brand,name,category,cg_status,cruelty_free,notes,image_url,country_availability')
-        const data = rawData as unknown as Product[] | null
-        if (!cancelled) {
-          if (!error && data && data.length > 0) {
-            setProducts(data.map(p => ({
-              id: p.id,
-              brand: p.brand,
-              name: p.name,
-              category: p.category,
-              cg_status: p.cg_status,
-              cruelty_free: p.cruelty_free,
-              notes: p.notes,
-              image_url: p.image_url,
-              country_availability: p.country_availability,
-            })).filter((p, i, arr) =>
-              // Dedup by brand+name (case-insensitive)
-              arr.findIndex(x => x.brand.toLowerCase() === p.brand.toLowerCase() && x.name.toLowerCase() === p.name.toLowerCase()) === i
-            ))
-          } else {
-            const { SEED_PRODUCTS } = await import('../data/seedProducts')
-            setProducts(SEED_PRODUCTS)
-          }
-        }
-      } catch {
-        if (!cancelled) {
-          const { SEED_PRODUCTS } = await import('../data/seedProducts')
-          setProducts(SEED_PRODUCTS)
-        }
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }
-    load()
-    return () => { cancelled = true }
-  }, [])
-
   // Load user reviews or revert to localStorage
   useEffect(() => {
     if (!user) {
@@ -122,46 +86,37 @@ export function Products() {
       setNotes(getStoredNotes())
       return
     }
-    let cancelled = false
-    async function loadReviews() {
-      const { data: rawReviews } = await supabase
-        .from('product_reviews')
-        .select('product_id,status,rating,results_notes')
-        .eq('user_id', user!.id)
-      const data = rawReviews as unknown as ProductReview[] | null
-      if (cancelled || !data) return
-      const reviewActions: ProductActions = {}
-      const reviewNotes: ProductNotes = {}
-      const reviewRatings: ProductRatings = {}
-      for (const review of data) {
-        const key = review.product_id
-        reviewActions[key] = new Set()
-        if (review.status) reviewActions[key].add('tried')
-        if (review.rating != null) reviewActions[key].add('tried')
-        if (review.results_notes) reviewNotes[key] = review.results_notes
-        // Sync rating label from Supabase
-        if (review.rating != null) {
-          if (review.rating >= 5) reviewRatings[key] = 'loved'
-          else if (review.rating >= 4) reviewRatings[key] = 'liked'
-          else if (review.rating >= 2) reviewRatings[key] = 'ok'
-          else reviewRatings[key] = 'disliked'
-        }
+    if (reviewsLoading || reviewsError) return
+    const data = userReviews as ProductReview[]
+    const reviewActions: ProductActions = {}
+    const reviewNotes: ProductNotes = {}
+    const reviewRatings: ProductRatings = {}
+    for (const review of data) {
+      const key = review.product_id
+      reviewActions[key] = new Set()
+      if (review.status) reviewActions[key].add('tried')
+      if (review.rating != null) reviewActions[key].add('tried')
+      if (review.results_notes) reviewNotes[key] = review.results_notes
+      // Sync rating label from Supabase
+      if (review.rating != null) {
+        if (review.rating >= 5) reviewRatings[key] = 'loved'
+        else if (review.rating >= 4) reviewRatings[key] = 'liked'
+        else if (review.rating >= 2) reviewRatings[key] = 'ok'
+        else reviewRatings[key] = 'disliked'
       }
-      // Preserve localStorage bookmarks
-      const stored = getStoredActions()
-      for (const [key, set] of Object.entries(stored)) {
-        if (set.has('bookmarked')) {
-          if (!reviewActions[key]) reviewActions[key] = new Set()
-          reviewActions[key].add('bookmarked')
-        }
-      }
-      setActions(reviewActions)
-      setNotes(prev => ({ ...prev, ...reviewNotes }))
-      setRatings(prev => ({ ...prev, ...reviewRatings }))
     }
-    loadReviews()
-    return () => { cancelled = true }
-  }, [user])
+    // Preserve localStorage bookmarks
+    const stored = getStoredActions()
+    for (const [key, set] of Object.entries(stored)) {
+      if (set.has('bookmarked')) {
+        if (!reviewActions[key]) reviewActions[key] = new Set()
+        reviewActions[key].add('bookmarked')
+      }
+    }
+    setActions(reviewActions)
+    setNotes(prev => ({ ...prev, ...reviewNotes }))
+    setRatings(prev => ({ ...prev, ...reviewRatings }))
+  }, [reviewsLoading, reviewsError, user, userReviews])
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -172,6 +127,72 @@ export function Products() {
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
+
+  const deleteReviewMutation = useMutation({
+    mutationFn: async (productId: string) => {
+      if (!userId) return
+      const { error } = await supabase
+        .from('product_reviews')
+        .delete()
+        .eq('user_id', userId)
+        .eq('product_id', productId)
+      if (error) throw error
+    },
+    onError: (error) => {
+      console.error('Delete review failed:', error)
+    },
+    onSuccess: () => {
+      if (userId) {
+        queryClient.invalidateQueries({ queryKey: ['reviews', userId] })
+      }
+    },
+  })
+
+  const upsertReviewMutation = useMutation({
+    mutationFn: async ({ productId, rating }: { productId: string; rating: TriedRating }) => {
+      if (!userId) return
+      const ratingMap: Record<TriedRating, number> = { loved: 5, liked: 4, ok: 3, disliked: 1 }
+      const repurchaseMap: Record<TriedRating, string> = { loved: 'yes', liked: 'yes', ok: 'maybe', disliked: 'no' }
+      const { error } = await supabase.from('product_reviews').upsert({
+        user_id: userId,
+        product_id: productId,
+        status: 'tried_once',
+        rating: ratingMap[rating],
+        would_repurchase: repurchaseMap[rating],
+      } as never, { onConflict: 'user_id,product_id' })
+      if (error) throw error
+    },
+    onError: (error) => {
+      console.error('Review upsert failed:', error)
+    },
+    onSuccess: () => {
+      if (userId) {
+        queryClient.invalidateQueries({ queryKey: ['reviews', userId] })
+      }
+    },
+  })
+
+  const upsertNoteMutation = useMutation({
+    mutationFn: async ({ productId, note }: { productId: string; note: string }) => {
+      if (!userId) return
+      const { error } = await supabase
+        .from('product_reviews')
+        .upsert({
+          user_id: userId,
+          product_id: productId,
+          results_notes: note.trim() || null,
+        } as never, { onConflict: 'user_id,product_id' })
+      if (error) throw error
+    },
+    onError: (error) => {
+      console.error('Note upsert failed:', error)
+    },
+    onSuccess: () => {
+      if (userId) {
+        queryClient.invalidateQueries({ queryKey: ['reviews', userId] })
+      }
+    },
+  })
 
   const allSuggestions = useMemo(() =>
     Array.from(new Set([
@@ -213,8 +234,7 @@ export function Products() {
           return next
         })
         if (user && isUuid(key)) {
-          supabase.from('product_reviews').delete().eq('user_id', user.id).eq('product_id', key)
-            .then(({ error }) => { if (error) console.error('Delete review failed:', error) })
+          deleteReviewMutation.mutate(key)
         }
       } else {
         setRatingPopup(key)
@@ -252,16 +272,7 @@ export function Products() {
 
     // Persist to Supabase
     if (user && isUuid(key)) {
-      const ratingMap: Record<TriedRating, number> = { loved: 5, liked: 4, ok: 3, disliked: 1 }
-      const repurchaseMap: Record<TriedRating, string> = { loved: 'yes', liked: 'yes', ok: 'maybe', disliked: 'no' }
-      supabase.from('product_reviews').upsert({
-        user_id: user.id,
-        product_id: key,
-        status: 'tried_once',
-        rating: ratingMap[rating],
-        would_repurchase: repurchaseMap[rating],
-      } as never, { onConflict: 'user_id,product_id' })
-        .then(({ error }) => { if (error) console.error('Review upsert failed:', error) })
+      upsertReviewMutation.mutate({ productId: key, rating })
     }
   }
 
@@ -278,14 +289,7 @@ export function Products() {
     })
     // Persist to Supabase for logged-in users
     if (user && isUuid(key)) {
-      supabase
-        .from('product_reviews')
-        .upsert({
-          user_id: user.id,
-          product_id: key,
-          results_notes: note.trim() || null,
-        } as never, { onConflict: 'user_id,product_id' })
-        .then(({ error }) => { if (error) console.error('Note upsert failed:', error) })
+      upsertNoteMutation.mutate({ productId: key, note })
     }
   }
 

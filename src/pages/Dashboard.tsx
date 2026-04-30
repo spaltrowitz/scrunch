@@ -1,33 +1,22 @@
-import { useState, useEffect } from 'react'
 import { useAuth } from '../lib/auth'
 import { Link } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
+import { useUserProfile, useUserReviews } from '../hooks/useProducts'
 
 export function Dashboard() {
   const { user } = useAuth()
-  const [profileComplete, setProfileComplete] = useState<boolean | null>(null)
-  const [ratingCount, setRatingCount] = useState(0)
-  const [cgmExperience, setCgmExperience] = useState<string | null>(null)
+  const { data: profile, isLoading: profileLoading, error: profileError } = useUserProfile(user?.id)
+  const { data: reviews = [], isLoading: reviewsLoading, error: reviewsError } = useUserReviews(user?.id)
+  const loading = (profileLoading || reviewsLoading) && !(profileError || reviewsError)
+  const profileComplete = user ? !!profile?.onboarding_completed && !!profile?.porosity : null
+  const ratingCount = reviews.length
+  const cgmExperience = profile?.cgm_experience ?? null
 
   const firstName = user?.user_metadata?.full_name?.split(' ')[0]
     || user?.email?.split('@')[0]
     || 'friend'
 
-  useEffect(() => {
-    if (!user) return
-    Promise.all([
-      supabase.from('profiles').select('onboarding_completed,porosity,cgm_experience').eq('id', user.id).single(),
-      supabase.from('product_reviews').select('id').eq('user_id', user.id),
-    ]).then(([profileRes, reviewsRes]) => {
-      const p = profileRes.data as unknown as { onboarding_completed: boolean; porosity: string | null; cgm_experience: string | null } | null
-      setProfileComplete(!!p?.onboarding_completed && !!p?.porosity)
-      setCgmExperience(p?.cgm_experience ?? null)
-      setRatingCount((reviewsRes.data as unknown as unknown[] | null)?.length ?? 0)
-    })
-  }, [user])
-
   // Still loading
-  if (profileComplete === null) return (
+  if (loading || profileComplete === null) return (
     <div className="max-w-3xl mx-auto px-4 py-12">
       <p className="text-gray-500 animate-pulse">Loading...</p>
     </div>

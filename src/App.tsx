@@ -19,7 +19,14 @@ import { About } from './pages/About'
 import { Terms } from './pages/Terms'
 import { Recommendations } from './pages/Recommendations'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+    },
+  },
+})
 
 function AppRoutes() {
   const { loading } = useAuth()

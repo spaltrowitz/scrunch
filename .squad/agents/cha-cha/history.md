@@ -39,3 +39,35 @@
 7. Use `select('id', { count: 'exact', head: true })` for Dashboard review count
 
 **Standards adopted:** See decisions.md entry 2026-04-30T19:34:00-04:00 for 6 mandatory performance patterns.
+
+### 2025-07-25 — Quick Wins #2 & #3 Implemented (branch: spaltrowitz/add-product-request-validation)
+
+**Quick Win #2 — Narrowed `select('*')` to named columns (6 files, 9 queries):**
+- Home.tsx: `select('id,brand,name,category,cg_status,cruelty_free,notes,image_url')` — drops ~12 unused columns including `ingredients[]`
+- Products.tsx: products query → 9 cols; reviews query → 4 cols (`product_id,status,rating,results_notes`)
+- Profile.tsx: 17 profile cols (dropped id, avatar_url, country, zip_code, wash_frequency, timestamps)
+- MyProducts.tsx: `select('id,product_id,rating,would_repurchase,status, products(brand,name,category,cg_status)')` — was fetching all review + all product cols
+- ProductDetail.tsx: products → 12 cols; reviews → 6 cols + profile join
+- Recommendations.tsx: 5 separate queries narrowed:
+  - Profile: 9 cols (was ~22)
+  - User reviews + products join: 7 review cols + 10 product cols
+  - All products for scoring: 10 cols (keeps `ingredients` for ingredient matching)
+  - Collab rec products: 8 cols (no ingredients needed — only rendered, not scored)
+  - Fresh reviews refresh: same as initial user reviews query
+
+**Key insight:** Recommendations.tsx needs `ingredients` in the main products query (for `scoreProductByIngredients` and `checkSensitivitiesWithStrictness`), but the collab rec products (max 5) only need display fields since they bypass ingredient scoring.
+
+**Quick Win #3 — Dynamic import for seedProducts.ts:**
+- Converted static `import { SEED_PRODUCTS }` to `await import('../data/seedProducts')` in both Home.tsx and Products.tsx
+- Only triggers on Supabase fetch failure (error fallback path)
+- Vite now code-splits `seedProducts` into a separate ~69KB chunk, removed from the initial bundle
+- The containing `load()` functions were already async, so no structural changes needed
+
+### 2025-07-26 — Quick Win #1 React Query migration (branch: spaltrowitz/add-product-request-validation)
+
+**What shipped:**
+- Added shared React Query hooks (`useProducts`, `useProduct`, `useUserReviews`, `useUserProfile`) with canonical query keys (`['products']`, `['product', id]`, `['reviews', userId]`, `['profile', userId]`).
+- Centralized product fallback to dynamically-imported `seedProducts` inside `useProducts`, mapping seeds to safe `Product` defaults.
+- Replaced all Supabase `useEffect` fetches with `useQuery` across Home, Products, Recommendations, ProductDetail, Profile, MyProducts, Dashboard, and OnboardingWizard.
+- Converted write paths (ratings, dismissals, notes, profile save) to `useMutation` with query invalidation.
+- QueryClient defaults now set: `staleTime` 5 min, `gcTime` 10 min.

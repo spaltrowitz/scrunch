@@ -1,12 +1,9 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { PRODUCT_CATEGORY_LABELS } from '../lib/constants'
-import type { ProductCategory, CgStatus, Product } from '../lib/database.types'
-import type { SeedProduct } from '../data/seedProducts'
+import type { ProductCategory, CgStatus } from '../lib/database.types'
 import { ProductImage } from '../hooks/useProductImage'
-import { supabase } from '../lib/supabase'
-
-type DisplayProduct = SeedProduct & { id?: string }
+import { useProducts } from '../hooks/useProducts'
 
 const CATEGORY_ICONS: Partial<Record<ProductCategory, string>> = {
   low_poo: '🧴',
@@ -32,49 +29,11 @@ const CG_BADGE: Record<CgStatus, { label: string; className: string }> = {
 }
 
 export function Home() {
-  const [products, setProducts] = useState<DisplayProduct[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data: products = [], isLoading, error } = useProducts()
+  const loading = isLoading && !error
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory | null>(null)
   const [cgFilter, setCgFilter] = useState<CgStatus | ''>('')
   const [brandFilter, setBrandFilter] = useState('')
-
-  useEffect(() => {
-    let cancelled = false
-    async function load() {
-      try {
-        const { data: rawData, error } = await supabase.from('products').select('id,brand,name,category,cg_status,cruelty_free,notes,image_url')
-        const data = rawData as unknown as Product[] | null
-        if (!cancelled) {
-          if (!error && data && data.length > 0) {
-            setProducts(data.map(p => ({
-              id: p.id,
-              brand: p.brand,
-              name: p.name,
-              category: p.category,
-              cg_status: p.cg_status,
-              cruelty_free: p.cruelty_free,
-              notes: p.notes,
-              image_url: p.image_url,
-            })).filter((p, i, arr) =>
-              arr.findIndex(x => x.brand.toLowerCase() === p.brand.toLowerCase() && x.name.toLowerCase() === p.name.toLowerCase()) === i
-            ))
-          } else {
-            const { SEED_PRODUCTS } = await import('../data/seedProducts')
-            setProducts(SEED_PRODUCTS)
-          }
-        }
-      } catch {
-        if (!cancelled) {
-          const { SEED_PRODUCTS } = await import('../data/seedProducts')
-          setProducts(SEED_PRODUCTS)
-        }
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }
-    load()
-    return () => { cancelled = true }
-  }, [])
 
   const brands = useMemo(() => {
     const set = new Set(products.map(p => p.brand))

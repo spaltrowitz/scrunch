@@ -1,29 +1,13 @@
-import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
-import { supabase } from '../lib/supabase'
 import { CURL_PATTERNS, POROSITY_OPTIONS, parseSensitivity, INGREDIENT_PREFERENCE_LABELS } from '../lib/constants'
-import type { Profile } from '../lib/database.types'
+import { useUserProfile } from '../hooks/useProducts'
 
 export function ProfilePage() {
   const { user } = useAuth()
   const navigate = useNavigate()
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    if (user) loadProfile()
-  }, [user])
-
-  const loadProfile = async () => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('curl_pattern,porosity,hair_density,hair_width,hair_length,scalp_type,climate,water_type,cgm_experience,heat_tool_usage,workout_frequency,fragrance_preference,color_treatment,hair_goals,sensitivities,onboarding_completed,profile_public')
-      .eq('id', user!.id)
-      .single()
-    setProfile(data as Profile | null)
-    setLoading(false)
-  }
+  const { data: profile, isLoading, error } = useUserProfile(user?.id)
+  const loading = isLoading && !error
 
   if (!user) {
     return (

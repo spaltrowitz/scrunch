@@ -1,32 +1,13 @@
-import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth'
 import { CG_STATUS_CONFIG, PRODUCT_CATEGORY_LABELS } from '../lib/constants'
-import type { ProductReview, Product } from '../lib/database.types'
-
-type ReviewWithProduct = ProductReview & { products: Product }
+import { useUserReviews } from '../hooks/useProducts'
 
 export function MyProducts() {
   const { user } = useAuth()
-  const [reviews, setReviews] = useState<ReviewWithProduct[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    if (user) loadMyReviews()
-  }, [user])
-
-  const loadMyReviews = async () => {
-    setLoading(true)
-    const { data } = await supabase
-      .from('product_reviews')
-      .select('id,product_id,rating,would_repurchase,status, products(brand,name,category,cg_status)')
-      .eq('user_id', user!.id)
-      .order('created_at', { ascending: false })
-
-    setReviews(((data as ReviewWithProduct[] | null) ?? []).filter(r => r.products != null))
-    setLoading(false)
-  }
+  const { data: reviews = [], isLoading, error } = useUserReviews(user?.id)
+  const loading = isLoading && !error
+  const filteredReviews = reviews.filter(review => review.products != null)
 
   if (!user) {
     return (
@@ -45,14 +26,14 @@ export function MyProducts() {
 
       {loading ? (
         <div className="text-center py-12 text-gray-500">Loading...</div>
-      ) : reviews.length === 0 ? (
+      ) : filteredReviews.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-500 mb-2">You haven't logged any products yet.</p>
           <Link to="/products" className="text-violet-600 hover:underline text-sm">Browse products to get started →</Link>
         </div>
       ) : (
         <div className="space-y-3">
-          {reviews.map(review => (
+          {filteredReviews.map(review => (
             <Link
               key={review.id}
               to={`/products/${review.product_id}`}

@@ -1,11 +1,13 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth'
 import { PRODUCT_CATEGORY_LABELS } from '../lib/constants'
 import type { Product, ProductReview, Profile, ProductCategory, CurlPattern, Porosity } from '../lib/database.types'
 import { ProductImage } from '../hooks/useProductImage'
 import { QuickRateCard } from '../components/products/QuickRateCard'
+import { useProducts, useUserProfile, useUserReviews } from '../hooks/useProducts'
 import {
   buildIngredientProfile,
   scoreProductByIngredients,
@@ -304,81 +306,81 @@ const MIN_RATINGS_FOR_ADVANCED = 5
 
 export function Recommendations() {
   const { user } = useAuth()
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const [userReviews, setUserReviews] = useState<(ProductReview & { products: Product })[]>([])
-  const [popularProducts, setPopularProducts] = useState<Product[]>([])
-  const [recommendedProducts, setRecommendedProducts] = useState<RecommendedProduct[]>([])
-  const [ingredientRecs, setIngredientRecs] = useState<RecommendedProduct[]>([])
-  const [tier, setTier] = useState<Tier>(1)
-  const [loading, setLoading] = useState(true)
-  const [, setRatingCount] = useState(0)
+  const queryClient = useQueryClient()
+  const userId = user?.id
+  const { data: profile, isLoading: profileLoading, error: profileError } = useUserProfile(userId)
+  const { data: userReviews = [], isLoading: reviewsLoading, error: reviewsError } = useUserReviews(userId)
+  const { data: products = [], isLoading: productsLoading, error: productsError } = useProducts()
   const [showRatingPopup, setShowRatingPopup] = useState<string | null>(null)
-  const [sensitivityFilterCount, setSensitivityFilterCount] = useState(0)
   const [dismissingProduct, setDismissingProduct] = useState<string | null>(null)
   const [dismissReasons, setDismissReasons] = useState<Set<string>>(new Set())
   const [dismissNote, setDismissNote] = useState('')
 
-  const ratedProductIds = new Set(userReviews.map(r => r.product_id))
-
-  // ----- data loading -----
-
-  const loadData = useCallback(async () => {
-    if (!user) return
-    setLoading(true)
-
-    const [profileRes, reviewsRes, productsRes] = await Promise.all([
-      supabase.from('profiles').select('id,display_name,curl_pattern,porosity,hair_width,cgm_experience,climate,onboarding_completed,sensitivities').eq('id', user.id).single(),
-      supabase
-        .from('product_reviews')
-        .select('id,product_id,rating,status,results_notes,would_repurchase,created_at, products(id,brand,name,category,cg_status,cruelty_free,notes,image_url,ingredients,review_count)')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false }),
-      supabase
-        .from('products')
-        .select('id,brand,name,category,cg_status,cruelty_free,notes,image_url,ingredients,review_count')
-        .order('review_count', { ascending: false })
-        .limit(200),
-    ])
-
-    const userProfile = profileRes.data as unknown as Profile | null
-    const reviews = (reviewsRes.data as unknown as (ProductReview & { products: Product })[]) ?? []
-    const products = (productsRes.data as unknown as Product[]) ?? []
-
-    setProfile(userProfile)
-    setUserReviews(reviews)
-    setRatingCount(reviews.length)
-    setPopularProducts(products)
-
-    const ratedIds = new Set(reviews.map(r => r.product_id))
-    const reviewsWithRating = reviews.filter(r => r.rating != null)
-    const sensitivities = userProfile?.sensitivities ?? []
-
-    // Determine tier & build recommendations
-    // Profile is "done" if porosity is set (the most important factor per CG guide)
-    // curl_pattern is now optional
-    const profileDone = userProfile?.onboarding_completed && !!userProfile.porosity
+  const ratedProductIds = useMemo(() => new Set(userReviews.map(r => r.product_id)), [userReviews])
+  const reviewsWithRating = useMemo(() => userReviews.filter(r => r.rating != null), [userReviews])
+  const popularProducts = useMemo(
+    () => [...products].sort((a, b) => b.review_count - a.review_count).slice(0, 200),
+    [products],
+  )
+  const profileDone = !!profile?.onboarding_completed && !!profile?.porosity
+  const sensitivities = profile?.sensitivities ?? []
+  const ratedProductIdList = useMemo(() => userReviews.map(r => r.product_id), [userReviews])
+  const dislikedCategoriesKey = useMemo(() => (
+    userReviews
+      .filter(r => r.rating != null && r.rating <= 2)
+      .map(r => r.products.category)
+      .sort()
+      .join('|')
+  ), [userReviews])
+  const shouldLoadCollab = !!user && profileDone && !!profile?.curl_pattern
+    && reviewsWithRating.length >= MIN_RATINGS_FOR_ADVANCED
+  const { data: collabData, isLoading: collabLoading, error: collabError } = useQuery({
+    queryKey: ['collab-recs', userId, profile?.curl_pattern, profile?.porosity, ratedProductIdList, dislikedCategoriesKey],
+    enabled: shouldLoadCollab,
+    queryFn: async () => {
+      const ratedIds = new Set(ratedProductIdList)
+      return await loadCollaborativeRecs(profile!, userReviews, ratedIds)
+    },
+  })
+  const baseLoading = (productsLoading || profileLoading || reviewsLoading)
+    && !(productsError || profileError || reviewsError)
+  const loading = baseLoading || (shouldLoadCollab && collabLoading && !collabError)
+  const {
+    tier,
+    recommendedProducts,
+    ingredientRecs,
+    sensitivityFilterCount,
+  } = useMemo(() => {
+    if (popularProducts.length === 0) {
+      return {
+        tier: 1 as Tier,
+        recommendedProducts: [],
+        ingredientRecs: [],
+        sensitivityFilterCount: 0,
+      }
+    }
+    const userProfile = profile ?? null
+    const ratedIds = ratedProductIds
     let currentTier: Tier = 1
     let recs: RecommendedProduct[] = []
     let ingredientResults: RecommendedProduct[] = []
     let sensitivityFiltered = 0
-
     if (!profileDone) {
       // Tier 1
       currentTier = 1
-      recs = buildTier1(products, userProfile?.cgm_experience)
+      recs = buildTier1(popularProducts, userProfile?.cgm_experience)
     } else if (reviewsWithRating.length < MIN_RATINGS_FOR_INGREDIENTS) {
       // Tier 2 — now uses porosity + texture (not curl pattern)
       currentTier = 2
-      recs = buildTier2(products, userProfile!, ratedIds)
+      recs = buildTier2(popularProducts, userProfile!, ratedIds)
     } else if (reviewsWithRating.length < MIN_RATINGS_FOR_ADVANCED) {
       // Tier 2.5 — ingredient-based
       currentTier = 2.5
-      const tier2Recs = buildTier2(products, userProfile!, ratedIds)
+      const tier2Recs = buildTier2(popularProducts, userProfile!, ratedIds)
       const { recs: ingRecs, sensitivityFilterCount: filtCount } = buildIngredientTier(
-        products, reviews, ratedIds, sensitivities,
+        popularProducts, userReviews, ratedIds, sensitivities,
       )
       sensitivityFiltered = filtCount
-
       if (ingRecs.length > 0) {
         // Blend: ingredient recs first, then hair-type fill
         const seen = new Set(ingRecs.map(p => p.id))
@@ -399,22 +401,16 @@ export function Recommendations() {
       // Tier 3 or 4 — check for similar users
       // Also build ingredient recs as a supplementary section
       const { recs: ingRecs, sensitivityFilterCount: filtCount } = buildIngredientTier(
-        products, reviews, ratedIds, sensitivities,
+        popularProducts, userReviews, ratedIds, sensitivities,
       )
       ingredientResults = ingRecs
       sensitivityFiltered = filtCount
-
-      const { collabRecs, hasSimilarUsers } = await loadCollaborativeRecs(
-        userProfile!,
-        reviews,
-        ratedIds,
-      )
-      if (hasSimilarUsers && collabRecs.length > 0) {
+      if (collabData?.hasSimilarUsers && collabData.collabRecs.length > 0) {
         currentTier = 4
-        const tier3 = buildTier3(products, reviews, ratedIds)
+        const tier3 = buildTier3(popularProducts, userReviews, ratedIds)
         // Blend: collab first, then tier3 fill, dedupe
-        const seen = new Set(collabRecs.map(p => p.id))
-        const blended: RecommendedProduct[] = collabRecs.map(p => ({
+        const seen = new Set(collabData.collabRecs.map(p => p.id))
+        const blended: RecommendedProduct[] = collabData.collabRecs.map(p => ({
           ...p,
           _reason: 'Loved by people with similar hair',
         }))
@@ -427,16 +423,25 @@ export function Recommendations() {
         recs = blended.slice(0, 5)
       } else {
         currentTier = 3
-        recs = buildTier3(products, reviews, ratedIds)
+        recs = buildTier3(popularProducts, userReviews, ratedIds)
       }
     }
-
-    setTier(currentTier)
-    setRecommendedProducts(recs)
-    setIngredientRecs(ingredientResults)
-    setSensitivityFilterCount(sensitivityFiltered)
-    setLoading(false)
-  }, [user])
+    return {
+      tier: currentTier,
+      recommendedProducts: recs,
+      ingredientRecs: ingredientResults,
+      sensitivityFilterCount: sensitivityFiltered,
+    }
+  }, [
+    collabData,
+    popularProducts,
+    profile,
+    profileDone,
+    ratedProductIds,
+    reviewsWithRating.length,
+    sensitivities,
+    userReviews,
+  ])
 
   /** Collaborative filtering: find users with same curl_pattern + porosity, get their 4-5 rated products */
   const loadCollaborativeRecs = async (
@@ -509,41 +514,43 @@ export function Recommendations() {
     return { collabRecs: recs, hasSimilarUsers: true }
   }
 
-  useEffect(() => {
-    loadData()
-  }, [loadData])
-
   // ----- rating handler -----
 
+  const rateMutation = useMutation({
+    mutationFn: async ({ productId, rating }: { productId: string; rating: number }) => {
+      if (!userId) return
+      const { error } = await supabase
+        .from('product_reviews')
+        .upsert(
+          {
+            user_id: userId,
+            product_id: productId,
+            rating,
+            status: 'tried_once',
+            would_repurchase: rating >= 4 ? 'yes' : rating <= 2 ? 'no' : 'maybe',
+            photo_urls: [],
+          } as never,
+          { onConflict: 'user_id,product_id' },
+        )
+      if (error) throw error
+    },
+    onError: (error) => {
+      console.error('Rating upsert failed:', error)
+    },
+    onSuccess: () => {
+      if (userId) {
+        queryClient.invalidateQueries({ queryKey: ['reviews', userId] })
+      }
+    },
+  })
+
   const handleRate = async (productId: string, rating: number) => {
-    if (!user) return
-
-    await supabase
-      .from('product_reviews')
-      .upsert(
-        {
-          user_id: user.id,
-          product_id: productId,
-          rating,
-          status: 'tried_once',
-          would_repurchase: rating >= 4 ? 'yes' : rating <= 2 ? 'no' : 'maybe',
-          photo_urls: [],
-        } as never,
-        { onConflict: 'user_id,product_id' },
-      )
-
-    setRatingCount(prev => prev + 1)
-    setShowRatingPopup(null)
-
-    // Refresh reviews
-    const { data: freshReviews } = await supabase
-      .from('product_reviews')
-      .select('id,product_id,rating,status,results_notes,would_repurchase,created_at, products(id,brand,name,category,cg_status,cruelty_free,notes,image_url,ingredients,review_count)')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-
-    const reviews = (freshReviews as unknown as (ProductReview & { products: Product })[]) ?? []
-    setUserReviews(reviews)
+    if (!userId) return
+    try {
+      await rateMutation.mutateAsync({ productId, rating })
+    } finally {
+      setShowRatingPopup(null)
+    }
   }
 
   // ----- bookmark handler -----
@@ -561,33 +568,50 @@ export function Recommendations() {
 
   // ----- dismiss handler -----
 
+  const dismissMutation = useMutation({
+    mutationFn: async ({ productId, notes }: { productId: string; notes: string }) => {
+      if (!userId) return
+      const { error } = await supabase
+        .from('product_reviews')
+        .upsert(
+          {
+            user_id: userId,
+            product_id: productId,
+            rating: 1,
+            would_repurchase: 'no',
+            results_notes: notes,
+            status: 'tried_once',
+            photo_urls: [],
+          } as never,
+          { onConflict: 'user_id,product_id' },
+        )
+      if (error) throw error
+    },
+    onError: (error) => {
+      console.error('Dismiss upsert failed:', error)
+    },
+    onSuccess: () => {
+      if (userId) {
+        queryClient.invalidateQueries({ queryKey: ['reviews', userId] })
+      }
+    },
+  })
+
   const handleDismiss = async (productId: string) => {
-    if (!user || dismissReasons.size === 0) return
+    if (!userId || dismissReasons.size === 0) return
 
     const reasonText = [...dismissReasons].join(', ')
     const notes = dismissNote.trim()
       ? `${reasonText}. ${dismissNote.trim()}`
       : reasonText
 
-    await supabase
-      .from('product_reviews')
-      .upsert(
-        {
-          user_id: user.id,
-          product_id: productId,
-          rating: 1,
-          would_repurchase: 'no',
-          results_notes: notes,
-          status: 'tried_once',
-          photo_urls: [],
-        } as never,
-        { onConflict: 'user_id,product_id' },
-      )
-
-    setDismissingProduct(null)
-    setDismissReasons(new Set())
-    setDismissNote('')
-    loadData()
+    try {
+      await dismissMutation.mutateAsync({ productId, notes })
+    } finally {
+      setDismissingProduct(null)
+      setDismissReasons(new Set())
+      setDismissNote('')
+    }
   }
 
   // ----- render gates -----
@@ -615,7 +639,7 @@ export function Recommendations() {
   }
 
   const firstName = profile?.display_name?.split(' ')[0] ?? 'there'
-  const { title: recTitle, subtitle: recSubtitle } = tierHeader(tier, profile)
+  const { title: recTitle, subtitle: recSubtitle } = tierHeader(tier, profile ?? null)
 
   const lovedReviews = userReviews.filter(r => r.rating != null && r.rating >= 4 && r.rating <= 5)
   const likedReviews = userReviews.filter(r => r.rating === 3)
