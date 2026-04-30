@@ -98,19 +98,6 @@ export function ProductDetail() {
     loadProduct()
   }
 
-  const _saveNote = async () => {
-    if (!user || !product) return
-    setSubmitting(true)
-    await supabase.from('product_reviews').upsert({
-      user_id: user.id,
-      product_id: product.id,
-      results_notes: personalNote.trim() || null,
-    } as never, { onConflict: 'user_id,product_id' })
-    setSubmitting(false)
-    loadProduct()
-  }
-  void _saveNote
-
   if (loading) return <div className="text-center py-12 text-gray-500">Loading…</div>
   if (!product) return <div className="text-center py-12 text-gray-500">Product not found</div>
 

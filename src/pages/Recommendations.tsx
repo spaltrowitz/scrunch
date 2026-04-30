@@ -23,6 +23,7 @@ type Tier = 1 | 2 | 2.5 | 3 | 4
 interface RecommendedProduct extends Product {
   _reason?: string
   _sensitivityWarning?: string
+  _score?: number
 }
 
 const MIN_RATINGS_FOR_INGREDIENTS = 3
@@ -310,7 +311,7 @@ export function Recommendations() {
   const [ingredientRecs, setIngredientRecs] = useState<RecommendedProduct[]>([])
   const [tier, setTier] = useState<Tier>(1)
   const [loading, setLoading] = useState(true)
-  const [ratingCount, setRatingCount] = useState(0)
+  const [, setRatingCount] = useState(0)
   const [showRatingPopup, setShowRatingPopup] = useState<string | null>(null)
   const [sensitivityFilterCount, setSensitivityFilterCount] = useState(0)
   const [dismissingProduct, setDismissingProduct] = useState<string | null>(null)
@@ -372,7 +373,7 @@ export function Recommendations() {
     } else if (reviewsWithRating.length < MIN_RATINGS_FOR_ADVANCED) {
       // Tier 2.5 — ingredient-based
       currentTier = 2.5
-      const tier2Recs = buildTier2(products, userProfile!.curl_pattern!, userProfile!.porosity!, ratedIds)
+      const tier2Recs = buildTier2(products, userProfile!, ratedIds)
       const { recs: ingRecs, sensitivityFilterCount: filtCount } = buildIngredientTier(
         products, reviews, ratedIds, sensitivities,
       )

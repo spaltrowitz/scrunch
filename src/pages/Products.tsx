@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { PRODUCT_CATEGORY_LABELS, PRODUCT_CATEGORY_DESCRIPTIONS } from '../lib/constants'
-import type { ProductCategory } from '../lib/database.types'
+import type { ProductCategory, Product, ProductReview } from '../lib/database.types'
 import { SEED_PRODUCTS } from '../data/seedProducts'
 import type { SeedProduct } from '../data/seedProducts'
 import { ProductImage } from '../hooks/useProductImage'
@@ -80,7 +80,8 @@ export function Products() {
     let cancelled = false
     async function load() {
       try {
-        const { data, error } = await supabase.from('products').select('*')
+        const { data: rawData, error } = await supabase.from('products').select('*')
+        const data = rawData as unknown as Product[] | null
         if (!cancelled) {
           if (!error && data && data.length > 0) {
             setProducts(data.map(p => ({
@@ -120,10 +121,11 @@ export function Products() {
     }
     let cancelled = false
     async function loadReviews() {
-      const { data } = await supabase
+      const { data: rawReviews } = await supabase
         .from('product_reviews')
         .select('*')
         .eq('user_id', user!.id)
+      const data = rawReviews as unknown as ProductReview[] | null
       if (cancelled || !data) return
       const reviewActions: ProductActions = {}
       const reviewNotes: ProductNotes = {}

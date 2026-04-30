@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { PRODUCT_CATEGORY_LABELS } from '../lib/constants'
-import type { ProductCategory, CgStatus } from '../lib/database.types'
+import type { ProductCategory, CgStatus, Product } from '../lib/database.types'
 import { SEED_PRODUCTS } from '../data/seedProducts'
 import type { SeedProduct } from '../data/seedProducts'
 import { ProductImage } from '../hooks/useProductImage'
@@ -43,7 +43,8 @@ export function Home() {
     let cancelled = false
     async function load() {
       try {
-        const { data, error } = await supabase.from('products').select('*')
+        const { data: rawData, error } = await supabase.from('products').select('*')
+        const data = rawData as unknown as Product[] | null
         if (!cancelled) {
           if (!error && data && data.length > 0) {
             setProducts(data.map(p => ({

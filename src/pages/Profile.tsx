@@ -83,7 +83,7 @@ export function ProfilePage() {
                 { label: 'Hair Length', value: profile!.hair_length?.replace(/_/g, ' ') },
                 { label: 'Scalp Type', value: profile!.scalp_type },
                 { label: 'Climate', value: profile!.climate },
-                { label: 'Water Type', value: (profile as Record<string, unknown>).water_type as string | null },
+                { label: 'Water Type', value: profile!.water_type },
                 { label: 'CGM Experience', value: profile!.cgm_experience?.replace(/_/g, ' ') },
                 { label: 'Heat Tools', value: profile!.heat_tool_usage?.replace(/_/g, ' ') },
                 { label: 'Workout Frequency', value: profile!.workout_frequency?.replace(/_/g, ' ') },
@@ -96,7 +96,7 @@ export function ProfilePage() {
 
             {/* Count unset optional fields */}
             {(() => {
-              const optional = [profile!.scalp_type, profile!.climate, profile!.cgm_experience, profile!.heat_tool_usage, profile!.workout_frequency, profile!.fragrance_preference, profile!.color_treatment, (profile as Record<string, unknown>).water_type as string | null]
+              const optional = [profile!.scalp_type, profile!.climate, profile!.cgm_experience, profile!.heat_tool_usage, profile!.workout_frequency, profile!.fragrance_preference, profile!.color_treatment, profile!.water_type]
               const unsetCount = optional.filter(v => !v).length
               if (unsetCount === 0) return null
               return (
