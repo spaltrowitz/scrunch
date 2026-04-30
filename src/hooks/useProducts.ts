@@ -54,16 +54,16 @@ async function loadSeedProducts(): Promise<Product[]> {
 export function useProducts() {
   return useQuery({
     queryKey: ['products'],
-    queryFn: async () => {
+    queryFn: async (): Promise<{ products: Product[]; isFallback: boolean }> => {
       try {
         const { data: rawData, error } = await supabase.from('products').select(PRODUCT_SELECT)
         const data = rawData as unknown as Product[] | null
         if (!error && data && data.length > 0) {
-          return dedupeProducts(data)
+          return { products: dedupeProducts(data), isFallback: false }
         }
-        return await loadSeedProducts()
+        return { products: await loadSeedProducts(), isFallback: true }
       } catch {
-        return await loadSeedProducts()
+        return { products: await loadSeedProducts(), isFallback: true }
       }
     },
   })

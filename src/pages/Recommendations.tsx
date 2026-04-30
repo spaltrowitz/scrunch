@@ -312,7 +312,8 @@ export function Recommendations() {
   const userId = user?.id
   const { data: profile, isLoading: profileLoading, error: profileError } = useUserProfile(userId)
   const { data: userReviews = [], isLoading: reviewsLoading, error: reviewsError } = useUserReviews(userId)
-  const { data: products = [], isLoading: productsLoading, error: productsError } = useProducts()
+  const { data: productsData, isLoading: productsLoading, error: productsError } = useProducts()
+  const products = productsData?.products ?? []
   const [showRatingPopup, setShowRatingPopup] = useState<string | null>(null)
   const [dismissingProduct, setDismissingProduct] = useState<string | null>(null)
   const [dismissReasons, setDismissReasons] = useState<Set<string>>(new Set())

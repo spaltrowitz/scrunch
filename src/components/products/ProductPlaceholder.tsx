@@ -48,8 +48,8 @@ export function ProductPlaceholder({ brand, name, category, className = 'w-16 h-
         <span className="text-[8px] text-gray-500 leading-tight text-center line-clamp-1">
           {name}
         </span>
-        <span className="text-[7px] text-violet-400 leading-tight italic">
-          Image coming soon
+        <span className="text-[7px] text-gray-400 leading-tight">
+          No image
         </span>
 
         {/* Mobile info icon */}

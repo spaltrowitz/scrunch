@@ -60,7 +60,8 @@ function storeNotes(notes: ProductNotes) {
 export function Products() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
-  const { data: products = [], isLoading: productsLoading, error: productsError } = useProducts()
+  const { data, isLoading: productsLoading, error: productsError } = useProducts()
+  const products = data?.products ?? []
   const { data: userReviews = [], isLoading: reviewsLoading, error: reviewsError } = useUserReviews(user?.id)
   const loading = productsLoading && !productsError
   const userId = user?.id
