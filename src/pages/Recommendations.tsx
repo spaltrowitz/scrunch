@@ -23,9 +23,13 @@ type Tier = 1 | 2 | 2.5 | 3 | 4
 interface RecommendedProduct extends Product {
   _reason?: string
   _sensitivityWarning?: string
+  /** Only set for ingredient-based matches — a real 0–100 percentage */
+  _matchPercent?: number
 }
 
 const MIN_RATINGS_FOR_INGREDIENTS = 3
+// Ingredient match scores below this threshold are too weak to surface
+const MIN_INGREDIENT_MATCH_SCORE = 25
 
 // Category priorities by POROSITY + TEXTURE (the guide says these matter most)
 const POROSITY_TEXTURE_PRIORITY: Record<string, ProductCategory[]> = {
@@ -99,13 +103,36 @@ function buildTier1(products: Product[], cgmExperience?: string | null): Product
   return result.slice(0, 5)
 }
 
+/**
+ * Build a set of brands the user has only negative experiences with.
+ * If a brand has at least one product rated ≥ 3, it stays eligible.
+ */
+function buildDislikedBrands(
+  reviews: (ProductReview & { products: Product })[],
+): Set<string> {
+  const disliked = new Set<string>()
+  const liked = new Set<string>()
+  for (const r of reviews) {
+    const brand = r.products.brand.toLowerCase()
+    if (r.rating != null && r.rating >= 3) liked.add(brand)
+    if (r.rating != null && r.rating <= 2) disliked.add(brand)
+  }
+  const avoid = new Set<string>()
+  for (const brand of disliked) {
+    if (!liked.has(brand)) avoid.add(brand)
+  }
+  return avoid
+}
+
 function buildTier2(
   products: Product[],
   profile: Profile,
   ratedIds: Set<string>,
+  dislikedBrands: Set<string>,
 ): RecommendedProduct[] {
   const approved = products.filter(
-    p => p.cg_status === 'approved' && !ratedIds.has(p.id),
+    p => p.cg_status === 'approved' && !ratedIds.has(p.id)
+      && !dislikedBrands.has(p.brand.toLowerCase()),
   )
   const porosity = profile.porosity || 'medium'
   const width = profile.hair_width || 'medium'
@@ -158,6 +185,7 @@ function buildTier3(
   allProducts: Product[],
   reviews: (ProductReview & { products: Product })[],
   ratedIds: Set<string>,
+  dislikedBrands: Set<string>,
 ): RecommendedProduct[] {
   const loved = reviews.filter(r => r.rating != null && r.rating >= 4)
   const disliked = reviews.filter(r => r.rating != null && r.rating <= 2)
@@ -170,7 +198,9 @@ function buildTier3(
   }
   const dislikedCats = new Set(disliked.map(r => r.products.category))
 
-  const candidates = allProducts.filter(p => !ratedIds.has(p.id))
+  const candidates = allProducts.filter(
+    p => !ratedIds.has(p.id) && !dislikedBrands.has(p.brand.toLowerCase()),
+  )
 
   const scored = candidates.map(p => {
     let s = 0
@@ -191,6 +221,7 @@ function buildIngredientTier(
   reviews: (ProductReview & { products: Product })[],
   ratedIds: Set<string>,
   sensitivities: string[],
+  dislikedBrands: Set<string>,
 ): { recs: RecommendedProduct[]; sensitivityFilterCount: number } {
   const loved = reviews
     .filter(r => r.rating != null && r.rating >= 4)
@@ -206,7 +237,8 @@ function buildIngredientTier(
   }
 
   const candidates = allProducts.filter(
-    p => p.cg_status === 'approved' && !ratedIds.has(p.id),
+    p => p.cg_status === 'approved' && !ratedIds.has(p.id)
+      && !dislikedBrands.has(p.brand.toLowerCase()),
   )
 
   let sensitivityFilterCount = 0
@@ -222,19 +254,20 @@ function buildIngredientTier(
       }
       if (flexible.length > 0) {
         const { score, matchedIngredients } = scoreProductByIngredients(product, profile)
-        if (score > 0 && matchedIngredients.length > 0) {
+        const adjustedScore = Math.round(score * 0.7)
+        if (adjustedScore >= MIN_INGREDIENT_MATCH_SCORE && matchedIngredients.length > 0) {
           const reason = `Contains ${formatIngredientList(matchedIngredients)} — ingredients you've loved in other products`
           const warning = `⚠️ Contains ${formatIngredientList(flexible)} (you prefer to avoid)`
-          scored.push({ ...product, _score: score * 0.7, _reason: reason, _sensitivityWarning: warning })
+          scored.push({ ...product, _score: adjustedScore, _matchPercent: adjustedScore, _reason: reason, _sensitivityWarning: warning })
         }
         continue
       }
     }
 
     const { score, matchedIngredients } = scoreProductByIngredients(product, profile)
-    if (score > 0 && matchedIngredients.length > 0) {
+    if (score >= MIN_INGREDIENT_MATCH_SCORE && matchedIngredients.length > 0) {
       const reason = `Contains ${formatIngredientList(matchedIngredients)} — ingredients you've loved in other products`
-      scored.push({ ...product, _score: score, _reason: reason })
+      scored.push({ ...product, _score: score, _matchPercent: score, _reason: reason })
     }
   }
 
@@ -351,6 +384,7 @@ export function Recommendations() {
     const ratedIds = new Set(reviews.map(r => r.product_id))
     const reviewsWithRating = reviews.filter(r => r.rating != null)
     const sensitivities = userProfile?.sensitivities ?? []
+    const dislikedBrands = buildDislikedBrands(reviews)
 
     // Determine tier & build recommendations
     // Profile is "done" if porosity is set (the most important factor per CG guide)
@@ -368,13 +402,13 @@ export function Recommendations() {
     } else if (reviewsWithRating.length < MIN_RATINGS_FOR_INGREDIENTS) {
       // Tier 2 — now uses porosity + texture (not curl pattern)
       currentTier = 2
-      recs = buildTier2(products, userProfile!, ratedIds)
+      recs = buildTier2(products, userProfile!, ratedIds, dislikedBrands)
     } else if (reviewsWithRating.length < MIN_RATINGS_FOR_ADVANCED) {
       // Tier 2.5 — ingredient-based
       currentTier = 2.5
-      const tier2Recs = buildTier2(products, userProfile!.curl_pattern!, userProfile!.porosity!, ratedIds)
+      const tier2Recs = buildTier2(products, userProfile!, ratedIds, dislikedBrands)
       const { recs: ingRecs, sensitivityFilterCount: filtCount } = buildIngredientTier(
-        products, reviews, ratedIds, sensitivities,
+        products, reviews, ratedIds, sensitivities, dislikedBrands,
       )
       sensitivityFiltered = filtCount
 
@@ -398,7 +432,7 @@ export function Recommendations() {
       // Tier 3 or 4 — check for similar users
       // Also build ingredient recs as a supplementary section
       const { recs: ingRecs, sensitivityFilterCount: filtCount } = buildIngredientTier(
-        products, reviews, ratedIds, sensitivities,
+        products, reviews, ratedIds, sensitivities, dislikedBrands,
       )
       ingredientResults = ingRecs
       sensitivityFiltered = filtCount
@@ -407,10 +441,11 @@ export function Recommendations() {
         userProfile!,
         reviews,
         ratedIds,
+        dislikedBrands,
       )
       if (hasSimilarUsers && collabRecs.length > 0) {
         currentTier = 4
-        const tier3 = buildTier3(products, reviews, ratedIds)
+        const tier3 = buildTier3(products, reviews, ratedIds, dislikedBrands)
         // Blend: collab first, then tier3 fill, dedupe
         const seen = new Set(collabRecs.map(p => p.id))
         const blended: RecommendedProduct[] = collabRecs.map(p => ({
@@ -426,7 +461,7 @@ export function Recommendations() {
         recs = blended.slice(0, 5)
       } else {
         currentTier = 3
-        recs = buildTier3(products, reviews, ratedIds)
+        recs = buildTier3(products, reviews, ratedIds, dislikedBrands)
       }
     }
 
@@ -442,6 +477,7 @@ export function Recommendations() {
     userProfile: Profile,
     reviews: (ProductReview & { products: Product })[],
     ratedIds: Set<string>,
+    dislikedBrands: Set<string>,
   ): Promise<{ collabRecs: Product[]; hasSimilarUsers: boolean }> => {
     if (!userProfile.curl_pattern || !userProfile.porosity) {
       return { collabRecs: [], hasSimilarUsers: false }
@@ -497,7 +533,8 @@ export function Recommendations() {
       .in('id', rankedIds)
 
     let recs = (recProducts as unknown as Product[]) ?? []
-    // Preserve ranking & deprioritise disliked categories
+    // Exclude disliked brands, preserve ranking & deprioritise disliked categories
+    recs = recs.filter(p => !dislikedBrands.has(p.brand.toLowerCase()))
     recs.sort((a, b) => {
       const aDis = dislikedCats.has(a.category) ? 1 : 0
       const bDis = dislikedCats.has(b.category) ? 1 : 0
@@ -662,7 +699,7 @@ export function Recommendations() {
                 product={product}
                 reason={product._reason}
                 sensitivityWarning={product._sensitivityWarning}
-                matchScore={product._score}
+                matchScore={product._matchPercent}
                 showRatingPopup={showRatingPopup === product.id}
                 onOpenRating={() => setShowRatingPopup(product.id)}
                 onCloseRating={() => setShowRatingPopup(null)}
@@ -718,6 +755,7 @@ export function Recommendations() {
                   product={product}
                   reason={product._reason}
                   sensitivityWarning={product._sensitivityWarning}
+                  matchScore={product._matchPercent}
                   showRatingPopup={showRatingPopup === product.id}
                   onOpenRating={() => setShowRatingPopup(product.id)}
                   onCloseRating={() => setShowRatingPopup(null)}
@@ -933,7 +971,7 @@ function RecommendedCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <p className="text-xs text-gray-500">{product.brand}</p>
-            {matchScore != null && matchScore > 0 && (
+            {matchScore != null && matchScore >= 25 && (
               <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${
                 matchScore >= 80 ? 'bg-emerald-50 text-emerald-700' :
                 matchScore >= 60 ? 'bg-green-50 text-green-700' :
