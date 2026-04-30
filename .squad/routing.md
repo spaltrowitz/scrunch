@@ -23,3 +23,4 @@
 | UI/UX feature | Jan (design) + Frenchy (impl) |
 | Hair care domain questions | Marty (domain) + relevant tech agent |
 | Product decisions | Kenickie (PM) + Sandy (tech feasibility) |
+| Query optimization, performance, efficiency, bundle size, re-renders, caching | Cha-Cha |

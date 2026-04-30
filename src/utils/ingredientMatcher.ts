@@ -1,0 +1,284 @@
+// ---------------------------------------------------------------------------
+// Ingredient-based product matching for the recommendation engine
+// ---------------------------------------------------------------------------
+
+export interface IngredientProfile {
+  /** Ingredients appearing in 2+ loved products */
+  commonIngredients: string[]
+  /** Ingredients appearing in 2+ disliked products */
+  avoidIngredients: string[]
+}
+
+export interface IngredientScore {
+  score: number // 0-100
+  matchedIngredients: string[] // which loved ingredients matched
+}
+
+/** Map of normalized ingredient → rarity weight (≥1.0; higher = rarer) */
+export type IngredientRarityMap = Map<string, number>
+
+// Filler ingredients that appear in almost every product — ignore for matching
+// Note: glycerin, aloe, and panthenol are intentionally NOT in this list
+// because they are beneficial humectants that differentiate product quality
+const FILLER_INGREDIENTS = new Set([
+  'water', 'aqua', 'eau',
+  'phenoxyethanol',
+  'fragrance', 'parfum',
+  'citric acid',
+  'sodium benzoate',
+  'potassium sorbate',
+  'disodium edta', 'tetrasodium edta', 'edta',
+  'sodium chloride',
+  'carbomer',
+  'tocopherol',
+  'sodium hydroxide',
+])
+
+// Sensitivity keyword → ingredient patterns to flag
+const SENSITIVITY_MAP: Record<string, RegExp[]> = {
+  coconut: [
+    /\bcoconut\b/i, /\bcocos nucifera\b/i, /\bcoco-/i,
+    /\bcocamidopropyl\b/i, /\bcocamide\b/i, /\bcaprylic/i,
+    /\bcapric/i, /\bcocogluc/i,
+  ],
+  protein: [
+    /\bhydrolyzed\b.*\bprotein\b/i, /\bkeratin\b/i,
+    /\bsilk amino acid/i, /\bcollagen\b/i, /\bwheat protein\b/i,
+    /\brice protein\b/i, /\bsoy protein\b/i, /\bquinoa protein\b/i,
+    /\bamino acid/i, /\byeast extract\b/i,
+    /\bhydrolyzed\b.*\bkeratin\b/i, /\bhydrolyzed\b.*\bsilk\b/i,
+    /\bhydrolyzed\b.*\bwheat\b/i, /\bhydrolyzed\b.*\brice\b/i,
+    /\bhydrolyzed\b.*\bcorn\b/i, /\bhydrolyzed\b.*\boat\b/i,
+  ],
+  sulfate: [
+    /\bsodium lauryl sulfate\b/i, /\bsodium laureth sulfate\b/i,
+    /\bammonium lauryl sulfate\b/i, /\bammonium laureth sulfate\b/i,
+  ],
+  silicone: [
+    /\bdimethicone\b/i, /\bcyclomethicone\b/i, /\bamodimethicone\b/i,
+    /\bmethicone\b/i, /\bsiloxane\b/i,
+  ],
+  fragrance: [/\bfragrance\b/i, /\bparfum\b/i, /\blinalool\b/i, /\blimonene\b/i],
+  alcohol: [/\balcohol denat\b/i, /\bsd alcohol\b/i, /\bisopropyl alcohol\b/i],
+  gluten: [
+    /\bwheat\b/i, /\bhydrolyzed wheat\b/i, /\btriticum vulgare\b/i,
+    /\bavena sativa\b/i, /\bhordeum vulgare\b/i,
+  ],
+  aloe: [/\baloe\b/i, /\baloe barbadensis\b/i, /\baloe vera\b/i],
+}
+
+function normalize(ingredient: string): string {
+  return ingredient.toLowerCase().trim()
+}
+
+function isFiller(normalized: string): boolean {
+  return FILLER_INGREDIENTS.has(normalized)
+}
+
+/**
+ * Build an ingredient profile from a user's loved and disliked products.
+ * "Common" means appearing in 2+ products.
+ */
+export function buildIngredientProfile(
+  lovedProducts: { ingredients: string[] }[],
+  dislikedProducts: { ingredients: string[] }[],
+): IngredientProfile {
+  const lovedCounts = countIngredients(lovedProducts)
+  const dislikedCounts = countIngredients(dislikedProducts)
+
+  const commonIngredients = Object.entries(lovedCounts)
+    .filter(([ing, count]) => count >= 2 && !isFiller(ing))
+    .sort((a, b) => b[1] - a[1])
+    .map(([ing]) => ing)
+
+  const avoidIngredients = Object.entries(dislikedCounts)
+    .filter(([ing, count]) => count >= 2 && !isFiller(ing))
+    .map(([ing]) => ing)
+
+  return { commonIngredients, avoidIngredients }
+}
+
+function countIngredients(
+  products: { ingredients: string[] }[],
+): Record<string, number> {
+  const counts: Record<string, number> = {}
+  for (const product of products) {
+    const seen = new Set<string>()
+    for (const ing of product.ingredients) {
+      const n = normalize(ing)
+      if (!seen.has(n)) {
+        counts[n] = (counts[n] || 0) + 1
+        seen.add(n)
+      }
+    }
+  }
+  return counts
+}
+
+/**
+ * Build a rarity weight map from a product catalog using IDF.
+ * Rare ingredients get higher weights (~2–4×), ubiquitous ones stay near 1.0.
+ * This makes matching on a distinctive ingredient like "babassu oil" worth
+ * far more than matching on "glycerin" which appears in most products.
+ */
+export function buildIngredientRarity(
+  products: { ingredients: string[] }[],
+): IngredientRarityMap {
+  const docCount = products.length
+  if (docCount === 0) return new Map()
+
+  // Count how many products contain each non-filler ingredient
+  const docFreq: Record<string, number> = {}
+  for (const product of products) {
+    const seen = new Set<string>()
+    for (const ing of product.ingredients) {
+      const n = normalize(ing)
+      if (!seen.has(n) && !isFiller(n)) {
+        docFreq[n] = (docFreq[n] || 0) + 1
+        seen.add(n)
+      }
+    }
+  }
+
+  const rarityMap: IngredientRarityMap = new Map()
+  for (const [ing, freq] of Object.entries(docFreq)) {
+    // IDF: log(total / freq) + 1 → minimum 1.0 for ubiquitous ingredients
+    rarityMap.set(ing, 1 + Math.log(docCount / freq))
+  }
+  return rarityMap
+}
+
+/**
+ * Score a product 0–100 based on ingredient overlap with the user's profile.
+ * - Ingredients in the first 5 positions get a position bonus (higher concentration)
+ * - Matches with loved ingredients add points
+ * - Matches with avoid ingredients subtract points
+ * - When rarityWeights are provided, rare ingredients contribute more to the score
+ */
+export function scoreProductByIngredients(
+  product: { ingredients: string[] },
+  profile: IngredientProfile,
+  rarityWeights?: IngredientRarityMap,
+): IngredientScore {
+  if (profile.commonIngredients.length === 0) {
+    return { score: 0, matchedIngredients: [] }
+  }
+
+  const normalizedIngredients = product.ingredients.map(normalize)
+  const commonSet = new Set(profile.commonIngredients)
+  const avoidSet = new Set(profile.avoidIngredients)
+
+  let rawScore = 0
+  const matchedIngredients: string[] = []
+
+  for (let i = 0; i < normalizedIngredients.length; i++) {
+    const ing = normalizedIngredients[i]
+    // Position weight: first 5 ingredients get a bonus
+    const positionWeight = i < 5 ? 2 : 1
+    const rarityWeight = rarityWeights?.get(ing) ?? 1
+
+    if (commonSet.has(ing)) {
+      rawScore += 10 * positionWeight * rarityWeight
+      matchedIngredients.push(ing)
+    }
+
+    if (avoidSet.has(ing)) {
+      rawScore -= 5 * positionWeight * rarityWeight
+    }
+  }
+
+  // Normalize to 0-100 accounting for rarity weights of the user's loved ingredients
+  const maxPossible = profile.commonIngredients.reduce((sum, ing) => {
+    const rw = rarityWeights?.get(ing) ?? 1
+    return sum + 15 * rw
+  }, 0) || 1
+  const score = Math.max(0, Math.min(100, Math.round((rawScore / maxPossible) * 100)))
+
+  return { score, matchedIngredients }
+}
+
+/**
+ * Check whether a product contains ingredients that match any of the user's
+ * stated sensitivities. Returns flagged items grouped by strictness.
+ * Sensitivity strings may include a strictness suffix (e.g. "silicone_free:strict").
+ */
+export function checkSensitivities(
+  product: { ingredients: string[] },
+  sensitivities: string[],
+): string[] {
+  if (!sensitivities.length) return []
+
+  // Parse strictness but still return all flagged ingredients for backward compatibility
+  const flagged: string[] = []
+  for (const ing of product.ingredients) {
+    for (const raw of sensitivities) {
+      const name = raw.replace(/:(?:strict|flexible)$/, '')
+      const patterns = SENSITIVITY_MAP[name.toLowerCase()]
+      if (patterns) {
+        if (patterns.some(p => p.test(ing))) {
+          flagged.push(ing.trim())
+          break
+        }
+      } else {
+        // Fallback: direct substring match for unknown sensitivities
+        if (normalize(ing).includes(name.toLowerCase())) {
+          flagged.push(ing.trim())
+          break
+        }
+      }
+    }
+  }
+  return flagged
+}
+
+/**
+ * Check sensitivities with strictness awareness.
+ * Returns separate lists for strict and flexible matches.
+ */
+export function checkSensitivitiesWithStrictness(
+  product: { ingredients: string[] },
+  sensitivities: string[],
+): { strict: string[]; flexible: string[] } {
+  if (!sensitivities.length) return { strict: [], flexible: [] }
+
+  const strict: string[] = []
+  const flexible: string[] = []
+
+  for (const ing of product.ingredients) {
+    for (const raw of sensitivities) {
+      const name = raw.replace(/:(?:strict|flexible)$/, '')
+      const isFlexible = raw.endsWith(':flexible')
+      const patterns = SENSITIVITY_MAP[name.toLowerCase()]
+      let matched = false
+
+      if (patterns) {
+        matched = patterns.some(p => p.test(ing))
+      } else {
+        matched = normalize(ing).includes(name.toLowerCase())
+      }
+
+      if (matched) {
+        if (isFlexible) {
+          flexible.push(ing.trim())
+        } else {
+          strict.push(ing.trim())
+        }
+        break
+      }
+    }
+  }
+  return { strict, flexible }
+}
+
+/**
+ * Format matched ingredients for display (capitalize first letter).
+ * Returns e.g. "Glycerin and Aloe vera"
+ */
+export function formatIngredientList(ingredients: string[], max = 3): string {
+  const capped = ingredients.slice(0, max)
+  const formatted = capped.map(i => i.charAt(0).toUpperCase() + i.slice(1))
+  if (formatted.length === 1) return formatted[0]
+  if (formatted.length === 2) return `${formatted[0]} and ${formatted[1]}`
+  const last = formatted.pop()!
+  return `${formatted.join(', ')}, and ${last}`
+}
