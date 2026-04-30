@@ -327,15 +327,15 @@ export function Recommendations() {
     setLoading(true)
 
     const [profileRes, reviewsRes, productsRes] = await Promise.all([
-      supabase.from('profiles').select('*').eq('id', user.id).single(),
+      supabase.from('profiles').select('id,display_name,curl_pattern,porosity,hair_width,cgm_experience,climate,onboarding_completed,sensitivities').eq('id', user.id).single(),
       supabase
         .from('product_reviews')
-        .select('*, products(*)')
+        .select('id,product_id,rating,status,results_notes,would_repurchase,created_at, products(id,brand,name,category,cg_status,cruelty_free,notes,image_url,ingredients,review_count)')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false }),
       supabase
         .from('products')
-        .select('*')
+        .select('id,brand,name,category,cg_status,cruelty_free,notes,image_url,ingredients,review_count')
         .order('review_count', { ascending: false })
         .limit(200),
     ])
@@ -494,7 +494,7 @@ export function Recommendations() {
 
     const { data: recProducts } = await supabase
       .from('products')
-      .select('*')
+      .select('id,brand,name,category,cg_status,cruelty_free,notes,image_url')
       .in('id', rankedIds)
 
     let recs = (recProducts as unknown as Product[]) ?? []
@@ -538,7 +538,7 @@ export function Recommendations() {
     // Refresh reviews
     const { data: freshReviews } = await supabase
       .from('product_reviews')
-      .select('*, products(*)')
+      .select('id,product_id,rating,status,results_notes,would_repurchase,created_at, products(id,brand,name,category,cg_status,cruelty_free,notes,image_url,ingredients,review_count)')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
 

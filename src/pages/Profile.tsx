@@ -18,7 +18,7 @@ export function ProfilePage() {
   const loadProfile = async () => {
     const { data } = await supabase
       .from('profiles')
-      .select('*')
+      .select('curl_pattern,porosity,hair_density,hair_width,hair_length,scalp_type,climate,water_type,cgm_experience,heat_tool_usage,workout_frequency,fragrance_preference,color_treatment,hair_goals,sensitivities,onboarding_completed,profile_public')
       .eq('id', user!.id)
       .single()
     setProfile(data as Profile | null)

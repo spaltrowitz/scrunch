@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { PRODUCT_CATEGORY_LABELS } from '../lib/constants'
 import type { ProductCategory, CgStatus, Product } from '../lib/database.types'
-import { SEED_PRODUCTS } from '../data/seedProducts'
 import type { SeedProduct } from '../data/seedProducts'
 import { ProductImage } from '../hooks/useProductImage'
 import { supabase } from '../lib/supabase'
@@ -43,7 +42,7 @@ export function Home() {
     let cancelled = false
     async function load() {
       try {
-        const { data: rawData, error } = await supabase.from('products').select('*')
+        const { data: rawData, error } = await supabase.from('products').select('id,brand,name,category,cg_status,cruelty_free,notes,image_url')
         const data = rawData as unknown as Product[] | null
         if (!cancelled) {
           if (!error && data && data.length > 0) {
@@ -60,11 +59,15 @@ export function Home() {
               arr.findIndex(x => x.brand.toLowerCase() === p.brand.toLowerCase() && x.name.toLowerCase() === p.name.toLowerCase()) === i
             ))
           } else {
+            const { SEED_PRODUCTS } = await import('../data/seedProducts')
             setProducts(SEED_PRODUCTS)
           }
         }
       } catch {
-        if (!cancelled) setProducts(SEED_PRODUCTS)
+        if (!cancelled) {
+          const { SEED_PRODUCTS } = await import('../data/seedProducts')
+          setProducts(SEED_PRODUCTS)
+        }
       } finally {
         if (!cancelled) setLoading(false)
       }

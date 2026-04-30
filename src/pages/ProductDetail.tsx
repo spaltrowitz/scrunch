@@ -55,10 +55,10 @@ export function ProductDetail() {
   const loadProduct = async () => {
     setLoading(true)
     const [productRes, reviewsRes] = await Promise.all([
-      supabase.from('products').select('*').eq('id', id!).single(),
+      supabase.from('products').select('id,brand,name,category,cg_status,cruelty_free,notes,image_url,ingredients,flagged_ingredients,avg_rating,review_count').eq('id', id!).single(),
       supabase
         .from('product_reviews')
-        .select('*, profile:profiles!product_reviews_user_id_fkey(display_name, curl_pattern, porosity)')
+        .select('id,user_id,product_id,rating,results_notes,created_at, profile:profiles!product_reviews_user_id_fkey(display_name,curl_pattern,porosity)')
         .eq('product_id', id!)
         .order('created_at', { ascending: false }),
     ])

@@ -2,7 +2,6 @@ import { useState, useRef, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { PRODUCT_CATEGORY_LABELS, PRODUCT_CATEGORY_DESCRIPTIONS } from '../lib/constants'
 import type { ProductCategory, Product, ProductReview } from '../lib/database.types'
-import { SEED_PRODUCTS } from '../data/seedProducts'
 import type { SeedProduct } from '../data/seedProducts'
 import { ProductImage } from '../hooks/useProductImage'
 import { RequestProductForm } from '../components/products/RequestProductForm'
@@ -80,7 +79,7 @@ export function Products() {
     let cancelled = false
     async function load() {
       try {
-        const { data: rawData, error } = await supabase.from('products').select('*')
+        const { data: rawData, error } = await supabase.from('products').select('id,brand,name,category,cg_status,cruelty_free,notes,image_url,country_availability')
         const data = rawData as unknown as Product[] | null
         if (!cancelled) {
           if (!error && data && data.length > 0) {
@@ -99,11 +98,15 @@ export function Products() {
               arr.findIndex(x => x.brand.toLowerCase() === p.brand.toLowerCase() && x.name.toLowerCase() === p.name.toLowerCase()) === i
             ))
           } else {
+            const { SEED_PRODUCTS } = await import('../data/seedProducts')
             setProducts(SEED_PRODUCTS)
           }
         }
       } catch {
-        if (!cancelled) setProducts(SEED_PRODUCTS)
+        if (!cancelled) {
+          const { SEED_PRODUCTS } = await import('../data/seedProducts')
+          setProducts(SEED_PRODUCTS)
+        }
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -123,7 +126,7 @@ export function Products() {
     async function loadReviews() {
       const { data: rawReviews } = await supabase
         .from('product_reviews')
-        .select('*')
+        .select('product_id,status,rating,results_notes')
         .eq('user_id', user!.id)
       const data = rawReviews as unknown as ProductReview[] | null
       if (cancelled || !data) return

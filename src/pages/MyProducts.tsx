@@ -20,7 +20,7 @@ export function MyProducts() {
     setLoading(true)
     const { data } = await supabase
       .from('product_reviews')
-      .select('*, products(*)')
+      .select('id,product_id,rating,would_repurchase,status, products(brand,name,category,cg_status)')
       .eq('user_id', user!.id)
       .order('created_at', { ascending: false })
 
