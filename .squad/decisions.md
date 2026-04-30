@@ -18,3 +18,14 @@
 **Why:** Product strategy — these personas drive feature prioritization and UX decisions
 
 ---
+
+### 2026-04-30T13:44:00-04:00: Onboarding philosophy — invisible onboarding
+**By:** Shari Paltrowitz (via Copilot)
+**What:** Onboarding should be invisible per these reference articles:
+1. "Your Onboarding Should Become Invisible" (Growthmates) — don't gate value behind questions. Let users act immediately. Collect profiling data WHILE they're getting value, not before. Best AI products start working with you immediately.
+2. "AI Product Development" (Atomic Object) — validate core loop first, scope small, product thinking > speed. Don't add features just because you can.
+
+Applied to Scrunch: Do NOT put a journey question before the product browse. Either defer it (ask after they've explored), infer it (watch behavior), or embed it inline. The homepage should show products immediately — zero friction before first value.
+**Why:** User research — Shari's product direction based on industry best practices
+
+---
