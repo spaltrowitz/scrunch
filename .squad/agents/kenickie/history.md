@@ -33,6 +33,13 @@
 - Inference-only may be sufficient — recommendation is to ship without explicit question first, add it only if data shows too many users stuck in generic bucket after 2+ sessions.
 - The app must work great with ZERO personalization. Personalization is enhancement, not dependency. This aligns with "validate core loop before adding features" principle.
 - 2025-07-24: Acquisition channel analysis complete. Key finding: 3/4 personas (Newbie, Budget, Optimizer) overlap on Reddit r/curlyhair + TikTok. The Store Scanner is the outlier — they arrive via Google SEO ("is [product] CG approved?"), not social browsing.
+- 2025-07-24: V1 scope definition written (3 tiers: ALPHA → BETA → LAUNCH). Key learnings from scoping exercise:
+  - ALPHA can ship with static JSON and zero backend — 108 products in a filterable grid is enough for friend feedback.
+  - The Reddit post (BETA) is the real forcing function. It requires: shareable URLs with OG previews, search, and a product request form. These are the credibility minimums for a community that scrutinizes tools.
+  - Image gap is the #1 risk: 36% coverage today, need 80%+ for LAUNCH. Image sourcing must run in parallel with dev from day 1.
+  - CG classification accuracy is the #2 risk: one wrong call on Reddit destroys trust. Ingredient-level justification (not just pass/fail) is a LAUNCH requirement.
+  - Service worker for offline use (Store Scanner in-aisle) is aspirational for LAUNCH — may defer post-launch depending on timeline pressure.
+  - Estimated ~6 weeks from first commit to public launch. ALPHA could ship in 2-3 days if someone starts coding now.
 - Marketing implication: ONE core strategy (Reddit + TikTok community presence) plus ONE supplement (SEO product pages) covers all 4 personas. No need for 4 separate channel strategies.
 - Store Scanner = SEO persona. They Google mid-shopping-trip. Every product in our DB should have a rankable landing page for "[product name] curly girl approved."
 - Reddit r/curlyhair is the single highest-overlap channel. All 4 personas visit it, though for different reasons (Newbies ask questions, Optimizers debate ingredients, Budget asks for dupes, Scanners ask "is X approved?").
