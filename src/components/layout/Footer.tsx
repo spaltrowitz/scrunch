@@ -9,6 +9,15 @@ export function Footer() {
         <Link to="/about" className="hover:text-violet-600 no-underline">About</Link>
         <span>·</span>
         <Link to="/terms" className="hover:text-violet-600 no-underline">Terms</Link>
+        <span>·</span>
+        <a
+          href="https://spaltrowitz.github.io/#support"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-violet-600 no-underline"
+        >
+          🧴 Buy my next curl cream
+        </a>
       </div>
     </footer>
   )
