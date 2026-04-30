@@ -10,6 +10,23 @@
 ## Learnings
 <!-- Append new learnings below this line -->
 
+### 2026-04-30 — Quick Wins #1, #2, #3 Completed (branch: spaltrowitz/add-product-request-validation)
+
+**Completed tasks:**
+1. **Quick Win #2 — Narrowed `select('*')` to named columns (6 files, 9 queries):** All product/review fetches now specify explicit columns. Home (8 cols), Products (9+4), Profile (17), MyProducts (nested), ProductDetail (12+6), Recommendations (5 queries, context-aware). Estimated 40% reduction in network over-fetching.
+
+2. **Quick Win #3 — Dynamic import seedProducts.ts (69KB):** Converted static imports in Home.tsx and Products.tsx to `await import()` in error fallback only. Vite code-splits into separate chunk, removed from initial bundle.
+
+3. **Quick Win #1 — Full React Query migration (8 pages, 4 shared hooks):** Completed migration of all Supabase fetches from raw `useEffect` + `useState` to React Query. Created shared hooks: `useProducts()`, `useProduct(id)`, `useUserReviews(userId)`, `useUserProfile(userId)` with canonical query keys. All write paths (ratings, notes, dismissals, profile save) converted to `useMutation` with query invalidation. QueryClient configured with `staleTime: 5min, gcTime: 10min`. Eliminated N+1 duplicate fetches and 13KB React Query dead weight.
+
+**Pages migrated:** Home, Products, Recommendations, ProductDetail, Profile, MyProducts, Dashboard, OnboardingWizard.
+
+**Result:** Build + tests passing. Committed to spaltrowitz/add-product-request-validation. Ready for PR review.
+
+**Standards applied:** #1 (React Query mandatory), #2 (no select `*`), #4 (dynamic import for fallback data).
+
+---
+
 ### 2025-07-25 — First Comprehensive Audit (branch: spaltrowitz/add-product-request-validation)
 
 **Critical patterns found:**

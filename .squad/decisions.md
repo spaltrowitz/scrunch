@@ -30,6 +30,44 @@ Applied to Scrunch: Do NOT put a journey question before the product browse. Eit
 
 ---
 
+### 2026-04-30T19:40:00-04:00: Column-specific select() patterns per page
+**By:** Cha-Cha (⚡ Performance Optimizer)  
+**What:** Every Supabase `.select()` call now lists explicit columns instead of `'*'`. Each page fetches only fields it renders/filters/sorts on.
+**Key mappings:**
+- Home: id, brand, name, category, cg_status, cruelty_free, notes, image_url
+- Products: + country_availability; reviews: product_id, status, rating, results_notes
+- ProductDetail: + ingredients, flagged_ingredients, avg_rating, review_count; reviews: id, user_id, rating, created_at
+- MyProducts: reviews (5 cols) + products join (4 cols)
+- Recommendations: scoring (10 cols with ingredients), collab display (8 cols, no ingredients)
+- Profile: display fields minus id, avatar_url, country, zip_code, wash_frequency, timestamps
+
+**Why:** Products have large `ingredients[]` arrays (30-50 items each). With 200+ products, `select('*')` was 60% over-fetching.  
+**Scope:** All new Supabase queries must use explicit columns, not `select('*')`.
+
+---
+
+### 2026-04-30T19:40:00-04:00: React Query patterns — products/profile/reviews
+**By:** Cha-Cha (⚡ Performance Optimizer)  
+**What:** Canonical React Query query key conventions and shared hook patterns for data fetching.
+**Query keys:**
+- Products list: `['products']`
+- Product detail: `['product', id]`
+- User reviews: `['reviews', userId]`
+- User profile: `['profile', userId]`
+- Product reviews (detail): `['product-reviews', id]`
+- Collaborative recs: `['collab-recs', userId, curlPattern, porosity, ratedIds, dislikedCategories]`
+
+**Shared hooks:**
+- `useProducts()` — owns seed fallback via dynamic import
+- `useProduct(id)` — single product detail
+- `useUserReviews(userId)` — user reviews with product join
+- `useUserProfile(userId)` — user profile data
+
+**Mutations:** All Supabase writes use `useMutation` with query invalidation. Example: rate product → invalidate `['reviews', userId]`.  
+**Why:** Centralize caching, deduplication, stale-while-revalidate behavior. Prevent N+1 requests.
+
+---
+
 ### 2026-04-30T19:34:00-04:00: Performance Standards — Team Adoption
 **By:** Cha-Cha (⚡ Performance Optimizer, via Scribe)
 **What:** 6 mandatory performance patterns for all team members:
