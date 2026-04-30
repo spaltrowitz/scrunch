@@ -22,11 +22,11 @@ import { Recommendations } from './pages/Recommendations'
 const queryClient = new QueryClient()
 
 function AppRoutes() {
-  const { user, loading } = useAuth()
+  const { loading } = useAuth()
   if (loading) return null
   return (
     <Routes>
-      <Route path="/" element={user ? <Dashboard /> : <Home />} />
+      <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/onboarding" element={<Onboarding />} />
