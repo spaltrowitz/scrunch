@@ -1,14 +1,14 @@
 import { useAuth } from '../lib/auth'
 import { Link } from 'react-router-dom'
-import { useUserProfile, useUserReviews } from '../hooks/useProducts'
+import { useUserProfile, useUserReviewCount } from '../hooks/useProducts'
 
 export function Dashboard() {
   const { user } = useAuth()
   const { data: profile, isLoading: profileLoading, error: profileError } = useUserProfile(user?.id)
-  const { data: reviews = [], isLoading: reviewsLoading, error: reviewsError } = useUserReviews(user?.id)
-  const loading = (profileLoading || reviewsLoading) && !(profileError || reviewsError)
+  const { data: reviewCount = 0, isLoading: countLoading, error: countError } = useUserReviewCount(user?.id)
+  const loading = (profileLoading || countLoading) && !(profileError || countError)
   const profileComplete = user ? !!profile?.onboarding_completed && !!profile?.porosity : null
-  const ratingCount = reviews.length
+  const ratingCount = reviewCount
   const cgmExperience = profile?.cgm_experience ?? null
 
   const firstName = user?.user_metadata?.full_name?.split(' ')[0]

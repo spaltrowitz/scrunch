@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import type { ProductCategory } from '../lib/database.types'
 import { ProductPlaceholder } from '../components/products/ProductPlaceholder'
 
@@ -21,7 +21,7 @@ function setCache(cache: Record<string, string>) {
   }
 }
 
-export function useProductImage(brand: string, productName: string): string | null {
+export function useProductImage(brand: string, productName: string, enabled = true): string | null {
   const cacheKey = `${brand}::${productName}`
   const [imageUrl, setImageUrl] = useState<string | null>(() => {
     const cache = getCache()
@@ -31,6 +31,8 @@ export function useProductImage(brand: string, productName: string): string | nu
   })
 
   useEffect(() => {
+    if (!enabled) return
+
     const cache = getCache()
     if (cache[cacheKey]) {
       setImageUrl(cache[cacheKey] === 'none' ? null : cache[cacheKey])
@@ -60,9 +62,34 @@ export function useProductImage(brand: string, productName: string): string | nu
       })
 
     return () => { cancelled = true }
-  }, [brand, productName, cacheKey])
+  }, [brand, productName, cacheKey, enabled])
 
   return imageUrl
+}
+
+function useInView(): [React.RefCallback<Element>, boolean] {
+  const [isInView, setIsInView] = useState(false)
+  const observerRef = useRef<IntersectionObserver | null>(null)
+
+  const ref = useCallback((node: Element | null) => {
+    if (observerRef.current) {
+      observerRef.current.disconnect()
+      observerRef.current = null
+    }
+    if (!node) return
+    observerRef.current = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true)
+          observerRef.current?.disconnect()
+        }
+      },
+      { rootMargin: '200px' },
+    )
+    observerRef.current.observe(node)
+  }, [])
+
+  return [ref, isInView]
 }
 
 export function ProductImage({ brand, name, seedImageUrl, category, className = 'w-16 h-16' }: {
@@ -72,22 +99,24 @@ export function ProductImage({ brand, name, seedImageUrl, category, className = 
   category?: ProductCategory | null
   className?: string
 }) {
-  const apiImageUrl = useProductImage(brand, name)
+  const [containerRef, isInView] = useInView()
+  const needsApiFetch = !seedImageUrl && isInView
+  const apiImageUrl = useProductImage(brand, name, needsApiFetch)
   const [imgError, setImgError] = useState(false)
   const imageUrl = seedImageUrl || apiImageUrl
 
-  if (imageUrl && !imgError) {
-    return (
-      <img
-        src={imageUrl}
-        alt={`${brand} ${name}`}
-        className={`${className} object-cover rounded-lg bg-gray-50`}
-        onError={() => setImgError(true)}
-      />
-    )
-  }
-
   return (
-    <ProductPlaceholder brand={brand} name={name} category={category} className={className} />
+    <div ref={containerRef} className={className}>
+      {imageUrl && !imgError ? (
+        <img
+          src={imageUrl}
+          alt={`${brand} ${name}`}
+          className="w-full h-full object-cover rounded-lg bg-gray-50"
+          onError={() => setImgError(true)}
+        />
+      ) : (
+        <ProductPlaceholder brand={brand} name={name} category={category} className="w-full h-full" />
+      )}
+    </div>
   )
 }

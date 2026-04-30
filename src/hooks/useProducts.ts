@@ -8,9 +8,13 @@ type ReviewWithProduct = ProductReview & { products: Product }
 const PRODUCT_SELECT = 'id,brand,name,category,ingredients,cg_status,flagged_ingredients,curlscan_status,isitcg_status,status_conflict,country_availability,price_range,protein_free,fragrance_free,key_ingredients,avg_rating,review_count,verified,submitted_by,image_url,notes,cruelty_free,created_at,updated_at'
 
 function dedupeProducts(products: Product[]): Product[] {
-  return products.filter((p, i, arr) =>
-    arr.findIndex(x => x.brand.toLowerCase() === p.brand.toLowerCase() && x.name.toLowerCase() === p.name.toLowerCase()) === i
-  )
+  const seen = new Map<string, boolean>()
+  return products.filter(p => {
+    const key = `${p.brand.toLowerCase()}::${p.name.toLowerCase()}`
+    if (seen.has(key)) return false
+    seen.set(key, true)
+    return true
+  })
 }
 
 function seedToProduct(seed: SeedProduct, index: number): Product {
@@ -95,6 +99,22 @@ export function useUserReviews(userId?: string) {
         .order('created_at', { ascending: false })
       if (error) throw error
       return (data as ReviewWithProduct[] | null) ?? []
+    },
+  })
+}
+
+export function useUserReviewCount(userId?: string) {
+  return useQuery({
+    queryKey: ['review-count', userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      if (!userId) return 0
+      const { count, error } = await supabase
+        .from('product_reviews')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', userId)
+      if (error) throw error
+      return count ?? 0
     },
   })
 }
