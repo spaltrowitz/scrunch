@@ -10,6 +10,8 @@ const PRODUCT_SELECT = 'id,brand,name,category,ingredients,cg_status,flagged_ing
 
 const REC_PRODUCT_SELECT = 'id,brand,name,category,cg_status,image_url,cruelty_free,ingredients,key_ingredients,protein_free,fragrance_free,avg_rating,review_count'
 
+const CATALOG_SELECT = 'id,brand,name,category,cg_status,image_url,cruelty_free,notes,country_availability'
+
 function dedupeProducts(products: Product[]): Product[] {
   const seen = new Map<string, boolean>()
   return products.filter(p => {
@@ -94,6 +96,33 @@ export function useRecommendationProducts() {
       }
     },
     placeholderData: recSeedPlaceholder,
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+const catalogSeedPlaceholder: { products: Product[]; isFallback: boolean } = {
+  products: SEED_PRODUCTS.map(seedToProduct),
+  isFallback: true,
+}
+
+export function useCatalogProducts() {
+  return useQuery({
+    queryKey: ['products', 'catalog'],
+    queryFn: async (): Promise<{ products: Product[]; isFallback: boolean }> => {
+      try {
+        const { data: rawData, error } = await supabase
+          .from('products')
+          .select(CATALOG_SELECT)
+        const data = rawData as unknown as Product[] | null
+        if (!error && data && data.length > 0) {
+          return { products: dedupeProducts(data), isFallback: false }
+        }
+        return { products: await loadSeedProducts(), isFallback: true }
+      } catch {
+        return { products: await loadSeedProducts(), isFallback: true }
+      }
+    },
+    placeholderData: catalogSeedPlaceholder,
     staleTime: 5 * 60 * 1000,
   })
 }

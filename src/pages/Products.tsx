@@ -7,7 +7,7 @@ import { FilterPanel } from '../components/products/FilterPanel'
 import { ProductCard } from '../components/products/ProductCard'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth'
-import { useProducts, useUserReviews } from '../hooks/useProducts'
+import { useCatalogProducts, useUserReviews } from '../hooks/useProducts'
 import { useToast } from '../hooks/useToast'
 
 type TriedRating = 'loved' | 'liked' | 'ok' | 'disliked'
@@ -62,7 +62,7 @@ export function Products() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
   const { addToast } = useToast()
-  const { data, isLoading: productsLoading, error: productsError } = useProducts()
+  const { data, isLoading: productsLoading, error: productsError } = useCatalogProducts()
   const products = data?.products ?? []
   const { data: userReviews = [], isLoading: reviewsLoading, error: reviewsError } = useUserReviews(user?.id)
   const loading = productsLoading && !productsError

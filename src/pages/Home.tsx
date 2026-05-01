@@ -84,15 +84,15 @@ export function Home() {
         </div>
       </section>
 
-      {/* Popular Products Teaser */}
+      {/* Products Teaser */}
       <section className="py-16 px-4 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              Popular Products
+              Explore Products
             </h2>
             <p className="text-gray-600">
-              Discover products loved by the community. Browse 410+ on our full catalog.
+              410+ curl-safe products from the community's most trusted brands.
             </p>
           </div>
 
