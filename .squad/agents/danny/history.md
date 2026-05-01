@@ -50,3 +50,10 @@
 - **Lesson:** When TypeScript types drift from the actual DB schema, the app can silently degrade. The `as unknown as Product[]` cast masked the real error. Consider using `supabase gen types` to keep types in sync with the actual schema.
 - **CORS verified:** Supabase correctly returns `access-control-allow-origin: https://spaltrowitz.github.io` — no CORS issues.
 - **RLS verified:** Anonymous reads work fine with the anon key — RLS policies allow public read on products.
+
+### 2026-05-02: Community Search Relevance Fix
+- **Root cause (relevance):** Two compounding issues — (1) long natural language queries confuse Reddit's search engine, returning popular posts instead of relevant ones; (2) results were re-sorted by upvote score (`sort by b.score - a.score`), destroying Reddit's relevance ordering and surfacing viral posts over topical matches.
+- **Fix (relevance):** Added `extractSearchTerms()` that strips stop words and limits to 6 key terms (e.g., "bangs wavy dry styling taylor swift" from a full paragraph). Removed the score-based re-sort — results now stay in Reddit's relevance order.
+- **Fix (summary honesty):** Replaced fake "AI Summary" (`generateAiAnswer`) with honest `generateSummary` — plain text like "Found 8 related discussions across r/curlyhair, r/wavyhair." No markdown, no pretend analysis. Badge changed from "🤖 AI Summary" to "📋 Community Results".
+- **Fix (markdown leaking):** Added `stripMarkdown()` utility that removes `**bold**`, `_italic_`, `> blockquotes`, `# headings`, `[links](url)`, and `` `code` `` from Reddit selftext snippets before display. Applied during result mapping.
+- **Lesson:** Reddit search works best with 4-6 keyword terms. Natural language queries return noise. Always extract terms before hitting their API.

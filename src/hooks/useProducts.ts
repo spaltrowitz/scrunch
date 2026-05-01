@@ -17,7 +17,7 @@ function dedupeProducts(products: Product[]): Product[] {
   })
 }
 
-function seedToProduct(seed: SeedProduct, index: number): Product {
+export function seedToProduct(seed: SeedProduct, index: number): Product {
   return {
     id: `seed-${index}`,
     brand: seed.brand,
@@ -67,6 +67,8 @@ export function useProducts() {
     },
   })
 }
+
+
 
 export function useProduct(id?: string) {
   return useQuery({

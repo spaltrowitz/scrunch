@@ -1,326 +1,160 @@
-import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { PRODUCT_CATEGORY_LABELS } from '../lib/constants'
-import type { ProductCategory, CgStatus } from '../lib/database.types'
 import { ProductImage } from '../hooks/useProductImage'
-import { useProducts } from '../hooks/useProducts'
-
-const CATEGORY_ICONS: Partial<Record<ProductCategory, string>> = {
-  low_poo: '🧴',
-  co_wash: '🫧',
-  rinse_out_conditioner: '💧',
-  deep_conditioner: '🧖‍♀️',
-  leave_in_conditioner: '✨',
-  curl_cream: '🍦',
-  gel: '💎',
-  mousse: '☁️',
-  oil_serum: '🫒',
-  spray_refresher: '💦',
-  clarifying_shampoo: '🫗',
-  custard: '🍮',
-  protein_treatment: '💪',
-  scalp_treatment: '🌿',
-}
-
-const CG_BADGE: Record<CgStatus, { label: string; className: string }> = {
-  approved: { label: 'Curl Safe ✓', className: 'bg-green-100 text-green-700' },
-  caution: { label: 'Caution', className: 'bg-amber-100 text-amber-700' },
-  not_approved: { label: 'Not Curl Safe', className: 'bg-red-100 text-red-700' },
-}
+import { useHomeProducts } from '../hooks/useHomeProducts'
 
 export function Home() {
-  const { data, isLoading, error } = useProducts()
+  const { data } = useHomeProducts()
   const products = data?.products ?? []
   const isFallback = data?.isFallback ?? false
-  const loading = isLoading && !error
-  const [selectedCategory, setSelectedCategory] = useState<ProductCategory | null>(null)
-  const [cgFilter, setCgFilter] = useState<CgStatus | ''>('')
-  const [brandFilter, setBrandFilter] = useState('')
-  const [showAllCategories, setShowAllCategories] = useState(false)
-
-  const clearFilters = () => {
-    setCgFilter('')
-    setSelectedCategory(null)
-    setBrandFilter('')
-  }
-
-  const brands = useMemo(() => {
-    const set = new Set(products.map(p => p.brand))
-    return [...set].sort()
-  }, [products])
-
-  const categoryCounts = useMemo(() => {
-    const counts: Partial<Record<ProductCategory, number>> = {}
-    for (const p of products) {
-      counts[p.category] = (counts[p.category] || 0) + 1
-    }
-    return counts
-  }, [products])
-
-  const sortedCategories = useMemo(() => {
-    return (Object.entries(PRODUCT_CATEGORY_LABELS) as [ProductCategory, string][])
-      .sort((a, b) => (categoryCounts[b[0]] || 0) - (categoryCounts[a[0]] || 0))
-  }, [categoryCounts])
-
-  const filteredProducts = useMemo(() => {
-    return products.filter(p => {
-      if (selectedCategory && p.category !== selectedCategory) return false
-      if (cgFilter && p.cg_status !== cgFilter) return false
-      if (brandFilter && p.brand !== brandFilter) return false
-      return true
-    })
-  }, [products, selectedCategory, cgFilter, brandFilter])
+  const featuredProducts = products.slice(0, 6)
 
   return (
     <div className="min-h-screen">
-      {/* Hero — clear value prop for first-time visitors */}
-      <section className="py-8 md:py-12 px-4 text-center bg-gradient-to-b from-violet-50 to-white">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
-          Find <span className="text-violet-600">curly hair products</span> that actually work
+      {/* Hero */}
+      <section className="min-h-screen flex flex-col items-center justify-center px-4 py-16 text-center bg-gradient-to-b from-violet-50 to-white">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight max-w-3xl">
+          Your curly hair deserves better than a Google spreadsheet.
         </h1>
-        <p className="text-sm text-gray-600 max-w-2xl mx-auto mb-5">
-          Scrunch is your personal curly hair assistant — search, check, and discover products the community loves.
+
+        <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl leading-relaxed">
+          Scrunch is your personal curly hair assistant. Instantly check if any product is curl-safe, discover what works for YOUR hair type, and learn from 400K+ community members. All in one place.
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto text-sm text-gray-700">
-          <div className="flex items-start justify-center gap-2">
-            <span className="text-lg">✅</span>
-            <span>Check any product's ingredients instantly</span>
-          </div>
-          <div className="flex items-start justify-center gap-2">
-            <span className="text-lg">💬</span>
-            <span>Get answers from 400K+ Reddit community members</span>
-          </div>
-          <div className="flex items-start justify-center gap-2">
-            <span className="text-lg">🎯</span>
-            <span>Personalized recommendations for your hair type</span>
-          </div>
-        </div>
+        <Link
+          to="/products"
+          className="px-8 py-4 min-h-[48px] flex items-center rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium text-lg transition-colors"
+        >
+          Explore Products →
+        </Link>
 
-        <div className="mt-6 flex flex-wrap gap-3 justify-center">
-          <Link
-            to="/ingredient-checker"
-            className="px-6 py-3 min-h-[44px] flex items-center rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium text-sm"
-          >
-            Check Your Products →
-          </Link>
-          <a
-            href="#categories"
-            className="px-6 py-3 min-h-[44px] flex items-center rounded-lg bg-gray-100 text-gray-900 no-underline hover:bg-gray-200 font-medium text-sm"
-          >
-            Browse Products ↓
-          </a>
-        </div>
+        <p className="text-xs md:text-sm text-gray-500 mt-12 max-w-2xl">
+          Built on data from r/curlyhair (339K members) · Powered by CurlScan, IsItCG, and CurlsBot
+        </p>
       </section>
 
-      {/* Fallback banner — visible when Supabase is down */}
+      {/* Fallback banner */}
       {isFallback && (
         <div className="bg-amber-50 border-b border-amber-200 text-amber-800 text-xs px-4 py-2 text-center">
           📡 Showing cached products — live database temporarily unavailable
         </div>
       )}
 
-      {/* Filter bar — always visible */}
-      <section className="sticky top-16 z-40 bg-white border-b border-gray-200 px-4 py-3 shadow-sm">
-        <div className="max-w-6xl mx-auto flex flex-wrap items-center gap-3">
-          <select
-            value={cgFilter}
-            onChange={e => setCgFilter(e.target.value as CgStatus | '')}
-            className="text-sm border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px] bg-white"
-            aria-label="Filter by curl safety"
-          >
-            <option value="">Curl Safety</option>
-            <option value="approved">Safe for Curls</option>
-            <option value="caution">Use with Caution</option>
-            <option value="not_approved">Not Curl Safe</option>
-          </select>
-
-          <select
-            value={selectedCategory || ''}
-            onChange={e => setSelectedCategory((e.target.value || null) as ProductCategory | null)}
-            className="text-sm border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px] bg-white"
-            aria-label="Filter by category"
-          >
-            <option value="">All Categories</option>
-            {sortedCategories.map(([key, label]) => (
-              <option key={key} value={key}>{label}</option>
-            ))}
-          </select>
-
-          <select
-            value={brandFilter}
-            onChange={e => setBrandFilter(e.target.value)}
-            className="text-sm border border-gray-300 rounded-lg px-3 py-2.5 min-h-[44px] bg-white"
-            aria-label="Filter by brand"
-          >
-            <option value="">All Brands</option>
-            {brands.map(b => (
-              <option key={b} value={b}>{b}</option>
-            ))}
-          </select>
-
-          {(cgFilter || selectedCategory || brandFilter) && (
-            <button
-              onClick={clearFilters}
-              className="text-sm text-violet-600 hover:text-violet-800 cursor-pointer min-h-[44px]"
+      {/* Feature 1 — Check Ingredients */}
+      <section className="py-20 px-4 border-b border-gray-200">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Check any ingredient list in seconds
+            </h2>
+            <p className="text-lg text-gray-600 mb-6 leading-relaxed">
+              Paste or upload a product label. Scrunch instantly tells you if it's curl-safe — backed by r/curlyhair community standards. No more guessing in the aisle.
+            </p>
+            <Link
+              to="/ingredient-checker"
+              className="inline-flex items-center px-6 py-3 min-h-[44px] rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors"
             >
-              Clear filters
-            </button>
-          )}
-
-          <div className="flex items-center gap-2 ml-auto">
-            <span className="text-xs text-gray-400" title="Price checking coming soon — compare prices on retailer sites for now">
-              💡 Prices vary by retailer
-            </span>
-            <span className="text-xs text-gray-500">
-              {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''}
-            </span>
+              Try Ingredient Checker →
+            </Link>
+          </div>
+          <div className="flex items-center justify-center h-64 bg-gray-100 rounded-lg text-6xl">
+            🔬
           </div>
         </div>
       </section>
 
-      {/* Feature Spotlight Row */}
-      <section className="max-w-6xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Link
-            to="/ingredient-checker"
-            className="flex flex-col items-center justify-center gap-3 p-6 rounded-lg border border-gray-200 hover:border-violet-300 hover:shadow-md transition-all no-underline hover:bg-violet-50"
-          >
-            <div className="text-5xl">🔬</div>
-            <h3 className="font-semibold text-base text-gray-900">Ingredient Checker</h3>
-            <p className="text-sm text-gray-600 text-center">Paste a product label, we'll tell you if it's curl-safe</p>
-            <span className="text-sm text-violet-600">Explore →</span>
-          </Link>
-
-          <Link
-            to="/community"
-            className="flex flex-col items-center justify-center gap-3 p-6 rounded-lg border border-gray-200 hover:border-violet-300 hover:shadow-md transition-all no-underline hover:bg-violet-50"
-          >
-            <div className="text-5xl">💬</div>
-            <h3 className="font-semibold text-base text-gray-900">Community Q&A</h3>
-            <p className="text-sm text-gray-600 text-center">Ask questions, see answers from 400K+ Redditors</p>
-            <span className="text-sm text-violet-600">Explore →</span>
-          </Link>
-
-          <Link
-            to="/recommendations"
-            className="flex flex-col items-center justify-center gap-3 p-6 rounded-lg border border-gray-200 hover:border-violet-300 hover:shadow-md transition-all no-underline hover:bg-violet-50"
-          >
-            <div className="text-5xl">🎯</div>
-            <h3 className="font-semibold text-base text-gray-900">Smart Recommendations</h3>
-            <p className="text-sm text-gray-600 text-center">Get personalized product picks based on your hair type</p>
-            <span className="text-sm text-violet-600">Explore →</span>
-          </Link>
+      {/* Feature 2 — Community (alternating layout) */}
+      <section className="py-20 px-4 border-b border-gray-200">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div className="flex items-center justify-center h-64 bg-gray-100 rounded-lg text-6xl md:order-1 order-2">
+            💬
+          </div>
+          <div className="md:order-2 order-1">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Learn from 400K+ curly heads
+            </h2>
+            <p className="text-lg text-gray-600 mb-6 leading-relaxed">
+              Stuck choosing between two products? Got a weird hair day? Ask in Community Q&A and get real answers from people who've been there.
+            </p>
+            <Link
+              to="/community"
+              className="inline-flex items-center px-6 py-3 min-h-[44px] rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors"
+            >
+              Visit Community Q&A →
+            </Link>
+          </div>
         </div>
       </section>
 
-      <div className="max-w-6xl mx-auto px-4 py-10">
-        {/* Category cards — shown when no filter is active, sorted by popularity */}
-        {!selectedCategory && !cgFilter && !brandFilter && (
-          <section id="categories" className="mb-10">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Browse by Category</h2>
-            <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {(showAllCategories ? sortedCategories : sortedCategories.slice(0, 8)).map(([key, label]) => (
-                <button
-                  key={key}
-                  onClick={() => setSelectedCategory(key)}
-                  className="flex flex-col items-center gap-1 p-4 rounded-xl border border-gray-200 hover:border-violet-300 hover:bg-violet-50 transition-colors cursor-pointer text-center min-h-[44px]"
-                >
-                  <span className="text-2xl">{CATEGORY_ICONS[key] || '📦'}</span>
-                  <span className="text-xs font-medium text-gray-800 leading-tight">{label}</span>
-                  <span className="text-xs text-gray-500">{categoryCounts[key] || 0}</span>
-                </button>
-              ))}
-            </div>
-            {!showAllCategories && sortedCategories.length > 6 && (
-              <div className="text-center mt-4">
-                <button
-                  onClick={() => setShowAllCategories(true)}
-                  className="text-sm text-violet-600 hover:text-violet-800 font-medium cursor-pointer"
-                >
-                  Show all categories →
-                </button>
-              </div>
-            )}
-          </section>
-        )}
+      {/* Feature 3 — Recommendations */}
+      <section className="py-20 px-4 border-b border-gray-200">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Personalized product picks based on YOUR hair
+            </h2>
+            <p className="text-lg text-gray-600 mb-6 leading-relaxed">
+              Not all curly hair is the same. Tell us about your waves, curls, or coils — Scrunch finds products that match your hair profile.
+            </p>
+            <Link
+              to="/recommendations"
+              className="inline-flex items-center px-6 py-3 min-h-[44px] rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors"
+            >
+              Get Recommendations →
+            </Link>
+          </div>
+          <div className="flex items-center justify-center h-64 bg-gray-100 rounded-lg text-6xl">
+            🎯
+          </div>
+        </div>
+      </section>
 
-        {/* Product grid */}
-        <section>
-          {selectedCategory && (
-            <div className="flex items-center gap-2 mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">
-                {PRODUCT_CATEGORY_LABELS[selectedCategory]}
-              </h2>
-            </div>
-          )}
+      {/* Popular Products Teaser */}
+      <section className="py-16 px-4 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+              Popular Products
+            </h2>
+            <p className="text-gray-600">
+              Discover products loved by the community. Browse 200+ more on our full catalog.
+            </p>
+          </div>
 
-          {loading ? (
-            <div className="text-center py-12 text-gray-500">Loading products…</div>
-          ) : filteredProducts.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-3xl mb-3">🔍</div>
-              <p className="text-gray-700 font-medium mb-1">No products match your filters</p>
-              <p className="text-sm text-gray-500 mb-4">
-                Try broadening your search or{' '}
-                <button onClick={clearFilters} className="text-violet-600 hover:underline cursor-pointer">
-                  clearing filters
-                </button>
-              </p>
-              <Link to="/products" className="text-sm text-violet-600 hover:underline no-underline">
-                Browse all products →
-              </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filteredProducts.slice(0, 12).map((product, i) => (
-                <Link
-                  key={product.id || `${product.brand}-${product.name}-${i}`}
-                  to={product.id ? `/products/${product.id}` : '/products'}
-                  className="flex gap-3 p-3 rounded-xl border border-gray-200 hover:border-violet-300 hover:shadow-sm transition-all no-underline group min-h-[44px]"
-                >
-                  <ProductImage
-                    brand={product.brand}
-                    name={product.name}
-                    seedImageUrl={product.image_url}
-                    className="w-14 h-14 shrink-0"
-                  />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-gray-900 truncate group-hover:text-violet-700">
-                      {product.name}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate">{product.brand}</p>
-                    <p className="text-[10px] text-violet-400 truncate">
-                      {PRODUCT_CATEGORY_LABELS[product.category]}
-                    </p>
-                    <div className="mt-1 flex items-center gap-1.5">
-                      <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${CG_BADGE[product.cg_status].className}`}>
-                        {CG_BADGE[product.cg_status].label}
-                      </span>
-                      {product.cruelty_free === 'yes' && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-pink-100 text-pink-700">🐰 CF</span>
-                      )}
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-
-          {filteredProducts.length > 12 && (
-            <div className="text-center mt-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+            {featuredProducts.map((product, i) => (
               <Link
-                to="/products"
-                className="text-sm text-violet-600 hover:text-violet-800 font-medium no-underline"
+                key={product.id || `${product.brand}-${product.name}-${i}`}
+                to={product.id ? `/products/${product.id}` : '/products'}
+                className="flex flex-col gap-2 p-3 rounded-lg border border-gray-200 bg-white hover:border-violet-300 hover:shadow-sm transition-all no-underline group"
               >
-                View all {filteredProducts.length} products →
+                <ProductImage
+                  brand={product.brand}
+                  name={product.name}
+                  seedImageUrl={product.image_url}
+                  className="w-full h-24 object-cover"
+                />
+                <p className="text-sm font-medium text-gray-900 truncate group-hover:text-violet-700">
+                  {product.name}
+                </p>
+                <p className="text-xs text-gray-500 truncate">{product.brand}</p>
               </Link>
-            </div>
-          )}
-        </section>
+            ))}
+          </div>
 
-        {/* New to curly hair — discoverable, not a gate */}
-        <section className="mt-12 p-6 rounded-2xl bg-violet-50 border border-violet-100">
+          <div className="text-center">
+            <Link
+              to="/products"
+              className="text-violet-600 hover:text-violet-800 font-medium no-underline"
+            >
+              See All Products →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* New to curly hair — discoverable closer */}
+      <section className="py-16 px-4">
+        <div className="max-w-3xl mx-auto p-8 rounded-2xl bg-violet-50 border border-violet-100">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <div className="text-3xl">🌱</div>
             <div className="flex-1">
@@ -336,8 +170,8 @@ export function Home() {
               Check Ingredients
             </Link>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </div>
   )
 }
