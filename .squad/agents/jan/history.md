@@ -65,3 +65,36 @@
 4. Add parallel entry points for each persona (not gates — paths)
 
 **Deliverable:** Full recommendations in `.squad/decisions/inbox/jan-homepage-ux.md`
+
+---
+
+## 2025-05-01: Homepage Value Prop Refresh — Design Spec
+
+**Context:** Shari feedback — homepage lacked clear value proposition, feature showcase, and call-to-action clarity.
+
+**What I analyzed:**
+- Current Home.tsx structure — hero + filters + category grid + product cards
+- Persona positioning — pills scattered, not integrated
+- Feature discoverability — ingredient checker is a link, not promoted as a key differentiator
+- Visual hierarchy — no narrative explaining why Scrunch vs. generic product browse
+
+**Design decisions:**
+1. **Enhanced hero section** — added tagline explaining Scrunch's role (personal assistant) + 3-line value prop bullets (ingredients, community, personalization). Kept existing tagline ("find curly hair products...") as the hook, replaced generic "200+ products" subtitle.
+
+2. **Feature Spotlight row** — 3 cards (Ingredient Checker, Community Q&A, Smart Recommendations) as horizontal cards between hero and category grid. Each card is a discoverable link, not a gate. Mobile stacks to 1 column.
+
+3. **Hero CTAs** — Added two buttons below value props: primary "Check Your Products" (violet), secondary "Browse Products" (gray). Gives first-time visitors a clear next action without forcing them.
+
+4. **Persona pills logic** — recognized that feature cards ARE persona-specific paths (Ingredient Checker = Store Scanner, Community = Newbie, Recommendations = Optimizer). No need to duplicate or hide — the feature cards replace scattered information.
+
+**Key principle applied:** Add narrative without adding visual clutter. The 2 new sections (hero value props + feature cards) replace scattered, less-coherent information. Net visual change: same or cleaner.
+
+**Deliverable:** Comprehensive spec with exact Tailwind classes, implementation code snippets, and accessibility notes. Ready for Frenchy to implement directly.
+
+**Why this works:**
+- Addresses Shari's feedback: visitor lands and immediately understands what Scrunch does, why it's different, and what to do
+- Respects "invisible onboarding" philosophy: feature cards are discoverable paths, not gates or forced flows
+- Mobile-first responsive design (stack on mobile, 3-col on desktop)
+- Maintains discovery-first homepage structure (products still visible immediately after scroll)
+- Builds trust: community badges + ingredient checking + personalization all visible above the fold
+
