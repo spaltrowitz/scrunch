@@ -100,3 +100,13 @@
 - **Removed**: sticky filter bar, category grid, "Show all categories" toggle, persona pills, old feature spotlight cards, 12-product grid, all filter state.
 - **Kept**: "New to curly hair?" CTA closer, Supabase fallback banner.
 - Page now ~2.5 scroll heights (was ~5-6). Build passes, 26/26 tests green.
+
+### Community Page UX Polish
+- Added `showSearchBox` state to collapse textarea after submission
+- After asking a question: textarea + suggested questions hide, replaced by compact "Ask another question" button
+- Added `fadeIn` CSS keyframe animation for result cards (opacity + slight slide-up)
+- Removed "📋 Community Results" badge — summary text now shows directly
+- Added ↗ icon after each Reddit post title to signal external links
+- Suggested questions only show before first search (hide along with textarea after submission)
+- **Avoided touching:** `extractSearchTerms()`, `searchReddit()`, `generateSummary()`, `stripMarkdown()` (Danny's domain)
+- Files changed: `src/pages/Community.tsx`, `src/index.css`
