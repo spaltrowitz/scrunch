@@ -143,3 +143,11 @@
 - Maintains discovery-first homepage structure (products still visible immediately after scroll)
 - Builds trust: community badges + ingredient checking + personalization all visible above the fold
 
+### 2026-07-15: Visual + Copy Polish Pass
+- **Footer must earn its space** — the footer had a donation CTA ("Buy my next curl cream"), a tagline ("wherever you scroll"), and no useful navigation. Stripped to tagline + 4 nav links. Support ask moved to About page as inline text link — much more tasteful.
+- **One mention is enough** — "holy grail" and "#HairTok" were repeated across hero subtitle, feature card descriptions, AND product section headers on the homepage. Consolidated to fewer, higher-impact placements.
+- **Remove non-functional UI** — Community page had a "Post to Scrunch community" button with a "coming soon" footnote. Dead buttons erode trust. Removed entirely until the feature exists.
+- **Redundant banners compete** — About page had both a "No ads, ever" banner AND a "Scrunch is free and ad-free" support CTA. Merged into one clean block.
+- **Copy verbosity scales with commitment** — hero/feature cards should be short (scanning mode). About page can be longer (reading mode). Shortened feature card descriptions that were trying to explain too much.
+- **Pre-existing TS errors can silently block deploys** — `noUnusedLocals` errors in Products.tsx and Recommendations.tsx were passing `npm run build` locally (unclear caching) but failing in `npm run deploy`. Always verify deploy works, not just build.
+
