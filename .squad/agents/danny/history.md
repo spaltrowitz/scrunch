@@ -42,3 +42,11 @@
 - **Already fixed (no changes needed)**: Recommendations `rateMutation` and ProductDetail `submitRatingMutation` both already use `queryClient.invalidateQueries()` with proper query keys — no manual re-fetch happening.
 - **Collaborative filtering**: Confirmed the 3 sequential queries (profiles → reviews → products) have true data dependencies — each query's parameters depend on the previous result. Cannot be parallelized without restructuring the algorithm.
 - **Pattern established**: For count-only use cases, always use `select('id', { count: 'exact', head: true })` and read the `count` from the response instead of fetching rows and using `.length`.
+
+### 2026-05-01: Supabase Fallback Banner Fix
+- **Root cause:** The `PRODUCT_SELECT` string in `useProducts.ts` included a `status_conflict` column that doesn't exist in the Supabase `products` table. PostgREST returned error code 42703 ("column does not exist"), which the query handler treated as a failure and fell back to seed data.
+- **Why curl worked:** Direct curl without the bad column select returned data fine. The issue was specifically in the column list the app was requesting.
+- **Fix:** Removed `status_conflict` from the select string, the Product type interface, the seedToProduct mapper, and the Database type definitions.
+- **Lesson:** When TypeScript types drift from the actual DB schema, the app can silently degrade. The `as unknown as Product[]` cast masked the real error. Consider using `supabase gen types` to keep types in sync with the actual schema.
+- **CORS verified:** Supabase correctly returns `access-control-allow-origin: https://spaltrowitz.github.io` — no CORS issues.
+- **RLS verified:** Anonymous reads work fine with the anon key — RLS policies allow public read on products.

@@ -145,3 +145,93 @@ Danny optimized backend data fetching and established patterns for the team:
 **Key Learning:** Supabase query optimization doesn't require new libraries — just using the API correctly (head:true, explicit columns, parallel fetches).
 
 **Build Status:** ✅ Build passes. All tests passing. Patterns reviewed and approved for team adoption.
+
+---
+
+## Agent: Frenchy (Frontend)
+
+**Task:** Simplify busy homepage  
+**Outcome:** Cut categories from 14→6 default, products from 40→12, moved persona pills. Build+tests pass.
+
+### Summary
+Frenchy implemented progressive disclosure on the homepage to reduce cognitive load:
+
+**Changes:**
+- Categories grid reduced from 14 always-visible to 6 default (expandable to all 14)
+- Products grid reduced from 40 to 12 initial products (scroll for more)
+- Persona pills repositioned from top to secondary navigation below categories
+- All functionality preserved — nothing removed, just progressive disclosure
+
+**Reasoning:** Homepage was visually overwhelming. Hick's Law — too many choices paralyzes users. New pattern lets users see most popular content immediately and drill deeper if interested.
+
+**Files Modified:** Home.tsx (progressive disclosure logic)
+
+**Build Status:** ✅ Build passes. All tests passing.
+
+---
+
+## Agent: Frenchy (Frontend)
+
+**Task:** Consolidate About page  
+**Outcome:** 219→121 lines. Merged sections, killed roadmap, collapsible credits. Build+tests pass.
+
+### Summary
+Frenchy refactored the About page for clarity and maintainability:
+
+**Changes:**
+- Reduced About.tsx from 219 lines to 121 lines (45% reduction)
+- Merged redundant sections
+- Removed roadmap section (out of scope for current project phase)
+- Credits section converted to collapsible accordion
+
+**Result:** Page is now more scannable and focused on core mission without losing any essential information.
+
+**Files Modified:** About.tsx (consolidation + collapsible credits)
+
+**Build Status:** ✅ Build passes. All tests passing.
+
+---
+
+## Agent: Danny (Backend)
+
+**Task:** Debug Supabase fallback on GitHub Pages  
+**Outcome:** Found phantom status_conflict column in PRODUCT_SELECT causing PostgREST error → silent fallback. Removed from query, type, and seed mapper. Build passes.
+
+### Summary
+Danny diagnosed and fixed a production issue causing the fallback banner to appear on spaltrowitz.github.io/scrunch:
+
+**Root Cause:** `status_conflict` column was defined in the TypeScript Product type but never created in the Supabase schema. When the query tried to select it, PostgREST returned an error silently caught by the fallback logic, showing cached products instead of live data.
+
+**Fix Applied:**
+- Removed `status_conflict` from Product TypeScript interface
+- Removed from all `select()` queries
+- Removed from seed data mapper
+
+**Prevention:** Team should run `supabase gen types` periodically to catch type/schema mismatches before they reach production.
+
+**Files Modified:** types.ts, queries (useProducts), seedProducts.ts
+
+**Build Status:** ✅ Build passes.
+
+---
+
+## Agent: Danny (Backend)
+
+**Task:** Add r/wavyhair subreddit  
+**Outcome:** Added to Community.tsx subreddits array, search links, badge text. Added to Credits.tsx. Build passes.
+
+### Summary
+Danny expanded the community features to include the wavy hair subreddit:
+
+**Changes:**
+- Added r/wavyhair to Community.tsx subreddits array with proper metadata
+- Updated search links to include r/wavyhair queries
+- Added appropriate badge text and styling
+- Added r/wavyhair credit to Credits.tsx
+
+**Impact:** Users can now access wavy hair community conversations alongside curly hair resources.
+
+**Files Modified:** Community.tsx, Credits.tsx
+
+**Build Status:** ✅ Build passes.
+

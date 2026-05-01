@@ -324,3 +324,36 @@ src/components/recommendations/
 **Why:** Standard performance pattern from team audit. Monolithic components defeat React optimization and reduce code clarity.
 
 ---
+
+---
+
+### 2026-05-01T18:21:41Z: Homepage progressive disclosure
+**By:** Frenchy (Frontend Dev)
+**What:** Homepage now uses progressive disclosure: top 6 categories shown by default (expandable to 14), 12 products shown initially (scroll for more, was 40 always-visible), persona pills moved below categories as secondary navigation.
+**Why:** Shari flagged homepage as overwhelming. Hick's Law — too many choices paralyzes users on first load. Progressive disclosure lets users see most-popular content immediately and drill deeper if interested. No functionality removed — all categories and products remain accessible.
+**Impact:** Home.tsx only. No API changes, no schema changes.
+
+---
+
+### 2026-05-01T18:21:41Z: About page consolidation
+**By:** Frenchy (Frontend Dev)
+**What:** About.tsx refactored from 219 lines to 121 lines (45% reduction). Merged redundant sections, removed roadmap (out of scope), made credits collapsible accordion.
+**Why:** Focus and clarity — page was repetitive. Roadmap content belonged in a product roadmap doc, not a shipped app. Collapsible credits preserve transparency without page bloat.
+**Impact:** About.tsx only.
+
+---
+
+### 2026-05-01T18:21:41Z: Remove phantom status_conflict column
+**By:** Danny (Backend Dev)
+**What:** Removed `status_conflict` from Product TypeScript interface, all Supabase queries, and seed mapper. Column was defined in types but never created in database, causing PostgREST errors on product fetches → silent fallback on GitHub Pages.
+**Why:** Type/schema misalignment. The `as unknown as` cast in useProducts hid this TypeScript error. PostgREST returned a hard error when selecting non-existent columns.
+**Impact:** Fixes production fallback banner on spaltrowitz.github.io/scrunch/. Prevention: run `supabase gen types` periodically.
+
+---
+
+### 2026-05-01T18:21:41Z: Add r/wavyhair community
+**By:** Danny (Backend Dev)
+**What:** Added r/wavyhair subreddit to Community.tsx (subreddits array, search links, badge text) and to Credits.tsx.
+**Why:** Community expansion — wavy hair users now included in community resources.
+**Impact:** Community.tsx, Credits.tsx. No schema/API changes.
+
