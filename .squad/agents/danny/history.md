@@ -129,3 +129,16 @@ Beta must-fix sprint (6 items) now complete across Frenchy + Danny. Scribe docum
 - **7 products recategorized:** 3 bond-repair products (Olaplex No. 3, K18 Leave-In, Curlsmith Bond Curl Rehab Salve) moved from `protein_treatment` → `bond_repair`. 4 scalp-focused oils (As I Am Dry Itchy, Hollywood Beauty Tea Tree, Mielle Rosemary Mint, Eden Bodyworks Peppermint) moved from `oil_serum` → `scalp_care`.
 - **1 duplicate removed:** Acure Dry Shampoo appeared at line 292 (with image URL) and line 398 (without). Kept the one with the image.
 - **Lesson:** Bond-repair products (Olaplex, K18, bond rehab) are mechanistically different from protein treatments — they work on disulfide bonds, not keratin reinforcement. Scalp-targeted oils belong in `scalp_care` even if they're technically oils — category should reflect primary use case, not product format.
+
+### 2025-07-25: Product Image Sourcing (Phase 3) — 64/69 Found
+- **Result:** Applied 64 verified product image URLs to seedProducts.ts. 5 products remain imageless (discontinued/unavailable: Monday Curl Define, TJ Conditioner, Ouai Hydrating Cream, Cantu Flaxseed Oil, SM Coconut Oil).
+- **Total catalog coverage:** Now ~98% of products have images (only 5 null out of ~280 products).
+- **Best image source: INCIDecoder GCS** (`incidecoder-content.storage.googleapis.com`) — covers nearly every hair product with clean product-on-white photos. Consistent URL pattern, no hotlinking blocks, good image quality. This is the go-to source for future image sourcing.
+- **Ulta media CDN** (`media.ulta.com/i/ulta/{sku}?w=400`) — works well for products currently sold at Ulta. Catches: (1) returns a specific placeholder image for unavailable SKUs (md5 hash `43eed7447d66573a67e2bc6e10858ab5` at `?w=400`), (2) without `?w=400` returns a tiny 4572-byte thumbnail. Always append `?w=400` and verify against placeholder hash.
+- **Sephora CDN** (`sephora.com/productimages/sku/s{id}-main-zoom.jpg?imwidth=612`) — works reliably but finding the SKU ID requires fetching the product page HTML and extracting from `<link rel="preload">` tag. Sephora blocks automated access after a few requests.
+- **Sally Beauty Scene7** (`s7d9.scene7.com/is/image/SallyBeauty/{sku}`) — good for salon/professional products (Beyond the Zone, Hask, Nutress, Ion).
+- **Garnier USA CDN** — direct CDN URLs from garnierusa.com work for all Garnier/Fructis products.
+- **Shopify brand stores** — best for indie/DTC brands (Harry's, Taliah Waajid, Nature Spell, Bed Head, Vanicream retailers).
+- **Sources that DON'T work:** Amazon (403), Walmart (404 on direct image URLs), Target scene7 (403), SheaMoisture.com (403 on Demandware CDN), brand sites using JS rendering (most return empty og:image).
+- **Open Beauty Facts** — near-zero coverage for curly hair products. Only found 1 out of 69 searches (Batiste). Not useful for this category.
+- **Lesson:** For bulk image sourcing, check INCIDecoder first (highest hit rate), then Ulta media CDN (for mainstream products), then Sephora (for prestige brands), then Sally Beauty (for professional brands). Always verify URLs return real images, not placeholders.
