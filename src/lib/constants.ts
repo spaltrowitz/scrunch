@@ -37,6 +37,7 @@ export const POROSITY_OPTIONS: { value: Porosity; label: string; description: st
 
 export const PRODUCT_CATEGORY_LABELS: Record<ProductCategory, string> = {
   clarifying_shampoo: 'Clarifying Shampoo',
+  dry_shampoo: 'Dry Shampoo',
   low_poo: 'Low-Poo (Sulfate-Free Shampoo)',
   co_wash: 'Co-Wash',
   rinse_out_conditioner: 'Rinse-Out Conditioner',
@@ -54,6 +55,7 @@ export const PRODUCT_CATEGORY_LABELS: Record<ProductCategory, string> = {
 
 export const PRODUCT_CATEGORY_DESCRIPTIONS: Record<ProductCategory, string> = {
   clarifying_shampoo: 'Contains sulfates to remove buildup. Use as your first wash when starting CG, then infrequently as needed.',
+  dry_shampoo: 'Powder or spray that absorbs oil between wash days. Extends time between washes. Check ingredients — many contain non-CG alcohols or silicones.',
   low_poo: 'Gentle, sulfate-free shampoo. Good for low porosity, fine hair, and loose curls that need cleansing without stripping.',
   co_wash: 'Conditioner-based cleansing — replaces shampoo in the CG method. Great for high porosity, coarse, and tight curls.',
   rinse_out_conditioner: 'Standard conditioner for detangling and moisture. Almost everyone benefits from these. Can double as co-wash or leave-in.',
