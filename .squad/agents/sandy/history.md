@@ -40,3 +40,13 @@
   - Mutation errors are console-only (no user-facing toast) — acceptable for beta, should add before launch.
   - All 6 performance standards from team audit are implemented: React Query, named columns, lazy routes, dynamic seed import, component decomposition, count queries.
   - Zero `select('*')` calls remain. Zero raw useEffect data fetching patterns remain.
+
+### 2026-07-17: PR Merge Batch (#9, #12, #15)
+
+- **PR #12** (dry_shampoo category + Acure Dry Shampoo): Clean, minimal diff. Added category to type, constants, copilot instructions, and one seed product. Merged immediately. Issue #10 auto-closed.
+- **PR #15** (custom brand ingredient matching): Substantial feature — hero ingredients, onboarding step 7, custom brand recommendation tier. Had significant conflicts with React Query migration (pre-#13 code). Rebased and reconciled: adapted useState/useEffect patterns to use existing React Query hooks (useProducts, useUserProfile, useUserReviews) and useMemo. Merged. No associated issue.
+- **PR #9** (B&B Curl Cream + brand scan pipeline): Larger scope than title suggests — includes brand scan workflow, Supabase edge functions, email notifications, and copilot instructions. Had conflicts in seedProducts.ts, Recommendations.tsx, RequestProductForm.tsx, and copilot-instructions.md. Resolved by keeping HEAD's React Query architecture and image sourcing policy, adding PR's brand scan instructions and new infrastructure. Dropped requestedProducts feature from Recommendations (used old useState pattern — needs re-implementation with React Query hooks). Merged. Issue #8 auto-closed.
+- **Key decision:** When PRs conflict with architectural migrations (React Query), resolve by adapting incoming code to the new architecture rather than reverting the migration. Drop features that can't be cleanly adapted and flag them for re-implementation.
+
+### 2026-05-01: Toast System Wired by Frenchy
+- Frenchy completed toast notification system addressing Sandy's code review note #2. All 7 mutations wired (ProductDetail, Products, Recommendations, OnboardingWizard). Convention established: all future mutations must include success/error toast feedback. Build/tests clean.

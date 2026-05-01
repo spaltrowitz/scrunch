@@ -59,3 +59,23 @@
 - All filter selects and buttons now have `min-h-[44px]` for mobile touch targets
 - ProductPlaceholder text changed from "Image coming soon" to "No image" (no timeline = don't promise)
 - Build passes, 26/26 tests green
+
+### Toast Notification System (2026-05-01)
+- Created `src/hooks/useToast.tsx` — React context with `ToastProvider` and `useToast()` hook
+- Created `src/components/ui/ToastContainer.tsx` — renders stacked toasts with slide-up animation
+- Toast types: success (green), error (red), info (blue) with auto-dismiss at 4s and manual close
+- Position: bottom-right on desktop, bottom-center on mobile (responsive via `max-sm:` Tailwind)
+- Added `ToastProvider` wrapper in `App.tsx` around the entire app
+- Wired toast feedback to all 7 `useMutation` calls across 4 files:
+  - `ProductDetail.tsx`: review submit (1 mutation)
+  - `Products.tsx`: delete review, upsert rating, upsert note (3 mutations)
+  - `Recommendations.tsx`: rate product, dismiss product (2 mutations)
+  - `OnboardingWizard.tsx`: save profile (1 mutation)
+- Every mutation now shows success confirmation or error message to the user
+- Addresses Sandy's code review note #2 from PR #13 approval
+- Build passes, 26/26 tests green
+
+### Cross-team context (2026-05-01)
+- Sandy merged 3 PRs this batch; PR #9 and #15 required rebasing to React Query patterns per architecture-first conflict resolution policy
+- Cha-Cha decomposed Recommendations.tsx (1173→399 lines) with memo-wrapped sub-components
+- Toast system establishes pattern for all future mutation feedback
