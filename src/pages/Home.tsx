@@ -13,7 +13,7 @@ export function Home() {
       {/* Hero */}
       <section className="flex flex-col items-center justify-center px-4 py-16 md:py-24 text-center bg-gradient-to-b from-violet-50 to-white">
         <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight max-w-2xl">
-          Your curly hair deserves better than a Google spreadsheet.
+          Finally, one place for curly hair that actually works.
         </h1>
 
         <p className="text-sm md:text-base text-gray-600 mb-6 max-w-xl leading-relaxed">
