@@ -165,3 +165,60 @@
 - Next action: Frame new categories as "especially for wavies (2A–2C)" when launching.
 
 **Outcome:** Decision merged into decisions.md. Awaiting PM approval on new categories + research verification on 3 products before implementation.
+
+---
+
+### 2026-05-02: Product Categorization Audit — Seed Catalog
+
+**Context:** Shari noticed low counts in certain categories (bond_repair: 1, scalp_care: 3, dry_shampoo: 6). Requested full audit of seedProducts.ts to identify miscategorized and missing products.
+
+**Methodology:**
+- Reviewed all 299 products across 16 categories
+- Focused on thin categories and category name patterns
+- Cross-referenced with domain knowledge + #HairTok trends
+- Checked for products that could move OR should be added
+
+**Key Findings:**
+
+#### A. Critical Miscategorizations (7 moves needed)
+
+**Bond repair products in protein_treatment:**
+- Olaplex No. 3 Hair Perfector ❌ Should be: bond_repair
+- K18 Leave-In Molecular Repair Hair Mask ❌ Should be: bond_repair
+- Curlsmith Bond Curl Rehab Salve ❌ Should be: bond_repair
+
+**Scalp care products in oil_serum:**
+- As I Am Dry Itchy Scalp Care Oil ❌ Should be: scalp_care
+- Hollywood Beauty Tea Tree Skin & Scalp Oil ❌ Should be: scalp_care
+- Mielle Rosemary Mint Scalp & Hair Strengthening Oil ❌ Should be: scalp_care
+- Eden Bodyworks Peppermint Tea Tree Hair Oil ❌ Should be: scalp_care
+
+**Root cause:** Product marketing is inconsistent. Oils can serve dual purposes (sealing moisture OR targeting scalp). When product name explicitly says "scalp," it belongs in scalp_care. Similarly, bond-repair products need their own category, not protein_treatment (which should be for strengthening proteins only).
+
+#### B. Categories Needing Expansion
+
+**bond_repair (currently 1 → should be 4-5):**
+- Add: Olaplex No. 0 Intensive Bond Building Treatment
+- Add: SheaMoisture Bond Maintainer Strengthening Conditioner
+
+**scalp_care (currently 3 → should be 8-9):**
+- Add: Dr. Jart+ Cicapair Cream
+- Add: Innersense Yucca Baobab Scalp Oil
+- Add: SheaMoisture Raw Shea Butter Restorative Shea & Argan Oil
+
+**dry_shampoo (currently 6 → should be 8-9):**
+- Add: Bumble and Bumble Dry Shampoo
+- Add: Davines Dry Shampoo
+
+#### C. Data Quality Issue
+
+- Acure Dry Shampoo appears 2x (identical entries) — recommend consolidating into 1 entry
+
+#### D. Secondary Finding
+
+- Briogeo Don't Despair Repair (in deep_conditioner) should arguably move to bond_repair based on primary function (post-color repair), not just deep conditioning. Currently marked as #HairTok trending but categorized as conditioning rather than repair.
+
+**Strategic Insight:**
+The thin categories reveal a real gap: users are actively seeking bond repair + scalp care on #HairTok, but we bury these under other categories. The "Optimizer" persona especially needs accessible bond repair options (K18, Olaplex are table stakes). Wavies need scalp care above all else.
+
+**Deliverable:** Full audit report saved to AUDIT_REPORT.md with specific product moves, reasons, and implementation notes for Danny.

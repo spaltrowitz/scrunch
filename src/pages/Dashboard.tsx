@@ -4,10 +4,9 @@ import { useUserProfile, useUserReviewCount } from '../hooks/useProducts'
 
 export function Dashboard() {
   const { user } = useAuth()
-  const { data: profile, isLoading: profileLoading, error: profileError } = useUserProfile(user?.id)
-  const { data: reviewCount = 0, isLoading: countLoading, error: countError } = useUserReviewCount(user?.id)
-  const loading = (profileLoading || countLoading) && !(profileError || countError)
-  const profileComplete = user ? !!profile?.onboarding_completed && !!profile?.porosity : null
+  const { data: profile } = useUserProfile(user?.id)
+  const { data: reviewCount = 0 } = useUserReviewCount(user?.id)
+  const profileComplete = profile ? !!profile.onboarding_completed && !!profile.porosity : false
   const ratingCount = reviewCount
   const cgmExperience = profile?.cgm_experience ?? null
 
@@ -15,10 +14,10 @@ export function Dashboard() {
     || user?.email?.split('@')[0]
     || 'friend'
 
-  // Still loading
-  if (loading || profileComplete === null) return (
+  // Not logged in
+  if (!user) return (
     <div className="max-w-3xl mx-auto px-4 py-12">
-      <p className="text-gray-500 animate-pulse">Loading...</p>
+      <p className="text-gray-500">Sign in to see your dashboard.</p>
     </div>
   )
 

@@ -47,5 +47,6 @@ export function useHomeProducts() {
       }
     },
     placeholderData: seedPlaceholder,
+    staleTime: 5 * 60 * 1000,
   })
 }

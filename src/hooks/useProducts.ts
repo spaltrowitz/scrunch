@@ -55,6 +55,11 @@ async function loadSeedProducts(): Promise<Product[]> {
   return dedupeProducts(SEED_PRODUCTS.map(seedToProduct))
 }
 
+const fullSeedPlaceholder: { products: Product[]; isFallback: boolean } = {
+  products: SEED_PRODUCTS.map(seedToProduct),
+  isFallback: true,
+}
+
 export function useProducts() {
   return useQuery({
     queryKey: ['products'],
@@ -70,6 +75,8 @@ export function useProducts() {
         return { products: await loadSeedProducts(), isFallback: true }
       }
     },
+    placeholderData: fullSeedPlaceholder,
+    staleTime: 5 * 60 * 1000,
   })
 }
 
@@ -141,6 +148,7 @@ export function useProduct(id?: string) {
       if (error) return null
       return data as unknown as Product
     },
+    staleTime: 5 * 60 * 1000,
   })
 }
 
@@ -158,6 +166,8 @@ export function useUserReviews(userId?: string) {
       if (error) throw error
       return (data as ReviewWithProduct[] | null) ?? []
     },
+    placeholderData: [],
+    staleTime: 5 * 60 * 1000,
   })
 }
 
@@ -174,6 +184,8 @@ export function useUserReviewCount(userId?: string) {
       if (error) throw error
       return count ?? 0
     },
+    placeholderData: 0,
+    staleTime: 5 * 60 * 1000,
   })
 }
 
@@ -191,5 +203,6 @@ export function useUserProfile(userId?: string) {
       if (error) throw error
       return data as unknown as Profile
     },
+    staleTime: 5 * 60 * 1000,
   })
 }
