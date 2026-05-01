@@ -9,6 +9,7 @@ export interface SeedProduct {
   cruelty_free: 'yes' | 'no' | 'unclear' | null
   notes: string | null
   image_url: string | null
+  hairtok_trending?: boolean
 }
 
 // Compute Scrunch Score from product data
@@ -109,7 +110,7 @@ export const SEED_PRODUCTS: SeedProduct[] = [
 
   // ── DEEP CONDITIONER ────────────────────────────────────────────────
   { brand: 'Aussie', name: '3 Minute Miracle Moist Deep', category: 'deep_conditioner', cg_status: 'not_approved', cruelty_free: 'yes', notes: 'PETA. Contains silicone and drying alcohol', image_url: 'https://images.openbeautyfacts.org/images/products/006/640/017/2815/front_en.8.400.jpg' },
-  { brand: 'Briogeo', name: "Don't Despair Repair!", category: 'deep_conditioner', cg_status: 'not_approved', cruelty_free: 'unclear', notes: 'CF but owned by Wella. Drying alcohol', image_url: 'https://cdn.shopify.com/s/files/1/0905/3204/products/ddr-mask-full-size-1.jpg?v=1762439465' },
+  { brand: 'Briogeo', name: "Don't Despair Repair!", category: 'deep_conditioner', cg_status: 'not_approved', cruelty_free: 'unclear', notes: 'CF but owned by Wella. Drying alcohol. #HairTok favorite for deep conditioning', image_url: 'https://cdn.shopify.com/s/files/1/0905/3204/products/ddr-mask-full-size-1.jpg?v=1762439465', hairtok_trending: true },
   { brand: 'Camille Rose', name: 'Algae Renew', category: 'deep_conditioner', cg_status: 'approved', cruelty_free: 'unclear', notes: null, image_url: 'https://cdn.shopify.com/s/files/1/0980/9736/files/ProductCard_Signature_AlgaeRenew.webp?v=1772792750' },
   { brand: 'Jessicurl', name: 'Deep Conditioning Treatment', category: 'deep_conditioner', cg_status: 'approved', cruelty_free: 'yes', notes: 'PETA/V. No added fragrance option. Sample sizes available', image_url: 'https://jessicurl.com/cdn/shop/files/DT-N3TubeLogoUpdateShot.png' },
   { brand: 'Mielle', name: 'Babassu & Mint Deep Conditioner', category: 'deep_conditioner', cg_status: 'not_approved', cruelty_free: 'unclear', notes: 'Site claims no animal testing. Drying alcohol', image_url: 'https://cdn.shopify.com/s/files/1/0763/8199/files/Packshot_Mielle_SHAseal_BabMint_DeepCond_8oz_En_80835620_2048px.jpg?v=1759329346' },
@@ -148,7 +149,7 @@ export const SEED_PRODUCTS: SeedProduct[] = [
   { brand: 'Ouai', name: 'Hydrating Cream', category: 'curl_cream', cg_status: 'not_approved', cruelty_free: null, notes: 'Fragrance free option. Contains drying alcohol', image_url: null },
   { brand: 'Ouidad', name: 'Featherlight Styling Cream', category: 'curl_cream', cg_status: 'not_approved', cruelty_free: null, notes: 'Contains silicone and drying alcohol', image_url: 'https://cdn.shopify.com/s/files/1/0610/4488/3714/files/ACC-Featherlight-1_2x_43afb712-864c-46b0-a856-5401732cfd00.png?v=1774894634' },
   { brand: 'Pacifica', name: 'Pineapple Swirl Curl Defining Cream', category: 'curl_cream', cg_status: 'approved', cruelty_free: 'yes', notes: 'PETA/V', image_url: 'https://www.pacificabeauty.com/cdn/shop/files/1_b12d89a4-8f95-4e52-84c7-de91847a11d6.jpg' },
-  { brand: 'Rizos Curls', name: 'Curl Defining Cream', category: 'curl_cream', cg_status: 'not_approved', cruelty_free: null, notes: 'Contains wax', image_url: 'https://cdn.shopify.com/s/files/1/1822/5087/files/RizosCurls_CurlDefiningCream_AloeVera_DeepNourish.webp?v=1762457438' },
+  { brand: 'Rizos Curls', name: 'Curl Defining Cream', category: 'curl_cream', cg_status: 'not_approved', cruelty_free: null, notes: 'Contains wax. #HairTok recommended styling cream', image_url: 'https://cdn.shopify.com/s/files/1/1822/5087/files/RizosCurls_CurlDefiningCream_AloeVera_DeepNourish.webp?v=1762457438', hairtok_trending: true },
   { brand: 'Seen', name: 'Curly Cream', category: 'curl_cream', cg_status: 'approved', cruelty_free: null, notes: 'Fragrance-free', image_url: 'https://cdn.shopify.com/s/files/1/0016/5144/1717/files/0053_CurlyCreme_FragranceFree_Front-_REG_97e881e1-4b51-4923-a078-88512618eff2.webp?v=1746083838' },
   { brand: 'SheaMoisture', name: 'Coconut & Hibiscus Curl Enhancing Smoothie', category: 'curl_cream', cg_status: 'approved', cruelty_free: 'yes', notes: 'CFK/PETA', image_url: 'https://images.openbeautyfacts.org/images/products/764/302/221/0366/front_nl.8.400.jpg' },
   { brand: 'Taliah Waajid', name: 'Curly Curl Cream', category: 'curl_cream', cg_status: 'approved', cruelty_free: 'unclear', notes: 'Site claims no animal testing', image_url: null },
@@ -235,7 +236,7 @@ export const SEED_PRODUCTS: SeedProduct[] = [
   { brand: 'Hollywood Beauty', name: 'Tea Tree Skin & Scalp Oil', category: 'oil_serum', cg_status: 'approved', cruelty_free: null, notes: null, image_url: 'https://hollywoodbeautyproducts.com/cdn/shop/files/45836005904_HB_TeaTreeOil_2ozBottle_FRONT.jpg?v=1758551388' },
   { brand: 'Hollywood Beauty', name: 'Jojoba Hair Oil', category: 'oil_serum', cg_status: 'approved', cruelty_free: null, notes: null, image_url: 'https://hollywoodbeautyproducts.com/cdn/shop/products/Organic-Jojoba-Oil.jpg?v=1676068140' },
   { brand: 'Hollywood Beauty', name: 'Jamaican Black Castor Hair Oil', category: 'oil_serum', cg_status: 'approved', cruelty_free: null, notes: null, image_url: 'https://hollywoodbeautyproducts.com/cdn/shop/files/45836005775_HB_JamaicanBlackCastorOil_2ozBottle_FRONT.jpg?v=1758637788' },
-  { brand: 'Mielle', name: 'Rosemary Mint Scalp & Hair Strengthening Oil', category: 'oil_serum', cg_status: 'approved', cruelty_free: 'unclear', notes: 'Site claims no animal testing', image_url: 'https://cdn.shopify.com/s/files/1/0763/8199/files/Rosemary_Oil_SHAcopy.jpg?v=1764011088' },
+  { brand: 'Mielle', name: 'Rosemary Mint Scalp & Hair Strengthening Oil', category: 'oil_serum', cg_status: 'approved', cruelty_free: 'unclear', notes: 'Site claims no animal testing. Trending on #HairTok for scalp care and hair growth', image_url: 'https://cdn.shopify.com/s/files/1/0763/8199/files/Rosemary_Oil_SHAcopy.jpg?v=1764011088', hairtok_trending: true },
   { brand: 'Mielle', name: 'Mint Almond Oil', category: 'oil_serum', cg_status: 'approved', cruelty_free: 'unclear', notes: 'Site claims no animal testing', image_url: 'https://cdn.shopify.com/s/files/1/0763/8199/products/MIELLE_ORGANICS_MINT_ALMOND_OIL_8OZ_159505819.jpg?v=1747830333' },
   { brand: 'SheaMoisture', name: '100% Pure Argan Oil', category: 'oil_serum', cg_status: 'approved', cruelty_free: 'yes', notes: 'CFK/PETA', image_url: null },
   { brand: 'SheaMoisture', name: 'Extra Virgin Coconut Oil', category: 'oil_serum', cg_status: 'approved', cruelty_free: 'yes', notes: 'CFK/PETA', image_url: null },
@@ -250,9 +251,9 @@ export const SEED_PRODUCTS: SeedProduct[] = [
   { brand: 'Curlsmith', name: 'Bond Curl Rehab Salve', category: 'protein_treatment', cg_status: 'approved', cruelty_free: 'yes', notes: 'CFK', image_url: 'https://cdn.shopify.com/s/files/1/1719/1281/files/Bond-Curl-Rehab-Salve_8floz_Front_2000x2000_2f18e69f-fb6d-4d92-9573-e49eab94865b.jpg?v=1763792409' },
   { brand: 'Hask', name: 'Keratin Protein Smoothing Deep Conditioner', category: 'protein_treatment', cg_status: 'approved', cruelty_free: 'yes', notes: 'CFK/PETA', image_url: 'https://cdn.shopify.com/s/files/1/0575/1390/2193/files/1_Smooth_DC_FRT_2500px.png?v=1764949405' },
   { brand: 'Hask', name: "Henna 'n' Placenta Super Strength Packette", category: 'protein_treatment', cg_status: 'approved', cruelty_free: 'yes', notes: 'CFK/PETA', image_url: null },
-  { brand: 'K18', name: 'Leave-In Molecular Repair Hair Mask', category: 'protein_treatment', cg_status: 'not_approved', cruelty_free: 'yes', notes: 'Bond builder. Contains drying alcohol', image_url: 'http://www.k18hair.com/cdn/shop/files/00_Mask_1024x1024.jpg?v=1726613673' },
+  { brand: 'K18', name: 'Leave-In Molecular Repair Hair Mask', category: 'protein_treatment', cg_status: 'not_approved', cruelty_free: 'yes', notes: 'Bond builder. Contains drying alcohol. Viral on #HairTok — bond-repair technology', image_url: 'http://www.k18hair.com/cdn/shop/files/00_Mask_1024x1024.jpg?v=1726613673', hairtok_trending: true },
   { brand: 'Nutress', name: 'Hair Moisturizing Protein Packette', category: 'protein_treatment', cg_status: 'approved', cruelty_free: null, notes: null, image_url: null },
-  { brand: 'Olaplex', name: 'No. 3 Hair Perfector', category: 'protein_treatment', cg_status: 'approved', cruelty_free: null, notes: 'Bond builder', image_url: 'https://cdn.shopify.com/s/files/1/0434/1661/files/1-No3_product_1440_7cd8abc9-5c07-40be-a7c6-eeb73f63dc32.png?v=1762271835' },
+  { brand: 'Olaplex', name: 'No. 3 Hair Perfector', category: 'protein_treatment', cg_status: 'approved', cruelty_free: null, notes: 'Bond builder. #HairTok favorite — bond-building treatment', image_url: 'https://cdn.shopify.com/s/files/1/0434/1661/files/1-No3_product_1440_7cd8abc9-5c07-40be-a7c6-eeb73f63dc32.png?v=1762271835', hairtok_trending: true },
   { brand: 'Ouidad', name: 'Unbreakable Bonds Mixing Drops', category: 'protein_treatment', cg_status: 'not_approved', cruelty_free: null, notes: 'Fragrance-free. Contains drying alcohol', image_url: 'https://curlwarehouse.com/cdn/shop/files/31002_ALT1_005_NEW_PNG_2048x3072_2000x_03075a8b-0057-4bad-a85c-7d1c0a5b09e1.webp?v=1722458432' },
   { brand: 'SheaMoisture', name: 'Manuka Honey & Yogurt Hydrate + Repair Protein Treatment', category: 'protein_treatment', cg_status: 'approved', cruelty_free: 'yes', notes: 'CFK/PETA', image_url: 'https://images.openbeautyfacts.org/images/products/764/302/220/9094/front_en.3.400.jpg' },
   { brand: 'TGIN', name: 'Miracle RepaiRx Deep Hydrating Hair Masque', category: 'protein_treatment', cg_status: 'not_approved', cruelty_free: 'unclear', notes: 'Site claims no animal testing. Contains silicone', image_url: 'https://cdn.shopify.com/s/files/1/0716/9540/1252/products/MRx-Mask-2021-scaled.jpg?v=1738350162' },
@@ -399,4 +400,17 @@ export const SEED_PRODUCTS: SeedProduct[] = [
   { brand: 'Batiste', name: 'Original Dry Shampoo', category: 'dry_shampoo', cg_status: 'not_approved', cruelty_free: 'yes', notes: 'Contains silicone (cyclopentasiloxane). Most popular dry shampoo globally', image_url: null },
   { brand: "Not Your Mother's", name: 'Clean Freak Refreshing Dry Shampoo', category: 'dry_shampoo', cg_status: 'caution', cruelty_free: 'unclear', notes: 'Site claims no animal testing. Contains some potentially drying ingredients', image_url: null },
   { brand: 'amika', name: 'Perk Up Dry Shampoo', category: 'dry_shampoo', cg_status: 'approved', cruelty_free: 'yes', notes: 'LB/PETA. Rice starch-based, no silicones', image_url: null },
+
+  // ══════════════════════════════════════════════════════════════════════
+  // HAIRTOK-SOURCED PRODUCTS (trending on #HairTok, CGM-verified)
+  // ══════════════════════════════════════════════════════════════════════
+
+  // ── SCALP CARE ──────────────────────────────────────────────────────
+  { brand: 'Generic', name: 'Rosemary Oil', category: 'scalp_care', cg_status: 'approved', cruelty_free: null, notes: 'Trending on #HairTok. Pure plant oil, no silicones or sulfates. Used for scalp massage and hair growth', image_url: null, hairtok_trending: true },
+
+  // ── BOND REPAIR ─────────────────────────────────────────────────────
+  { brand: 'Olaplex', name: 'No. 0 Intensive Bond Building Treatment', category: 'bond_repair', cg_status: 'caution', cruelty_free: null, notes: '#HairTok favorite. Bond-building primer used before No. 3. Needs ingredient verification', image_url: null, hairtok_trending: true },
+
+  // ── MOUSSE (from Marty's research) ──────────────────────────────────
+  { brand: 'AG Care', name: 'Cloud Air Volumizing Mousse', category: 'mousse', cg_status: 'caution', cruelty_free: null, notes: '#HairTok recommended. Lightweight volumizing mousse. Needs ingredient verification', image_url: null, hairtok_trending: true },
 ]

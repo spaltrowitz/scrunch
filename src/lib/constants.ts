@@ -51,6 +51,8 @@ export const PRODUCT_CATEGORY_LABELS: Record<ProductCategory, string> = {
   spray_refresher: 'Spray / Refresher',
   protein_treatment: 'Protein Treatment',
   scalp_treatment: 'Scalp Treatment',
+  scalp_care: 'Scalp Care',
+  bond_repair: 'Bond Repair',
 }
 
 export const PRODUCT_CATEGORY_DESCRIPTIONS: Record<ProductCategory, string> = {
@@ -69,6 +71,8 @@ export const PRODUCT_CATEGORY_DESCRIPTIONS: Record<ProductCategory, string> = {
   spray_refresher: 'Revives curls between wash days or provides flexible hold. Virtually weightless.',
   protein_treatment: 'Helps curls "bounce back." Best for high porosity, fine, or damaged hair. Use when curls feel mushy or lack elasticity.',
   scalp_treatment: 'Products specifically targeting scalp health — dryness, flakiness, irritation, or buildup.',
+  scalp_care: 'Scalp treatments, oils, and serums that nourish and support a healthy scalp environment.',
+  bond_repair: 'Bond-building treatments that repair broken disulfide bonds in hair damaged by heat, color, or chemical processing.',
 }
 
 export const HAIR_GOALS = [
