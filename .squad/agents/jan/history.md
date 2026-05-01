@@ -151,3 +151,11 @@
 - **Copy verbosity scales with commitment** — hero/feature cards should be short (scanning mode). About page can be longer (reading mode). Shortened feature card descriptions that were trying to explain too much.
 - **Pre-existing TS errors can silently block deploys** — `noUnusedLocals` errors in Products.tsx and Recommendations.tsx were passing `npm run build` locally (unclear caching) but failing in `npm run deploy`. Always verify deploy works, not just build.
 
+### 2026-07-15: Browse Page Declutter + Mobile Audit
+- **Collapsible filters are essential on mobile** — the Browse page showed ~15 category chips, 2 dropdowns, 2 checkboxes, and a request button all at once on 375px screens. Collapsing filters behind a "☰ Filters" toggle with an active-count badge reduces cognitive load without hiding functionality. Desktop stays unchanged.
+- **44px is the magic number** — Apple's HIG and WCAG both recommend 44px minimum touch targets. Applied across: nav links, search input, filter toggle, dropdowns, checkboxes, submit buttons, "Show more", suggested questions, and feedback buttons. Smaller than 44px = frustrating on phone.
+- **Rating popup needs 2x2 grid on mobile** — four rating buttons ("Loved", "Liked", "Ok", "Didn't like") in a single row at 375px makes each button ~70px wide with tiny text. Grid-cols-2 on mobile gives each button double the width. Desktop stays in a row.
+- **ProductCard action buttons shouldn't be indented on mobile** — the `pl-20` indent (80px) aligned actions under the product text on desktop, but on mobile it pushed "Tried it?" and "☆ Save" into a ~295px gutter. Removed indent on mobile (`pl-0 sm:pl-20`).
+- **Stack, don't squeeze** — the ratings prompt banner, search form controls, and brand/region dropdowns all used `flex` row layout that overflowed on mobile. Changed to `flex-col sm:flex-row` pattern everywhere.
+- **Pre-existing TS errors from other sessions can block deploys** — found unused `featuredProducts` variable in Home.tsx and unused `RatePromptSection` import in Recommendations.tsx from prior session's changes. These blocked `tsc -b`. Always clean up unused code before committing.
+
