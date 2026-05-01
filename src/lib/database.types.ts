@@ -64,7 +64,6 @@ export interface Product {
   flagged_ingredients: FlaggedIngredient[]
   curlscan_status: CgStatus | null
   isitcg_status: CgStatus | null
-  status_conflict: boolean
   country_availability: string[]
   price_range: string | null
   protein_free: boolean | null
@@ -109,7 +108,7 @@ export interface Database {
   public: {
     Tables: {
       profiles: { Row: Profile; Insert: Partial<Profile> & { id: string }; Update: Partial<Profile>; Relationships: [] }
-      products: { Row: Product; Insert: Omit<Product, 'id' | 'created_at' | 'updated_at' | 'avg_rating' | 'review_count' | 'status_conflict'>; Update: Partial<Product>; Relationships: [] }
+      products: { Row: Product; Insert: Omit<Product, 'id' | 'created_at' | 'updated_at' | 'avg_rating' | 'review_count'>; Update: Partial<Product>; Relationships: [] }
       product_reviews: { Row: ProductReview; Insert: Omit<ProductReview, 'id' | 'created_at' | 'updated_at'>; Update: Partial<ProductReview>; Relationships: [] }
     }
     Views: {}
