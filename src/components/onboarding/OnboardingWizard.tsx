@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAuth } from '../../lib/auth'
+import { useAuth } from '../../lib/auth.utils'
 import { supabase } from '../../lib/supabase'
 import {
   CURL_PATTERNS, POROSITY_OPTIONS, HAIR_GOALS, HAIR_GOAL_LABELS,
@@ -19,7 +19,7 @@ import type {
   FragrancePreference, WaterType,
 } from '../../lib/database.types'
 import { useUserProfile } from '../../hooks/useProducts'
-import { useToast } from '../../hooks/useToast'
+import { useToast } from '../../hooks/useToast.utils'
 
 interface OnboardingData {
   curl_pattern: CurlPattern | null
@@ -61,30 +61,33 @@ export function OnboardingWizard() {
   })
   const loadingProfile = profileLoading && !profileError
 
-  // Load existing profile data if editing
-  useEffect(() => {
-    if (!user || !profile?.onboarding_completed || isEditing) return
-    setIsEditing(true)
-    setData({
-      curl_pattern: profile.curl_pattern as CurlPattern || null,
-      porosity: profile.porosity as Porosity || null,
-      hair_density: profile.hair_density as HairDensity || null,
-      hair_width: profile.hair_width as HairWidth || null,
-      scalp_type: profile.scalp_type as ScalpType || null,
-      hair_length: profile.hair_length as HairLength || null,
-      color_treatment: profile.color_treatment as ColorTreatment || null,
-      climate: profile.climate as Climate || null,
-      heat_tool_usage: profile.heat_tool_usage as HeatToolUsage || null,
-      workout_frequency: profile.workout_frequency as WorkoutFrequency || null,
-      cgm_experience: profile.cgm_experience as CgmExperience || null,
-      fragrance_preference: profile.fragrance_preference as FragrancePreference || null,
-      water_type: profile.water_type as WaterType || null,
-      hair_goals: profile.hair_goals || [],
-      sensitivities: profile.sensitivities || [],
-      custom_brand: (profile.custom_brand as string) || null,
-      custom_hero_ingredients: (profile.custom_hero_ingredients as string[]) || [],
-    })
-  }, [profile, user, isEditing])
+  // Render-time sync: load profile data when it arrives
+  const [prevProfileId, setPrevProfileId] = useState<string | null>(null)
+  if (user && profile?.onboarding_completed && profile.id !== prevProfileId) {
+    setPrevProfileId(profile.id)
+    if (!isEditing) {
+      setIsEditing(true)
+      setData({
+        curl_pattern: profile.curl_pattern as CurlPattern || null,
+        porosity: profile.porosity as Porosity || null,
+        hair_density: profile.hair_density as HairDensity || null,
+        hair_width: profile.hair_width as HairWidth || null,
+        scalp_type: profile.scalp_type as ScalpType || null,
+        hair_length: profile.hair_length as HairLength || null,
+        color_treatment: profile.color_treatment as ColorTreatment || null,
+        climate: profile.climate as Climate || null,
+        heat_tool_usage: profile.heat_tool_usage as HeatToolUsage || null,
+        workout_frequency: profile.workout_frequency as WorkoutFrequency || null,
+        cgm_experience: profile.cgm_experience as CgmExperience || null,
+        fragrance_preference: profile.fragrance_preference as FragrancePreference || null,
+        water_type: profile.water_type as WaterType || null,
+        hair_goals: profile.hair_goals || [],
+        sensitivities: profile.sensitivities || [],
+        custom_brand: (profile.custom_brand as string) || null,
+        custom_hero_ingredients: (profile.custom_hero_ingredients as string[]) || [],
+      })
+    }
+  }
 
   const update = <K extends keyof OnboardingData>(key: K, value: OnboardingData[K]) => {
     setData(d => ({ ...d, [key]: value }))

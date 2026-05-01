@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
-import { useAuth } from '../lib/auth'
+import { useAuth } from '../lib/auth.utils'
 import type { Product, ProductReview, Profile } from '../lib/database.types'
 import { useRecommendationProducts, useUserProfile, useUserReviews } from '../hooks/useProducts'
 import {
@@ -30,7 +30,7 @@ export function Recommendations() {
   const { data: profile, isLoading: profileLoading, error: profileError } = useUserProfile(userId)
   const { data: userReviews = [], isLoading: reviewsLoading, error: reviewsError } = useUserReviews(userId)
   const { data: productsData, isLoading: productsLoading, error: productsError } = useRecommendationProducts()
-  const products = productsData?.products ?? []
+  const products = useMemo(() => productsData?.products ?? [], [productsData])
   const [showRatingPopup, setShowRatingPopup] = useState<string | null>(null)
   const [dismissingProduct, setDismissingProduct] = useState<string | null>(null)
   const [dismissReasons, setDismissReasons] = useState<Set<string>>(new Set())
@@ -43,7 +43,7 @@ export function Recommendations() {
     [products],
   )
   const profileDone = !!profile?.onboarding_completed && !!profile?.porosity
-  const sensitivities = profile?.sensitivities ?? []
+  const sensitivities = useMemo(() => profile?.sensitivities ?? [], [profile?.sensitivities])
   const ratedProductIdList = useMemo(() => userReviews.map(r => r.product_id), [userReviews])
   const dislikedCategoriesKey = useMemo(() => (
     userReviews

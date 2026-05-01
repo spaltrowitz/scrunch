@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useAuth } from '../lib/auth'
+import { useAuth } from '../lib/auth.utils'
 import { CG_STATUS_CONFIG, PRODUCT_CATEGORY_LABELS } from '../lib/constants'
 import { useUserReviews } from '../hooks/useProducts'
 

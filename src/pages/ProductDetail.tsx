@@ -1,13 +1,13 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
-import { useAuth } from '../lib/auth'
+import { useAuth } from '../lib/auth.utils'
 import { PRODUCT_CATEGORY_LABELS, PRODUCT_CATEGORY_DESCRIPTIONS } from '../lib/constants'
 import { ProductImage } from '../hooks/useProductImage'
 import type { ProductReview, Profile } from '../lib/database.types'
 import { useProduct } from '../hooks/useProducts'
-import { useToast } from '../hooks/useToast'
+import { useToast } from '../hooks/useToast.utils'
 
 type TriedRating = 'loved' | 'liked' | 'ok' | 'disliked'
 
@@ -70,11 +70,18 @@ export function ProductDetail() {
 
   // Rating form state
   const [ratingPopup, setRatingPopup] = useState(false)
-  const [selectedRating, setSelectedRating] = useState<TriedRating | null>(null)
-  const [personalNote, setPersonalNote] = useState('')
+  const initialRating = myReview?.rating != null ? numericToTriedRating(myReview.rating) : null
+  const initialNote = myReview?.results_notes ?? ''
+  const [selectedRating, setSelectedRating] = useState<TriedRating | null>(initialRating)
+  const [personalNote, setPersonalNote] = useState(initialNote)
   const [submitting, setSubmitting] = useState(false)
 
-  useEffect(() => {
+  // Sync form state when review data changes (render-time sync pattern)
+  const [prevRating, setPrevRating] = useState(myReview?.rating)
+  const [prevNotes, setPrevNotes] = useState(myReview?.results_notes)
+  if (myReview?.rating !== prevRating || myReview?.results_notes !== prevNotes) {
+    setPrevRating(myReview?.rating)
+    setPrevNotes(myReview?.results_notes)
     if (myReview?.rating != null) {
       setSelectedRating(numericToTriedRating(myReview.rating))
       setPersonalNote(myReview.results_notes ?? '')
@@ -82,7 +89,7 @@ export function ProductDetail() {
       setSelectedRating(null)
       setPersonalNote('')
     }
-  }, [myReview?.rating, myReview?.results_notes])
+  }
 
   const submitRatingMutation = useMutation({
     mutationFn: async ({ rating, note }: { rating: TriedRating; note: string }) => {

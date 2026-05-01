@@ -1,4 +1,4 @@
-import { useAuth } from '../lib/auth'
+import { useAuth } from '../lib/auth.utils'
 import { Link } from 'react-router-dom'
 import { useUserProfile, useUserReviewCount } from '../hooks/useProducts'
 

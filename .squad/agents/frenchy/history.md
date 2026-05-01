@@ -110,3 +110,17 @@
 - Suggested questions only show before first search (hide along with textarea after submission)
 - **Avoided touching:** `extractSearchTerms()`, `searchReddit()`, `generateSummary()`, `stripMarkdown()` (Danny's domain)
 - Files changed: `src/pages/Community.tsx`, `src/index.css`
+
+### Beta UX Audit Fixes — Items 4 & 5
+- **Products empty state (Item 4):** Enhanced the empty state when filters return 0 results — added 🔍 icon, friendlier copy, and a prominent violet "Clear all filters" button (was just a text link)
+- **Homepage mobile CTAs (Item 5):** Made feature card CTAs full-width with 44px min-height tap targets on mobile (`w-full md:w-auto`, `text-sm md:text-xs`, `py-3 md:py-2`, `min-h-[44px] md:min-h-0`), keeping compact inline style on desktop
+- Pattern: use `md:` breakpoint for mobile-first responsive CTAs — full-width + larger text on small screens, inline + smaller on desktop
+- Note: `npm run build` fails due to pre-existing TS errors in Community.tsx (Danny's domain) — my changes type-check clean
+
+### Beta Technical Review — Lint Fixes (Sandy's 3 must-fixes)
+- **setState-in-effect:** Replaced useEffect→setState patterns with render-time sync (React's "you might not need an effect" pattern) in OnboardingWizard, ProductDetail, Products, and useProductImage
+- **Fast refresh violations:** Extracted `useAuth`, `useToast`, `useProductImage` hooks into `.utils.ts` files so provider files only export React components
+- **exhaustive-deps:** Wrapped `products` and `sensitivities` derivations in `useMemo` to stabilize dependency arrays in Products.tsx and Recommendations.tsx
+- Pattern: render-time state sync (track previous value via useState, compare during render, update if changed) is the idiomatic replacement for "sync external data into local state" useEffect patterns
+- Pattern: for fast refresh, keep provider components and their hooks in separate files — provider in `.tsx`, hook in `.utils.ts`
+- Pattern: `const x = data?.y ?? []` creates new arrays every render — wrap in `useMemo` when used as dependency of other hooks

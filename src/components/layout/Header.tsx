@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { useAuth } from '../../lib/auth'
+import { useAuth } from '../../lib/auth.utils'
 import { ScrunchLogo } from '../ui/ScrunchLogo'
 
 export function Header() {

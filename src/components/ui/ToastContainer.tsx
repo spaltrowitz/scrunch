@@ -1,4 +1,4 @@
-import { useToast } from '../../hooks/useToast'
+import { useToast } from '../../hooks/useToast.utils'
 import type { ToastType } from '../../hooks/useToast'
 
 const STYLES: Record<ToastType, { bg: string; icon: string }> = {

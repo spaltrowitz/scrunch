@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../lib/auth'
+import { useAuth } from '../lib/auth.utils'
 import { CURL_PATTERNS, POROSITY_OPTIONS, parseSensitivity, INGREDIENT_PREFERENCE_LABELS, CUSTOM_BRANDS, HERO_INGREDIENTS } from '../lib/constants'
 import { useUserProfile } from '../hooks/useProducts'
 

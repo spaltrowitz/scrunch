@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProductCategory, Product, ProductReview } from '../lib/database.types'
 import { RequestProductForm } from '../components/products/RequestProductForm'
@@ -6,9 +6,9 @@ import { SearchBar } from '../components/products/SearchBar'
 import { FilterPanel } from '../components/products/FilterPanel'
 import { ProductCard } from '../components/products/ProductCard'
 import { supabase } from '../lib/supabase'
-import { useAuth } from '../lib/auth'
+import { useAuth } from '../lib/auth.utils'
 import { useCatalogProducts, useUserReviews } from '../hooks/useProducts'
-import { useToast } from '../hooks/useToast'
+import { useToast } from '../hooks/useToast.utils'
 
 type TriedRating = 'loved' | 'liked' | 'ok' | 'disliked'
 type ProductAction = 'tried' | 'bookmarked'
@@ -63,7 +63,7 @@ export function Products() {
   const queryClient = useQueryClient()
   const { addToast } = useToast()
   const { data, isLoading: productsLoading, error: productsError } = useCatalogProducts()
-  const products = data?.products ?? []
+  const products = useMemo(() => data?.products ?? [], [data])
   const { data: userReviews = [], isLoading: reviewsLoading, error: reviewsError } = useUserReviews(user?.id)
   const loading = productsLoading && !productsError
   const userId = user?.id
@@ -83,44 +83,44 @@ export function Products() {
   const [showRequestForm, setShowRequestForm] = useState(false)
   const [visibleCount, setVisibleCount] = useState(PRODUCTS_PER_PAGE)
 
-  // Load user reviews or revert to localStorage
-  useEffect(() => {
+  // Render-time sync: load user reviews or revert to localStorage
+  const [prevReviewsKey, setPrevReviewsKey] = useState<string | null>(null)
+  const currentReviewsKey = user ? (reviewsLoading || reviewsError ? null : JSON.stringify(userReviews.map(r => r.product_id))) : 'logged-out'
+  if (currentReviewsKey !== null && currentReviewsKey !== prevReviewsKey) {
+    setPrevReviewsKey(currentReviewsKey)
     if (!user) {
       setActions(getStoredActions())
       setNotes(getStoredNotes())
-      return
-    }
-    if (reviewsLoading || reviewsError) return
-    const data = userReviews as ProductReview[]
-    const reviewActions: ProductActions = {}
-    const reviewNotes: ProductNotes = {}
-    const reviewRatings: ProductRatings = {}
-    for (const review of data) {
-      const key = review.product_id
-      reviewActions[key] = new Set()
-      if (review.status) reviewActions[key].add('tried')
-      if (review.rating != null) reviewActions[key].add('tried')
-      if (review.results_notes) reviewNotes[key] = review.results_notes
-      // Sync rating label from Supabase
-      if (review.rating != null) {
-        if (review.rating >= 5) reviewRatings[key] = 'loved'
-        else if (review.rating >= 4) reviewRatings[key] = 'liked'
-        else if (review.rating >= 2) reviewRatings[key] = 'ok'
-        else reviewRatings[key] = 'disliked'
+    } else {
+      const reviewData = userReviews as ProductReview[]
+      const reviewActions: ProductActions = {}
+      const reviewNotes: ProductNotes = {}
+      const reviewRatings: ProductRatings = {}
+      for (const review of reviewData) {
+        const key = review.product_id
+        reviewActions[key] = new Set()
+        if (review.status) reviewActions[key].add('tried')
+        if (review.rating != null) reviewActions[key].add('tried')
+        if (review.results_notes) reviewNotes[key] = review.results_notes
+        if (review.rating != null) {
+          if (review.rating >= 5) reviewRatings[key] = 'loved'
+          else if (review.rating >= 4) reviewRatings[key] = 'liked'
+          else if (review.rating >= 2) reviewRatings[key] = 'ok'
+          else reviewRatings[key] = 'disliked'
+        }
       }
-    }
-    // Preserve localStorage bookmarks
-    const stored = getStoredActions()
-    for (const [key, set] of Object.entries(stored)) {
-      if (set.has('bookmarked')) {
-        if (!reviewActions[key]) reviewActions[key] = new Set()
-        reviewActions[key].add('bookmarked')
+      const stored = getStoredActions()
+      for (const [key, set] of Object.entries(stored)) {
+        if (set.has('bookmarked')) {
+          if (!reviewActions[key]) reviewActions[key] = new Set()
+          reviewActions[key].add('bookmarked')
+        }
       }
+      setActions(reviewActions)
+      setNotes(prev => ({ ...prev, ...reviewNotes }))
+      setRatings(prev => ({ ...prev, ...reviewRatings }))
     }
-    setActions(reviewActions)
-    setNotes(prev => ({ ...prev, ...reviewNotes }))
-    setRatings(prev => ({ ...prev, ...reviewRatings }))
-  }, [reviewsLoading, reviewsError, user, userReviews])
+  }
 
   const deleteReviewMutation = useMutation({
     mutationFn: async (productId: string) => {
