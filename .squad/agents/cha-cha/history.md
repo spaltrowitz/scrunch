@@ -122,3 +122,8 @@ Decomposed `src/pages/Recommendations.tsx` from 1173 lines into 7 files:
 **Orchestrator at 399 lines (vs 300 cap):** Justified because it manages 5 data queries, 3 mutations, collaborative filtering (Supabase-coupled), and complex tier selection logic. Further extraction would require passing Supabase client through abstraction layers with no performance benefit.
 
 **Verification:** `npm run build` ✅, `npx tsc --noEmit` ✅, `npm test` (26 tests) ✅
+
+### Cross-team context (2026-05-01)
+- Sandy merged 3 PRs this batch with architecture-first conflict resolution policy; PR #9 and #15 required rebasing to React Query patterns
+- Frenchy wired toast notification system to all 7 mutations, establishing feedback convention
+- Decomposition follows same pattern as Products.tsx extraction (Sandy's PR #13)

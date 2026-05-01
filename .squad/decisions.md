@@ -251,3 +251,76 @@ Applied to Scrunch: Do NOT put a journey question before the product browse. Eit
 **Why:** Product strategy — Beta launch readiness with clear scope boundaries and persona-specific value delivery.
 
 ---
+
+### 2026-05-01T16:25:00Z: PR Merge Batch — Conflict Resolution Policy
+**By:** Sandy (Lead Engineer)
+**What:** Merged PRs #9, #12, #15 to main. All three had merge conflicts due to the React Query migration (PR #13) that landed after they were branched. Resolution policy applied:
+
+1. **Architecture wins over feature code.** When incoming PRs use old patterns (useState/useEffect for data fetching), resolve conflicts by adapting to the current architecture (React Query hooks + useMemo), not by reverting the migration.
+2. **Drop features that can't cleanly adapt.** PR #9's `requestedProducts` matching in Recommendations.tsx used the old useCallback/useState loading pattern. Rather than create a hybrid, the feature was dropped from the merge and should be re-implemented as a `useProductRequests()` React Query hook.
+3. **Image sourcing policy preserved.** PR #9's seed data used Target/Ulta image URLs. These were kept for now but conflict with HEAD's image sourcing policy (brand sites + Open Beauty Facts only). These should be migrated in a follow-up.
+
+**Follow-up items:**
+- Re-implement requestedProducts matching using React Query hook pattern
+- Audit merged seed product image URLs against image sourcing policy
+- PR #15's custom brand fields (`custom_brand`, `custom_hero_ingredients`) need corresponding Supabase migration
+
+**Why:** Establishes precedent for how to handle PR conflicts when architectural migrations land between branch creation and merge.
+
+---
+
+### 2026-05-01T16:25:00Z: Toast Notification System — Convention
+**By:** Frenchy (Frontend Dev)
+**What:** Lightweight toast notification system implemented with React context (no external libraries) to provide user-facing feedback for all mutation operations.
+
+**Implementation:**
+- `src/hooks/useToast.tsx` — ToastProvider context + useToast() hook
+- `src/components/ui/ToastContainer.tsx` — visual toast component with 3 types (success/error/info), auto-dismiss at 4s, responsive positioning
+
+**Files wired:**
+- ProductDetail.tsx: review submit
+- Products.tsx: review delete, rating save, note save
+- Recommendations.tsx: rate product, dismiss product
+- OnboardingWizard.tsx: profile save
+
+**Convention for future mutations:**
+All new `useMutation` calls must include toast feedback in both `onSuccess` and `onError` handlers:
+```tsx
+onSuccess: () => addToast('Saved!', 'success')
+onError: () => addToast('Failed to save. Please try again.', 'error')
+```
+
+**Why:** Sandy's PR #13 review note #2 — mutation errors were console-only with no user-facing feedback. This addresses the blocker and establishes pattern for all future mutations.
+
+---
+
+### 2026-05-01T16:25:00Z: Recommendations.tsx Decomposition
+**By:** Cha-Cha (⚡ Performance Optimizer)
+**What:** Decomposed `Recommendations.tsx` from 1173 lines into 7 files following the same pattern as the Products.tsx decomposition (PR #13).
+
+**Structure:**
+```
+src/components/recommendations/
+├── recommendationEngine.ts    — Pure scoring functions (buildTier1-3, ingredientTier, tierHeader)
+├── RecommendedCard.tsx        — Product card + dismiss form (React.memo)
+├── RatingGroup.tsx            — Rating group + row (React.memo)
+├── SavedProducts.tsx          — Bookmarked products section (React.memo)
+├── RatePromptSection.tsx      — Quick-rate prompt (React.memo)
+└── IngredientRecsSection.tsx  — Ingredient-based recs section (React.memo)
+```
+
+**Orchestrator at 399 lines (exceeds 300-line cap but justified):** Manages 5 queries, 3 mutations, collaborative filtering, and tier selection. No clean split without over-abstracting Supabase access.
+
+**Key Decisions:**
+1. All extracted components use React.memo() — prevents re-renders when dismiss/rating popup state changes on sibling cards.
+2. Scoring engine is pure TypeScript — no React, no Supabase imports. Makes it independently testable and tree-shakeable.
+3. Collaborative filtering stays in orchestrator — it's tightly coupled to Supabase and React Query. Extracting it would require passing the Supabase client or creating a custom hook for a single query — not worth the complexity.
+
+**Verification:**
+- `npm run build` ✅
+- `npx tsc --noEmit` ✅ (zero type errors)
+- `npm test` ✅ (26 tests, 3 suites)
+
+**Why:** Standard performance pattern from team audit. Monolithic components defeat React optimization and reduce code clarity.
+
+---
