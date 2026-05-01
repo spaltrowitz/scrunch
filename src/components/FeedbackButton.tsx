@@ -2,23 +2,23 @@ import { useState } from 'react'
 
 const GITHUB_REPO = 'spaltrowitz/scrunch'
 
-type FeedbackType = 'bug' | 'feature' | 'feedback'
+type FeedbackType = 'bug' | 'idea' | 'love'
 
 const LABELS: Record<FeedbackType, string> = {
   bug: 'bug',
-  feature: 'enhancement',
-  feedback: 'feedback',
+  idea: 'enhancement',
+  love: 'feedback',
 }
 
 const PLACEHOLDERS: Record<FeedbackType, string> = {
   bug: "What happened? What did you expect to happen?\n\nSteps to reproduce:\n1. \n2. \n3. ",
-  feature: "Describe the feature you'd like to see.\n\nWhy would this be useful?",
-  feedback: "Share your thoughts — what's working, what isn't, what could be better?",
+  idea: "Describe your idea.\n\nHow would this help your curl journey?",
+  love: "What do you love about Scrunch? We'd love to hear!",
 }
 
 export function FeedbackButton() {
   const [isOpen, setIsOpen] = useState(false)
-  const [type, setType] = useState<FeedbackType>('feedback')
+  const [type, setType] = useState<FeedbackType>('love')
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -93,7 +93,7 @@ export function FeedbackButton() {
     setSubmitted(false)
     setTitle('')
     setBody('')
-    setType('feedback')
+    setType('love')
     setError(null)
   }
 
@@ -134,8 +134,8 @@ export function FeedbackButton() {
                 <div className="flex gap-2 mb-4">
                   {([
                     ['bug', '🐛 Bug'],
-                    ['feature', '✨ Feature Request'],
-                    ['feedback', '💭 Feedback'],
+                    ['idea', '💡 Idea'],
+                    ['love', '💜 Love it'],
                   ] as const).map(([value, label]) => (
                     <button
                       key={value}
@@ -159,14 +159,14 @@ export function FeedbackButton() {
                 <div className="space-y-3">
                   <div>
                     <label className="text-xs font-medium text-gray-700 block mb-1">
-                      {type === 'bug' ? 'What went wrong?' : type === 'feature' ? 'Feature name' : 'Subject'}
+                      {type === 'bug' ? 'What went wrong?' : type === 'idea' ? 'Your idea' : 'What do you love?'}
                     </label>
                     <input
                       type="text"
                       required
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
-                      placeholder={type === 'bug' ? 'e.g., Sign-in button not working' : type === 'feature' ? 'e.g., Filter products by protein-free' : 'e.g., Love the ingredient checker!'}
+                      placeholder={type === 'bug' ? 'e.g., Sign-in button not working' : type === 'idea' ? 'e.g., Filter products by protein-free' : 'e.g., The ingredient checker is amazing!'}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
                     />
                   </div>

@@ -7,7 +7,7 @@ export function About() {
         <ScrunchLogo className="w-16 h-16 mx-auto mb-4" />
         <h1 className="text-3xl font-bold text-gray-900 mb-3">About Scrunch</h1>
         <p className="text-lg text-gray-600 max-w-xl mx-auto">
-          The curly hair community deserves better tools. We're building them.
+          From Reddit deep-dives to TikTok holy grails — one place for curly hair that actually works.
         </p>
       </div>
 
@@ -15,7 +15,7 @@ export function About() {
         <section>
           <h2 className="text-xl font-semibold text-gray-900 mb-3">Why Scrunch?</h2>
           <p className="text-gray-600 leading-relaxed mb-4">
-            Product info for curly hair is scattered across spreadsheets, Reddit threads, and ingredient checkers that only say yes or no. Scrunch brings it all into one place where you can <strong>search</strong>, <strong>share</strong>, and <strong>track results</strong>.
+            Product info for curly hair is scattered across spreadsheets, Reddit threads, TikTok reels, and ingredient checkers that only say yes or no. You're watching a #HairTok routine, googling ingredients, cross-referencing r/curlyhair reviews — all in different tabs. Scrunch brings it all into one place where you can <strong>search</strong>, <strong>share</strong>, and <strong>track results</strong>.
           </p>
           <div className="grid md:grid-cols-2 gap-4">
             <div className="p-4 bg-white rounded-xl border border-gray-200">
@@ -32,16 +32,17 @@ export function About() {
             </div>
             <div className="p-4 bg-white rounded-xl border border-gray-200">
               <h3 className="font-semibold text-gray-900 mb-1 text-sm">💬 Community</h3>
-              <p className="text-xs text-gray-500">Get answers sourced from r/curlyhair (339K), r/curlygirl (61K), and r/wavyhair.</p>
+              <p className="text-xs text-gray-500">Community wisdom from r/curlyhair (339K+), r/curlygirl (61K+), r/wavyhair, and trending picks from #HairTok creators.</p>
             </div>
           </div>
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Built on Community Wisdom</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Built on Community Wisdom — Reddit to TikTok</h2>
           <p className="text-gray-600 text-sm leading-relaxed">
             Scrunch is built on the incredible work of the curly hair community — the{' '}
             <a href="https://docs.google.com/spreadsheets/d/1gn6VnPsRU1H3ziElbWqNVFY5mev6GB1pwKKt_MNpoAY/" target="_blank" rel="noopener noreferrer" className="text-violet-600 hover:text-violet-700 underline">r/curlyhair Holy Grail Product List</a>,
+            trending products from #HairTok and #CurlyHairTikTok,
             ingredient tools like{' '}
             <a href="https://curlscan.com/" target="_blank" rel="noopener noreferrer" className="text-violet-600 hover:text-violet-700 underline">CurlScan</a>,{' '}
             <a href="https://www.isitcg.com/" target="_blank" rel="noopener noreferrer" className="text-violet-600 hover:text-violet-700 underline">IsItCG</a>, and{' '}
@@ -69,7 +70,7 @@ export function About() {
 
         <div className="text-center pt-2">
           <p className="text-sm text-gray-500">
-            Made with 🌀 by the curly hair community, for the curly hair community.
+            Made with 🌀 by curly people, for curly people — wherever you scroll.
           </p>
         </div>
 
@@ -96,6 +97,8 @@ export function About() {
               { name: 'r/curlyhair', url: 'https://www.reddit.com/r/curlyhair/' },
               { name: 'r/curlygirl', url: 'https://www.reddit.com/r/curlygirl/' },
               { name: 'r/wavyhair', url: 'https://www.reddit.com/r/wavyhair/' },
+              { name: '#HairTok', url: 'https://www.tiktok.com/tag/hairtok' },
+              { name: '#CurlyHairTikTok', url: 'https://www.tiktok.com/tag/curlyhair' },
             ]} />
             <SourceGroup title="✨ Design Inspiration" sources={[
               { name: 'Yuka', url: 'https://yuka.io/' },

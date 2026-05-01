@@ -32,19 +32,27 @@ export function Home() {
       {/* Hero */}
       <section className="flex flex-col items-center justify-center px-4 py-16 md:py-24 text-center bg-gradient-to-b from-violet-50 to-white">
         <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight max-w-2xl">
-          Finally, one place for curly hair that actually works.
+          Your wash day just got a whole lot smarter.
         </h1>
 
         <p className="text-sm md:text-base text-gray-600 mb-6 max-w-xl leading-relaxed">
-          Instantly check if any product is curl-safe, discover what works for YOUR hair type, and learn from 400K+ community members.
+          Find your holy grail products, check any ingredient list in seconds, and discover what actually works — backed by 400K+ Reddit members and millions of #HairTok views.
         </p>
 
-        <Link
-          to="/products"
-          className="px-6 py-3 min-h-[44px] flex items-center rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium text-sm transition-colors"
-        >
-          Explore Products →
-        </Link>
+        <div className="flex flex-col items-center gap-3">
+          <Link
+            to="/products"
+            className="px-6 py-3 min-h-[44px] flex items-center rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium text-sm transition-colors"
+          >
+            Browse Products →
+          </Link>
+          <Link
+            to="/recommendations"
+            className="text-sm text-violet-600 hover:text-violet-800 no-underline font-medium"
+          >
+            Get Personalized Picks →
+          </Link>
+        </div>
 
       </section>
 
@@ -55,49 +63,35 @@ export function Home() {
         </div>
       )}
 
-      {/* Features — 3 columns side by side */}
+      {/* Features — 2 columns */}
       <section className="py-10 px-4 border-b border-gray-200">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="p-5 rounded-xl border border-gray-200 hover:border-violet-200 transition">
             <h2 className="text-sm font-semibold text-gray-900 mb-1.5">
-              Check any ingredient list in seconds
+              Explore 410+ Products
             </h2>
             <p className="text-xs text-gray-600 mb-3 leading-relaxed">
-              Paste a product label. Scrunch instantly tells you if it's curl-safe — backed by community standards.
+              Browse the catalog — from community holy grails to trending #HairTok picks. Filter by curl type, category, or brand.
             </p>
             <Link
-              to="/ingredient-checker"
+              to="/products"
               className="inline-flex items-center justify-center w-full md:w-auto text-sm md:text-xs px-4 md:px-3 py-3 md:py-2 min-h-[44px] md:min-h-0 rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors"
             >
-              Try Ingredient Checker →
+              Browse Products →
             </Link>
           </div>
           <div className="p-5 rounded-xl border border-gray-200 hover:border-violet-200 transition">
             <h2 className="text-sm font-semibold text-gray-900 mb-1.5">
-              Learn from 400K+ curly heads
+              Your hair goals, your perfect routine
             </h2>
             <p className="text-xs text-gray-600 mb-3 leading-relaxed">
-              Ask any question and get real answers from r/curlyhair, r/curlygirl, and r/wavyhair community members.
-            </p>
-            <Link
-              to="/community"
-              className="inline-flex items-center justify-center w-full md:w-auto text-sm md:text-xs px-4 md:px-3 py-3 md:py-2 min-h-[44px] md:min-h-0 rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors"
-            >
-              Visit Community Q&A →
-            </Link>
-          </div>
-          <div className="p-5 rounded-xl border border-gray-200 hover:border-violet-200 transition">
-            <h2 className="text-sm font-semibold text-gray-900 mb-1.5">
-              Personalized picks based on YOUR hair
-            </h2>
-            <p className="text-xs text-gray-600 mb-3 leading-relaxed">
-              Tell us about your waves, curls, or coils — Scrunch finds products that match your hair profile.
+              Whether you're building your first wash day routine or fine-tuning your protein-moisture balance — Scrunch matches products to your curl pattern, porosity, and goals.
             </p>
             <Link
               to="/recommendations"
               className="inline-flex items-center justify-center w-full md:w-auto text-sm md:text-xs px-4 md:px-3 py-3 md:py-2 min-h-[44px] md:min-h-0 rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors"
             >
-              Get Recommendations →
+              Get Personalized Picks →
             </Link>
           </div>
         </div>
@@ -111,7 +105,7 @@ export function Home() {
               Explore Products
             </h2>
             <p className="text-gray-600">
-              410+ curl-safe products from the community's most trusted brands.
+              410+ curl-safe products — from community holy grails to trending #HairTok picks.
             </p>
           </div>
 
@@ -156,7 +150,7 @@ export function Home() {
                 🎵 Trending on #HairTok
               </h2>
               <p className="text-gray-600">
-                Products the curly community is talking about on TikTok
+                The products going viral on #CurlyHairTikTok — checked for curl safety by Scrunch
               </p>
             </div>
 
@@ -211,22 +205,22 @@ export function Home() {
         </section>
       )}
 
-      {/* New to curly hair — discoverable closer */}
+      {/* Starting your curl journey — discoverable closer */}
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto p-8 rounded-2xl bg-violet-50 border border-violet-100">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <div className="text-3xl">🌱</div>
             <div className="flex-1">
-              <h3 className="font-semibold text-gray-900 mb-1">New to curly hair care?</h3>
+              <h3 className="font-semibold text-gray-900 mb-1">Starting your curl journey?</h3>
               <p className="text-sm text-gray-600">
-                Not sure where to start? Check our ingredient checker to see if your current products are curl-friendly.
+                Whether you just discovered your hair is wavy from a TikTok or you've been deep in Reddit threads — browse our catalog to find products that actually work for your hair type.
               </p>
             </div>
             <Link
-              to="/ingredient-checker"
+              to="/products"
               className="text-sm px-4 py-2.5 min-h-[44px] flex items-center rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 whitespace-nowrap"
             >
-              Check Ingredients
+              Browse Products →
             </Link>
           </div>
         </div>
