@@ -116,3 +116,23 @@
 - Product links accurate and verified
 
 **Outcome:** Legal approval granted. Phase 1 MVP roadmap created. Ready for dev assignment (Frenchy for frontend, Danny for Phase 2 backend).
+
+### 2026-07-17: Performance Audit — Honest Assessment
+
+**Build analysis:** Total dist 816KB. Main chunks: index 210KB (65KB gzip), supabase-js 228KB (63KB gzip), seedProducts 74KB (15KB gzip). CSS 49KB (9KB gzip). 27 chunks total — splitting is healthy.
+
+**Critical finding — static SEED_PRODUCTS import:** `useProducts.ts` line 5 and `useHomeProducts.ts` line 4 have `import { SEED_PRODUCTS } from '../data/seedProducts'` — a **static** import used for placeholderData construction at module scope. This means the 74KB seed file is pulled into the useProducts chunk (13.6KB) which is loaded by every page that uses products. The dynamic `import()` on line 57 of useProducts.ts is only used as the queryFn fallback. The placeholderData defeats the lazy-load optimization.
+
+**Loading gates — mostly fixed:** Home uses `data?.products ?? []` (correct). Recommendations uses `!productsData` (correct). But ProductDetail still uses `isLoading && !error` which will show "Loading…" on first visit since `useProduct(id)` has no placeholderData. MyProducts and Profile use `isLoading && !error` but those need auth data, so a spinner is acceptable.
+
+**Image loading — well architected:** IntersectionObserver with 200px rootMargin for lazy loading. localStorage cache for OpenBeautyFacts API hits. No waterfall — images only fetch when scrolled into view, and most products have seed `image_url` so API calls are rare.
+
+**React Query config — solid:** staleTime 5min, gcTime 10min, no excessive refetching. refetchOnWindowFocus defaults to true (fine with 5min stale).
+
+**Auth loading gate in App.tsx:** `if (loading) return null` — Supabase `getSession()` must resolve before ANY route renders. This is a cold-start bottleneck (Supabase free tier can take 1-3s after inactivity). During this time: completely blank screen.
+
+**No Supabase connection warming:** The first Supabase call happens only when a component mounts. No prefetch or connection ping.
+
+**CSS:** Tailwind v4 with Vite plugin — purging is automatic. 49KB (9KB gzip) is normal for a 14-page app.
+
+**Confidence: 7/10.** The app will feel fast for return visitors (cache warm, staleTime prevents refetch). First-visit and cold-start scenarios have 2-3 real issues.

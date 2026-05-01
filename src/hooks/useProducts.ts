@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import type { Product, ProductReview, Profile } from '../lib/database.types'
 import type { SeedProduct } from '../data/seedProducts'
@@ -136,6 +136,7 @@ export function useCatalogProducts() {
 }
 
 export function useProduct(id?: string) {
+  const queryClient = useQueryClient()
   return useQuery({
     queryKey: ['product', id],
     enabled: !!id,
@@ -148,6 +149,20 @@ export function useProduct(id?: string) {
         .single()
       if (error) return null
       return data as unknown as Product
+    },
+    placeholderData: () => {
+      if (!id) return undefined
+      const caches: { products: Product[]; isFallback: boolean }[] = [
+        queryClient.getQueryData(['products']) as { products: Product[]; isFallback: boolean },
+        queryClient.getQueryData(['products', 'catalog']) as { products: Product[]; isFallback: boolean },
+        queryClient.getQueryData(['products', 'recommendations']) as { products: Product[]; isFallback: boolean },
+      ]
+      for (const cache of caches) {
+        const found = cache?.products?.find((p: Product) => p.id === id)
+        if (found) return found
+      }
+      const seed = SEED_PRODUCTS.find((_s, i) => `seed-${i}` === id)
+      return seed ? seedToProduct(seed, SEED_PRODUCTS.indexOf(seed)) : undefined
     },
     staleTime: 5 * 60 * 1000,
   })

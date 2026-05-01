@@ -8,6 +8,8 @@ import { Footer } from './components/layout/Footer'
 import { ToastProvider } from './hooks/useToast'
 import { ToastContainer } from './components/ui/ToastContainer'
 
+const PAGE_PLACEHOLDER = <div className="flex-1 animate-pulse bg-gray-50" />
+
 const Home = lazy(() => import('./pages/Home').then(m => ({ default: m.Home })))
 const Login = lazy(() => import('./pages/Login').then(m => ({ default: m.Login })))
 const SignUp = lazy(() => import('./pages/SignUp').then(m => ({ default: m.SignUp })))
@@ -34,7 +36,7 @@ const queryClient = new QueryClient({
 
 function AppRoutes() {
   const { loading } = useAuth()
-  if (loading) return null
+  if (loading) return PAGE_PLACEHOLDER
   return (
     <Suspense fallback={<div className="flex items-center justify-center py-20 text-gray-400">Loading…</div>}>
       <Routes>
