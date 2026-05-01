@@ -65,7 +65,7 @@ export function Products() {
   const { data, isLoading: productsLoading, error: productsError } = useCatalogProducts()
   const products = useMemo(() => data?.products ?? [], [data])
   const { data: userReviews = [], isLoading: reviewsLoading, error: reviewsError } = useUserReviews(user?.id)
-  const loading = productsLoading && !productsError
+  const loading = !data
   const userId = user?.id
   const [search, setSearch] = useState('')
   const [selectedCategories, setSelectedCategories] = useState<Set<ProductCategory>>(new Set())
