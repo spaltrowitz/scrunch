@@ -7,9 +7,6 @@
 - **User:** Shari Paltrowitz
 
 ## Learnings
-
-
-## Learnings
 - Project is pre-development (no src/ directory yet). Only squad setup and IMAGE_SOURCING_STRATEGY.md exist.
 - Product database has 108+ products planned, sourced from brands popular in r/curlyhair community.
 - Core value proposition: CG-approved product database for curly hair community.
@@ -46,3 +43,12 @@
 - TikTok skews younger/newer — strong for Newbies and Budget Builders, weak for Optimizers who prefer long-form content (YouTube, forums).
 - Product Hunt and Naturally Curly forums are niche channels primarily relevant to the Optimizer persona.
 - NOT worth early investment: Instagram (low intent), Pinterest (slow burn), Facebook groups (hard to market in), paid ads (premature).
+- **2026-05-01: Beta Sprint Prioritization Complete**
+  - **Open PRs status**: 3 PRs ready (PR #15 custom brand finder, PR #12 dry shampoo, PR #9 B&B curl); no blockers found. Sandy approved Alpha PR (#13) with 6 minor non-blocking code notes.
+  - **Core decision**: Merge all 3 PRs immediately. High-effort items (Apple Sign-In, SEO landing pages, invisible onboarding, community integration) are Tier 2 (next 1–2 weeks), not blockers. Defer Google Sign-In, route prefetching, AuthProvider optimization to post-launch.
+  - **Beta launch strategy**: Lean ship (280 products, existing auth, invisible onboarding, SEO pages for top 20 products). Toast feedback + Apple Sign-In earn user trust in first week. Do not add complexity before launch.
+  - **Success hinges on**: (1) Image coverage ≥80% (currently met), (2) SEO landing pages for Store Scanner persona (Google searchers), (3) Invisible onboarding removing friction for Newbies, (4) Reddit community outreach in week of launch.
+  - **Risk mitigations**: Sandy spot-checks PR #15 ingredient matching logic. Parallel async product sourcing (image coverage). Monitor Google Search Console for organic traffic post-launch.
+  - **Key insight**: Store Scanner persona is ONLY persona arriving via Google SEO. All other 3 personas (Newbie, Budget, Optimizer) arrive via Reddit/TikTok/social. Prioritize SEO pages for differentiation, but community outreach is still table-stakes.
+  - **Parallel workstreams recommended**: Sandy (auth + PRs), Frenchy (invisible onboarding + Recommendations decomposition), Cha-Cha (bundle monitoring), Shari (community outreach + image sourcing).
+  - **Post-Beta roadmap**: Personalized category ordering, advanced community features (Discord, Reddit auto-posts), route prefetching, technical debt cleanup.
