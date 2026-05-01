@@ -401,10 +401,17 @@ export function Products() {
       )}
 
       {filteredProducts.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500 mb-2">No products match your filters.</p>
-          <button onClick={clearFilters} className="text-sm text-violet-600 hover:underline cursor-pointer">
-            Clear filters
+        <div className="text-center py-16 px-4">
+          <div className="text-4xl mb-4">🔍</div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No products found</h3>
+          <p className="text-gray-500 mb-6 max-w-md mx-auto">
+            No products match your current filters. Try adjusting your search or filters to find what you're looking for.
+          </p>
+          <button
+            onClick={clearFilters}
+            className="px-5 py-2.5 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 cursor-pointer transition-colors"
+          >
+            Clear all filters
           </button>
         </div>
       ) : (

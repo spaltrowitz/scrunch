@@ -48,7 +48,7 @@ export function Home() {
             </p>
             <Link
               to="/ingredient-checker"
-              className="inline-flex items-center text-xs px-3 py-2 rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors"
+              className="inline-flex items-center justify-center w-full md:w-auto text-sm md:text-xs px-4 md:px-3 py-3 md:py-2 min-h-[44px] md:min-h-0 rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors"
             >
               Try Ingredient Checker →
             </Link>
@@ -62,7 +62,7 @@ export function Home() {
             </p>
             <Link
               to="/community"
-              className="inline-flex items-center text-xs px-3 py-2 rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors"
+              className="inline-flex items-center justify-center w-full md:w-auto text-sm md:text-xs px-4 md:px-3 py-3 md:py-2 min-h-[44px] md:min-h-0 rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors"
             >
               Visit Community Q&A →
             </Link>
@@ -76,7 +76,7 @@ export function Home() {
             </p>
             <Link
               to="/recommendations"
-              className="inline-flex items-center text-xs px-3 py-2 rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors"
+              className="inline-flex items-center justify-center w-full md:w-auto text-sm md:text-xs px-4 md:px-3 py-3 md:py-2 min-h-[44px] md:min-h-0 rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors"
             >
               Get Recommendations →
             </Link>
