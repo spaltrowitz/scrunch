@@ -123,6 +123,21 @@ Decomposed `src/pages/Recommendations.tsx` from 1173 lines into 7 files:
 
 **Verification:** `npm run build` ✅, `npx tsc --noEmit` ✅, `npm test` (26 tests) ✅
 
+### 2025-07-26 — Homepage Load Time Optimization
+
+**Problem:** Homepage taking 1.3s+ to show products due to full Supabase query (all 22 columns) + cold start delay + no placeholder data.
+
+**What shipped (3 changes):**
+1. **New `useHomeProducts()` hook** (`src/hooks/useHomeProducts.ts`) — fetches only 7 columns (`id,brand,name,category,cg_status,image_url,cruelty_free`), orders by `review_count` desc, limits to 20 rows. Full `PRODUCT_SELECT` (22 cols) preserved for Products page and ProductDetail.
+2. **Instant seed data via `placeholderData`** — pre-computed 20 seed products render synchronously before Supabase responds. Eliminates "Loading products…" blank state entirely. Seed data lives in code-split chunk loaded with Home route.
+3. **staleTime already 5min globally** — confirmed QueryClient defaults (`staleTime: 5min, gcTime: 10min`) apply to all queries including the new homepage hook. No change needed.
+
+**Files modified:** `src/hooks/useHomeProducts.ts` (new), `src/hooks/useProducts.ts` (exported `seedToProduct`), `src/pages/Home.tsx` (switched to `useHomeProducts`, fixed loading guard).
+
+**Trade-off:** Seed data (70KB chunk) loads with Home route for instant render. Accepted because perceived load time drops from 1.3s to 0ms — users see products immediately while Supabase wakes up.
+
+**Verification:** `npm run build` ✅ (Home chunk 12KB, seeds 70KB separate), `npm test` (26 tests) ✅
+
 ### Cross-team context (2026-05-01)
 - Sandy merged 3 PRs this batch with architecture-first conflict resolution policy; PR #9 and #15 required rebasing to React Query patterns
 - Frenchy wired toast notification system to all 7 mutations, establishing feedback convention

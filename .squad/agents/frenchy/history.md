@@ -47,6 +47,9 @@
 - "Show More" pagination pattern: `useState(PRODUCTS_PER_PAGE)` + `filteredProducts.slice(0, visibleCount)` — reset `visibleCount` when filters change
 - Module-level constants (like `EMPTY_SET`) avoid per-render allocations — use this pattern for any Set/Map/array passed as default props
 - `useProductImage` has an `enabled` flag + IntersectionObserver in `ProductImage` — images only fetch when scrolled into viewport
+- Prose-inspired redesign lesson: removing filter state (useState, useMemo) from the homepage component drastically simplifies the code — filters belong on /products, not the landing page
+- `useHomeProducts()` in `src/hooks/useHomeProducts.ts` is the homepage-specific hook (7 columns, 20 rows, placeholderData) — never use `useProducts()` on the homepage
+- Full-viewport hero (`min-h-screen` + flex centering) creates immediate visual impact — worth the scroll trade-off for a mission-driven landing page
 
 ### Homepage UX Polish — Jan's Recommendations (2026-05-01)
 - Implemented 10 of 13 UX recommendations from Jan's review (4 🔴 must-haves + 6 🟡 nice-to-haves)
@@ -88,3 +91,12 @@
 - Capped category grid at 4 columns max (was 5 on lg), 3 on mobile (was 2)
 - Added more vertical spacing between sections (py-8 → py-10, mb-6 → mb-10)
 - Build passes, 26/26 tests green
+
+### Prose-Inspired Homepage Redesign (2026-07-25)
+- Full rewrite of `src/pages/Home.tsx` following Jan's spec at `.squad/designs/homepage-redesign-prose-inspired.md`
+- **Hero**: Full-viewport centered layout with bold headline, single CTA, subtle social proof line. Killed 3 value bullets and dual CTAs.
+- **3 Feature narrative sections**: Full-width alternating left/right rows with generous padding. Links to /ingredient-checker, /community, /recommendations.
+- **Product teaser**: 6 products in clean grid using `useHomeProducts()` hook. No filter bar, no category grid.
+- **Removed**: sticky filter bar, category grid, "Show all categories" toggle, persona pills, old feature spotlight cards, 12-product grid, all filter state.
+- **Kept**: "New to curly hair?" CTA closer, Supabase fallback banner.
+- Page now ~2.5 scroll heights (was ~5-6). Build passes, 26/26 tests green.

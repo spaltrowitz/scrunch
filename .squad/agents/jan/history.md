@@ -29,6 +29,34 @@
 
 # Jan — Product Design History
 
+## 2026-05-02: Prose-Inspired Homepage Redesign — Design Spec
+
+**Context:** Shari requested a sleeker, more mission-driven homepage redesign using Prose (prose.com) as a reference.
+
+**What I analyzed:**
+- Prose homepage design patterns: single mission statement, minimal aesthetic, one CTA, trust signals, progressive disclosure
+- Current Scrunch homepage: 5-6 screen heights of content (hero + 3 value bullets + feature cards + filter bar + 8 categories + 12 products + "new to curly hair" section)
+- User personas: Newbie, Store Scanner, Budget Builder, Optimizer — all served by discovery-first homepage
+
+**Design decisions:**
+1. **Hero simplification** — Single powerful headline ("Your curly hair deserves better than a Google spreadsheet"), remove value bullet grid, one CTA button, add one-line social proof. Reduces visual clutter while making mission crystal clear.
+
+2. **Feature expansion** — Convert cramped 3-card feature spotlight into 3 full-width narrative sections with alternating left/right layout. Each feature tells a story (Ingredient Checker, Community Q&A, Recommendations) — users scroll through why Scrunch is different.
+
+3. **Remove sticky filter bar from homepage** — Filters belong on `/products` page. Removing it from homepage saves cognitive load in the hero zone and respects "invisible onboarding" (don't gate discovery behind questions).
+
+4. **Replace heavy product grid** — Instead of 12-product grid on homepage, create lightweight "Popular Products" teaser showing 4-6 items. Send users to `/products` for full catalog with filters. Reduces cognitive overload.
+
+5. **Kill category grid duplication** — Current homepage shows 8 category cards PLUS full product grid below. Reposition categories as lightweight navigation links below products, all 14 shown. Serves discovery without duplication.
+
+6. **Remove "New to curly hair?" CTA section** — This content is discoverable via direct CTAs to `/ingredient-checker` and `/community`. Burying it on homepage dilutes the mission. Users who need it will find it through feature CTAs.
+
+**Result:** Homepage compresses from ~500-600vh to ~360vh (~2.5 screen heights). User lands, sees mission, takes one action. Content progressively discloses as they scroll — no overwhelm.
+
+**Key principle applied:** Prose trusts the mission to pull people in. Scrunch should do the same — lead with "why we exist" (curly hair deserves better), not "what we have" (200+ products). Product discovery happens *after* mission clarity.
+
+**Deliverable:** Complete design spec at `.squad/designs/homepage-redesign-prose-inspired.md` with exact copy, component structure, Tailwind classes, responsive breakpoints, and implementation notes for Frenchy.
+
 ## Learnings
 
 ### 2025-01-30: Goal Capture Onboarding UX (v1 — SUPERSEDED)

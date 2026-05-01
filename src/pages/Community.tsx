@@ -18,12 +18,58 @@ interface CommunityQuestion {
   timestamp: string
 }
 
+const STOP_WORDS = new Set([
+  'i', 'me', 'my', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+  'a', 'an', 'the', 'and', 'or', 'but', 'if', 'in', 'on', 'at', 'to', 'for',
+  'of', 'with', 'by', 'from', 'as', 'into', 'about', 'that', 'this', 'it',
+  'they', 'them', 'their', 'what', 'which', 'who', 'when', 'where', 'how',
+  'can', 'do', 'does', 'did', 'will', 'would', 'should', 'could', 'have',
+  'has', 'had', 'not', 'no', 'so', 'just', 'than', 'too', 'very', 'all',
+  'also', 'like', 'want', 'make', 'right', 'now', 'well', 'her', 'she', 'he',
+  'his', 'get', 'got', 'some', 'any', 'up', 'out', 'over', 'look',
+])
+
+function extractSearchTerms(query: string): string {
+  const words = query
+    .toLowerCase()
+    .replace(/[^\w\s]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 2 && !STOP_WORDS.has(w))
+
+  // Dedupe while preserving order
+  const seen = new Set<string>()
+  const unique = words.filter(w => {
+    if (seen.has(w)) return false
+    seen.add(w)
+    return true
+  })
+
+  // Reddit search works best with 4-6 key terms
+  return unique.slice(0, 6).join(' ')
+}
+
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/\*\*([^*]+)\*\*/g, '$1')   // **bold**
+    .replace(/\*([^*]+)\*/g, '$1')        // *italic*
+    .replace(/__([^_]+)__/g, '$1')        // __bold__
+    .replace(/_([^_]+)_/g, '$1')          // _italic_
+    .replace(/~~([^~]+)~~/g, '$1')        // ~~strikethrough~~
+    .replace(/^#{1,6}\s+/gm, '')          // # headings
+    .replace(/^>\s?/gm, '')               // > blockquotes
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // [links](url)
+    .replace(/`([^`]+)`/g, '$1')          // `code`
+    .replace(/\n{3,}/g, '\n\n')           // excess newlines
+    .trim()
+}
+
 async function searchReddit(query: string): Promise<RedditResult[]> {
+  const searchTerms = extractSearchTerms(query)
   const subreddits = ['curlyhair', 'curlygirl', 'wavyhair']
   const fetches = subreddits.map(async (sub) => {
     try {
       const res = await fetch(
-        `https://old.reddit.com/r/${sub}/search.json?q=${encodeURIComponent(query)}&restrict_sr=on&sort=relevance&limit=5`,
+        `https://old.reddit.com/r/${sub}/search.json?q=${encodeURIComponent(searchTerms)}&restrict_sr=on&sort=relevance&limit=5`,
         { headers: { 'Accept': 'application/json' } }
       )
       if (!res.ok) return []
@@ -37,7 +83,7 @@ async function searchReddit(query: string): Promise<RedditResult[]> {
           subreddit: `r/${sub}`,
           score: d.score,
           num_comments: d.num_comments,
-          snippet: (d.selftext || '').slice(0, 200),
+          snippet: stripMarkdown((d.selftext || '').slice(0, 300)).slice(0, 200),
         } as RedditResult
       })
     } catch {
@@ -48,32 +94,28 @@ async function searchReddit(query: string): Promise<RedditResult[]> {
 
   // If CORS blocked all results, provide direct search links instead
   if (results.length === 0) {
-    const encodedQuery = encodeURIComponent(query)
+    const encodedQuery = encodeURIComponent(searchTerms)
     results.push(
-      { title: `Search r/curlyhair for "${query}"`, url: `https://www.reddit.com/r/curlyhair/search/?q=${encodedQuery}&restrict_sr=1`, subreddit: 'r/curlyhair', score: 0, num_comments: 0, snippet: 'Click to search r/curlyhair directly on Reddit' },
-      { title: `Search r/curlygirl for "${query}"`, url: `https://www.reddit.com/r/curlygirl/search/?q=${encodedQuery}&restrict_sr=1`, subreddit: 'r/curlygirl', score: 0, num_comments: 0, snippet: 'Click to search r/curlygirl directly on Reddit' },
-      { title: `Search r/wavyhair for "${query}"`, url: `https://www.reddit.com/r/wavyhair/search/?q=${encodedQuery}&restrict_sr=1`, subreddit: 'r/wavyhair', score: 0, num_comments: 0, snippet: 'Click to search r/wavyhair directly on Reddit' },
+      { title: `Search r/curlyhair for "${searchTerms}"`, url: `https://www.reddit.com/r/curlyhair/search/?q=${encodedQuery}&restrict_sr=1`, subreddit: 'r/curlyhair', score: 0, num_comments: 0, snippet: 'Click to search r/curlyhair directly on Reddit' },
+      { title: `Search r/curlygirl for "${searchTerms}"`, url: `https://www.reddit.com/r/curlygirl/search/?q=${encodedQuery}&restrict_sr=1`, subreddit: 'r/curlygirl', score: 0, num_comments: 0, snippet: 'Click to search r/curlygirl directly on Reddit' },
+      { title: `Search r/wavyhair for "${searchTerms}"`, url: `https://www.reddit.com/r/wavyhair/search/?q=${encodedQuery}&restrict_sr=1`, subreddit: 'r/wavyhair', score: 0, num_comments: 0, snippet: 'Click to search r/wavyhair directly on Reddit' },
     )
   }
 
-  return results.sort((a, b) => b.score - a.score).slice(0, 8)
+  // Keep Reddit's relevance order — do NOT re-sort by score
+  return results.slice(0, 8)
 }
 
-function generateAiAnswer(question: string, redditResults: RedditResult[]): string {
+function generateSummary(_question: string, redditResults: RedditResult[]): string {
   const hasRealResults = redditResults.some(r => r.score > 0)
 
   if (!hasRealResults) {
-    return `I've created direct search links to Reddit's curly hair communities for "${question}".\n\n` +
-      `Click the links below to search **r/curlyhair** (339K members), **r/curlygirl** (61K members), and **r/wavyhair** directly.\n\n` +
-      `_AI-powered answers that search Reddit automatically are coming soon!_`
+    return `No matching discussions found via API. Click the links below to search Reddit's curly hair communities directly.`
   }
 
-  const topPost = redditResults[0]
-  return `Based on discussions from the curly hair community, here's what I found:\n\n` +
-    `**Most relevant thread:** "${topPost.title}" (${topPost.subreddit}, ${topPost.score} upvotes, ${topPost.num_comments} comments)\n\n` +
-    (topPost.snippet ? `> ${topPost.snippet}...\n\n` : '') +
-    `I found ${redditResults.length} related discussions across r/curlyhair, r/curlygirl, and r/wavyhair. Check the threads below for detailed answers from the community.\n\n` +
-    `_Note: AI-powered personalized answers coming soon! For now, I'm surfacing the best community discussions._`
+  const count = redditResults.length
+  const subs = [...new Set(redditResults.map(r => r.subreddit))].join(', ')
+  return `Found ${count} related discussions across ${subs}. Browse the threads below for community advice and tips.`
 }
 
 export function Community() {
@@ -91,7 +133,7 @@ export function Community() {
     setQuestion('')
 
     const redditResults = await searchReddit(q)
-    const aiAnswer = generateAiAnswer(q, redditResults)
+    const aiAnswer = generateSummary(q, redditResults)
 
     const newQ: CommunityQuestion = {
       id: Date.now().toString(),
@@ -183,7 +225,7 @@ export function Community() {
             {item.aiAnswer && (
               <div className="px-6 py-4 border-b border-gray-100">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs px-2 py-0.5 bg-violet-100 text-violet-700 rounded-full font-medium">🤖 AI Summary</span>
+                  <span className="text-xs px-2 py-0.5 bg-violet-100 text-violet-700 rounded-full font-medium">📋 Community Results</span>
                 </div>
                 <div className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
                   {item.aiAnswer}
