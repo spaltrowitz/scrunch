@@ -18,6 +18,7 @@ import type {
   FragrancePreference, WaterType,
 } from '../../lib/database.types'
 import { useUserProfile } from '../../hooks/useProducts'
+import { useToast } from '../../hooks/useToast'
 
 interface OnboardingData {
   curl_pattern: CurlPattern | null
@@ -43,6 +44,7 @@ export function OnboardingWizard() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { addToast } = useToast()
   const { data: profile, isLoading: profileLoading, error: profileError } = useUserProfile(user?.id)
   const [step, setStep] = useState(1)
   const [saving, setSaving] = useState(false)
@@ -130,8 +132,10 @@ export function OnboardingWizard() {
     },
     onError: (error) => {
       console.error('Profile upsert failed:', error)
+      addToast('Failed to save your profile. Please try again.', 'error')
     },
     onSuccess: () => {
+      addToast('Profile saved!', 'success')
       if (user) {
         queryClient.invalidateQueries({ queryKey: ['profile', user.id] })
       }
