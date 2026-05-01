@@ -36,6 +36,7 @@ export function Home() {
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory | null>(null)
   const [cgFilter, setCgFilter] = useState<CgStatus | ''>('')
   const [brandFilter, setBrandFilter] = useState('')
+  const [showAllCategories, setShowAllCategories] = useState(false)
 
   const clearFilters = () => {
     setCgFilter('')
@@ -148,26 +149,13 @@ export function Home() {
         </div>
       </section>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Persona quick-start paths — not gates, parallel entry points */}
-        <div className="flex flex-wrap gap-3 mb-6">
-          <Link to="/ingredient-checker" className="flex items-center gap-2 text-xs px-3 py-2.5 min-h-[44px] rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 no-underline">
-            🌱 New to curls? Check your products
-          </Link>
-          <Link to="/products" className="flex items-center gap-2 text-xs px-3 py-2.5 min-h-[44px] rounded-full bg-violet-50 text-violet-700 border border-violet-200 hover:bg-violet-100 no-underline">
-            🔍 Find curl-safe products
-          </Link>
-          <Link to="/products" className="flex items-center gap-2 text-xs px-3 py-2.5 min-h-[44px] rounded-full bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100 no-underline">
-            📋 Browse all {products.length || '200'}+ products
-          </Link>
-        </div>
-
+      <div className="max-w-6xl mx-auto px-4 py-10">
         {/* Category cards — shown when no filter is active, sorted by popularity */}
         {!selectedCategory && !cgFilter && !brandFilter && (
           <section className="mb-10">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Browse by Category</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-              {sortedCategories.map(([key, label]) => (
+            <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {(showAllCategories ? sortedCategories : sortedCategories.slice(0, 6)).map(([key, label]) => (
                 <button
                   key={key}
                   onClick={() => setSelectedCategory(key)}
@@ -179,8 +167,31 @@ export function Home() {
                 </button>
               ))}
             </div>
+            {!showAllCategories && sortedCategories.length > 6 && (
+              <div className="text-center mt-4">
+                <button
+                  onClick={() => setShowAllCategories(true)}
+                  className="text-sm text-violet-600 hover:text-violet-800 font-medium cursor-pointer"
+                >
+                  Show all categories →
+                </button>
+              </div>
+            )}
           </section>
         )}
+
+        {/* Persona quick-start paths — not gates, parallel entry points */}
+        <div className="flex flex-wrap gap-3 mb-10">
+          <Link to="/ingredient-checker" className="flex items-center gap-2 text-xs px-3 py-2 min-h-[44px] rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 no-underline">
+            🌱 New to curls? Check your products
+          </Link>
+          <Link to="/products" className="flex items-center gap-2 text-xs px-3 py-2 min-h-[44px] rounded-full bg-violet-50 text-violet-600 border border-violet-100 hover:bg-violet-100 no-underline">
+            🔍 Find curl-safe products
+          </Link>
+          <Link to="/products" className="flex items-center gap-2 text-xs px-3 py-2 min-h-[44px] rounded-full bg-gray-50 text-gray-500 border border-gray-100 hover:bg-gray-100 no-underline">
+            📋 Browse all {products.length || '200'}+ products
+          </Link>
+        </div>
 
         {/* Product grid */}
         <section>
@@ -210,7 +221,7 @@ export function Home() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filteredProducts.slice(0, 40).map((product, i) => (
+              {filteredProducts.slice(0, 12).map((product, i) => (
                 <Link
                   key={product.id || `${product.brand}-${product.name}-${i}`}
                   to={product.id ? `/products/${product.id}` : '/products'}
@@ -244,7 +255,7 @@ export function Home() {
             </div>
           )}
 
-          {filteredProducts.length > 40 && (
+          {filteredProducts.length > 12 && (
             <div className="text-center mt-6">
               <Link
                 to="/products"

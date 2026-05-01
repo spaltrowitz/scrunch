@@ -19,7 +19,7 @@ interface CommunityQuestion {
 }
 
 async function searchReddit(query: string): Promise<RedditResult[]> {
-  const subreddits = ['curlyhair', 'curlygirl']
+  const subreddits = ['curlyhair', 'curlygirl', 'wavyhair']
   const fetches = subreddits.map(async (sub) => {
     try {
       const res = await fetch(
@@ -52,6 +52,7 @@ async function searchReddit(query: string): Promise<RedditResult[]> {
     results.push(
       { title: `Search r/curlyhair for "${query}"`, url: `https://www.reddit.com/r/curlyhair/search/?q=${encodedQuery}&restrict_sr=1`, subreddit: 'r/curlyhair', score: 0, num_comments: 0, snippet: 'Click to search r/curlyhair directly on Reddit' },
       { title: `Search r/curlygirl for "${query}"`, url: `https://www.reddit.com/r/curlygirl/search/?q=${encodedQuery}&restrict_sr=1`, subreddit: 'r/curlygirl', score: 0, num_comments: 0, snippet: 'Click to search r/curlygirl directly on Reddit' },
+      { title: `Search r/wavyhair for "${query}"`, url: `https://www.reddit.com/r/wavyhair/search/?q=${encodedQuery}&restrict_sr=1`, subreddit: 'r/wavyhair', score: 0, num_comments: 0, snippet: 'Click to search r/wavyhair directly on Reddit' },
     )
   }
 
@@ -63,7 +64,7 @@ function generateAiAnswer(question: string, redditResults: RedditResult[]): stri
 
   if (!hasRealResults) {
     return `I've created direct search links to Reddit's curly hair communities for "${question}".\n\n` +
-      `Click the links below to search **r/curlyhair** (339K members) and **r/curlygirl** (61K members) directly.\n\n` +
+      `Click the links below to search **r/curlyhair** (339K members), **r/curlygirl** (61K members), and **r/wavyhair** directly.\n\n` +
       `_AI-powered answers that search Reddit automatically are coming soon!_`
   }
 
@@ -71,7 +72,7 @@ function generateAiAnswer(question: string, redditResults: RedditResult[]): stri
   return `Based on discussions from the curly hair community, here's what I found:\n\n` +
     `**Most relevant thread:** "${topPost.title}" (${topPost.subreddit}, ${topPost.score} upvotes, ${topPost.num_comments} comments)\n\n` +
     (topPost.snippet ? `> ${topPost.snippet}...\n\n` : '') +
-    `I found ${redditResults.length} related discussions across r/curlyhair and r/curlygirl. Check the threads below for detailed answers from the community.\n\n` +
+    `I found ${redditResults.length} related discussions across r/curlyhair, r/curlygirl, and r/wavyhair. Check the threads below for detailed answers from the community.\n\n` +
     `_Note: AI-powered personalized answers coming soon! For now, I'm surfacing the best community discussions._`
 }
 
@@ -108,7 +109,7 @@ export function Community() {
     <div className="max-w-3xl mx-auto px-4 py-12">
       <h1 className="text-2xl font-bold text-gray-900 mb-2">Community</h1>
       <p className="text-gray-600 mb-8">
-        Ask anything about curly hair care. We'll search r/curlyhair and r/curlygirl for the best answers.
+        Ask anything about curly or wavy hair care. We'll search r/curlyhair, r/curlygirl, and r/wavyhair for the best answers.
       </p>
 
       {/* Ask a question */}
@@ -122,7 +123,7 @@ export function Community() {
           />
           <div className="flex items-center justify-between mt-2">
             <p className="text-xs text-gray-400">
-              🔍 Searches r/curlyhair (339K) and r/curlygirl (61K)
+              🔍 Searches r/curlyhair (339K), r/curlygirl (61K), and r/wavyhair
             </p>
             <button
               type="submit"
