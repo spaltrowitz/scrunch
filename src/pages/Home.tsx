@@ -15,7 +15,7 @@ const FEATURED_CREATORS = [
 export function Home() {
   const { data } = useHomeProducts()
   const products = data?.products ?? []
-  const isFallback = data?.isFallback ?? false
+  const products = data?.products ?? []
   const featuredProducts = products.slice(0, 6)
 
   // TODO: Switch to notes-based filter once Danny adds '#HairTok' tags
@@ -32,7 +32,7 @@ export function Home() {
       {/* Hero */}
       <section className="flex flex-col items-center justify-center px-4 py-16 md:py-24 text-center bg-gradient-to-b from-violet-50 to-white">
         <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight max-w-2xl">
-          Your wash day just got a whole lot smarter.
+          Finally, one place for curly hair that actually works.
         </h1>
 
         <p className="text-sm md:text-base text-gray-600 mb-6 max-w-xl leading-relaxed">
@@ -55,13 +55,6 @@ export function Home() {
         </div>
 
       </section>
-
-      {/* Fallback banner */}
-      {isFallback && (
-        <div className="bg-amber-50 border-b border-amber-200 text-amber-800 text-xs px-4 py-2 text-center">
-          📡 Showing cached products — live database temporarily unavailable
-        </div>
-      )}
 
       {/* Features — 2 columns */}
       <section className="py-10 px-4 border-b border-gray-200">
