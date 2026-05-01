@@ -108,3 +108,10 @@ Beta must-fix sprint (6 items) now complete across Frenchy + Danny. Scribe docum
 - **No duplicates:** All 7 products were confirmed missing before adding. Existing Rizos Curls products (Hydrating shampoo, Curl Defining Cream, Light Hold Gel, Volumizing Hairspray) and adwoa beauty Baomint Leave-In were already in catalog but are different products.
 - **Lesson:** Always validate category and field values against the TypeScript types before adding — task descriptions may use informal names that don't match the actual union type.
 
+
+### 2026-05-02: Recommendations Page Instant Load Fix
+- **Root cause:** The loading gate `(productsLoading || profileLoading || reviewsLoading) && !errors` blocked ALL rendering until every Supabase query finished. Even though `useRecommendationProducts()` had `placeholderData` (renders instantly from seed data), the page showed "Loading recommendations…" waiting for profile and reviews to return from Supabase.
+- **Fix — Progressive rendering:** Changed loading gate to only block if zero products are available (no placeholder either). The page now renders Tier 1 recommendations instantly with seed product data, then reactively upgrades to Tier 2/3/4 as profile and reviews arrive from Supabase.
+- **Fix — Inline loading indicators:** Replaced the full-page spinner with subtle inline messages: "Personalizing your recommendations…" (while profile/reviews load) and "Finding people with similar hair…" (while collaborative filtering runs). Users see content immediately instead of a blank loading screen.
+- **Fix — Moved `loadCollaborativeRecs` outside component:** This async function had no component dependencies but was being recreated on every render inside the component body. Moved to module scope to avoid unnecessary allocations.
+- **Lesson:** `placeholderData` in React Query only helps if the loading gate doesn't block rendering anyway. The page had the right hook but the wrong gate — it was ANDing all three queries' loading states together, defeating the purpose of placeholder data.
