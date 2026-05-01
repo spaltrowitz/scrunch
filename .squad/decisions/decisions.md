@@ -845,3 +845,99 @@ Shari requested HairTok-sourced products be added to the Scrunch catalog with ne
 
 - Frontend (Frenchy): New categories will need filter UI support in Products page.
 - Database: No migration needed — seed data only. If/when we sync to Supabase, the `product_category` enum will need `scalp_care` and `bond_repair` added.
+
+---
+
+## User Directives — Batch 7 (2026-05-01)
+
+### Directive 1: Education/Discovery-First for New Visitors
+
+**Timestamp:** 2026-05-01T22:27Z  
+**Source:** Shari Paltrowitz (via Copilot)  
+**Context:** Homepage CTA prioritization
+
+**Statement:**
+> New visitors to curly hair don't want to check ingredients first — they want to learn basics about maintaining their hair and understand how this website will help them. The ingredient checker is a power-user feature, not a first-visit hook. The homepage should lead with education/discovery, not tools.
+
+**Why Captured:** Critical for homepage positioning. Ingredient Checker was previously proposed as primary CTA based on friction analysis (15 sec zero-login test), but user explicitly prefers education/discovery first-visit experience.
+
+**Implication:** Homepage hero should lead with product browsing or educational content, not ingredient checking. Ingredient Checker is a secondary feature or follow-on action.
+
+---
+
+### Directive 2: Community Q&A — Demote from Primary Feature
+
+**Timestamp:** 2026-05-01T22:30Z  
+**Source:** Shari Paltrowitz (via Copilot)  
+**Context:** Homepage feature prioritization
+
+**Statement:**
+> Community Q&A is NOT a primary product feature — it's currently the weakest part of the app. The Reddit search engine needs significant optimization before it should be prominently featured. Demote it on the homepage; don't lead with it as a main selling point.
+
+**Why Captured:** User assessment of feature quality + maturity. Community Q&A (Reddit search + results) is ranked P1 or lower, not P0. Should not be in top homepage real estate until search quality improves.
+
+**Implication:** Remove Community Q&A from hero, feature spotlight, or primary CTA. Relocate to lower page area or secondary feature box. Product catalog + Ingredient Checker should occupy primary slots.
+
+**Technical Note:** Danny's "Community Search Relevance v2" fixes (domain-aware keyword extraction, multi-query fallback, honest "no results" UI) address some maturity gaps but may not be sufficient for primary-feature status.
+
+---
+
+### Decision: Homepage CTA Hierarchy — Kenickie (PM)
+
+**Date:** 2026-05-01  
+**Status:** Approved per Shari's directives (with override)  
+**Request:** Shari Paltrowitz  
+**Spec:** `.squad/decisions/inbox/kenickie-homepage-cta-priority.md`
+
+**Context:** Shari's directives (education-first, demote Community Q&A) required override to Kenickie's analysis (Ingredient Checker = primary CTA based on friction/uniqueness).
+
+**Original Analysis (Kenickie):**
+- Ingredient Checker: 15-sec zero-friction aha moment
+- Product Discovery: requires filters + context
+- Recommendations: gated behind 3–5 min form
+- **Conclusion:** Ingredient Checker has fastest trust-building path → primary CTA
+
+**User Override:**
+- Education/discovery first, not ingredient checking
+- Community Q&A is weak, demote it
+- Too many competing CTAs causing decision paralysis
+
+**Resolved Decision:**
+- **PRIMARY CTA:** Browse/Discover Products (aligns with education-first directive)
+- **SECONDARY CTA:** Ingredient Checker (moved from primary, still visible, positioned as advanced tool)
+- **DEMOTED:** Community Q&A (moved to lower area, not primary feature box)
+- **TERTIARY:** Recommendations (repositioned after #HairTok section as "Ready to get personalized?")
+
+**Rationale:**
+- Honors user's product/education-first positioning while preserving Ingredient Checker as discoverable secondary feature
+- Removes Shari's stated frustration (too many CTAs, competing priorities)
+- Aligns with "invisible onboarding" principle (no gates before value = immediate browse access)
+- Preserves unique differentiator (Ingredient Checker) without making it the hero
+
+**Implementation:** Frenchy will execute per full spec in kenickie inbox file (lines ~100–170).
+
+---
+
+## Copy Refresh — Batch 7 (Jan, 2026-05-01)
+
+**Author:** Jan (Product Designer)  
+**Date:** 2026-05-01  
+**Scope:** 16 copy changes across Home.tsx and About.tsx  
+**Audience:** Unified Reddit + TikTok voice  
+**Deliverable:** `.squad/designs/copy-refresh-hairtok-reddit.md`
+
+**Key Principles Applied:**
+1. **Inclusive framing** — "From Reddit threads to TikTok reels" (additive, not replacement)
+2. **Shared vocabulary** — Terms like "wash day", "holy grails", "curl journey" work on both platforms
+3. **Dual social proof** — "400K+ Reddit members AND millions of #HairTok views"
+4. **Recognition moments** — Specific experiences (e.g., "discovered your hair is wavy from a TikTok") drive emotional resonance
+5. **Discovery language for TikTok** (trending, viral, holy grail); depth language for Reddit (deep-dives, community wisdom, vetted)
+
+**Changes Include:**
+- Hero headline refinement
+- Feature box copy updates
+- Social proof language unification
+- CTA button text polish
+- About page community positioning
+
+**Status:** Spec complete; awaiting Frenchy implementation in next phase.

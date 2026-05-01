@@ -149,3 +149,7 @@ This sprint completed all 6 beta must-fix items across team (Frenchy + Danny + t
 - Legal constraints for TikTok integration: no embeds, no creator images, no verbatim captions — text-only cards with links are the safe path
 - `useMemo` with dual filter strategy (notes field → hardcoded fallback) lets us ship UI before data migration is complete
 - Reusing the exact same product card markup keeps visual consistency without extracting a shared component (would be worth extracting if a 3rd grid appears)
+- When Shari's directives conflict with Kenickie's PM analysis, Shari wins — she overrode Kenickie's "Ingredient Checker = Primary CTA" with "Browse Products = Primary CTA" because new visitors want discovery, not tools
+- Reducing feature boxes from 4→2 requires switching grid from `md:grid-cols-3` to `md:grid-cols-2` with tighter `max-w-4xl` to avoid boxes looking too wide
+- Jan's copy spec had 16 changes but 4 targeted boxes we removed (Ingredient Checker, Community Q&A) — always cross-reference structural changes with copy specs to avoid applying dead edits
+- Feedback form label changes (Feature Request→Idea, Feedback→Love it) require updating the FeedbackType union, LABELS map, PLACEHOLDERS map, default state, reset state, and all conditional render expressions — 6 touch points for a "simple" label change
