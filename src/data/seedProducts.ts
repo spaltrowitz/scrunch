@@ -383,4 +383,11 @@ export const SEED_PRODUCTS: SeedProduct[] = [
 
   // ── SEPHORA: OIL / SERUM ──────────────────────────────────────────────
   { brand: 'COLOR WOW', name: 'Dream Coat Anti-Frizz Treatment for Curly Hair', category: 'oil_serum', cg_status: 'not_approved', cruelty_free: 'unclear', notes: 'Contains non-water-soluble silicones (amodimethicone, dimethicone)', image_url: 'https://cdn.shopify.com/s/files/1/0587/5210/6688/products/CW530_DreamCoatCurly_200ml_2048x2048_423125ac-91f1-4122-b216-1c0659be55e4.jpg?v=1648589845' },
+
+  // ── DRY SHAMPOO ─────────────────────────────────────────────────────
+  { brand: 'Acure', name: 'Dry Shampoo', category: 'dry_shampoo', cg_status: 'approved', cruelty_free: 'yes', notes: 'LB/PETA. Plant-based, no aerosol', image_url: null },
+  { brand: 'Klorane', name: 'Dry Shampoo with Oat Milk', category: 'dry_shampoo', cg_status: 'approved', cruelty_free: 'yes', notes: 'LB. Cult classic. Gentle, plant-based formula', image_url: null },
+  { brand: 'Batiste', name: 'Original Dry Shampoo', category: 'dry_shampoo', cg_status: 'not_approved', cruelty_free: 'yes', notes: 'Contains silicone (cyclopentasiloxane). Most popular dry shampoo globally', image_url: null },
+  { brand: "Not Your Mother's", name: 'Clean Freak Refreshing Dry Shampoo', category: 'dry_shampoo', cg_status: 'caution', cruelty_free: 'unclear', notes: 'Site claims no animal testing. Contains some potentially drying ingredients', image_url: null },
+  { brand: 'amika', name: 'Perk Up Dry Shampoo', category: 'dry_shampoo', cg_status: 'approved', cruelty_free: 'yes', notes: 'LB/PETA. Rice starch-based, no silicones', image_url: null },
 ]

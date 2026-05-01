@@ -50,6 +50,7 @@ export const PRODUCT_CATEGORY_LABELS: Record<ProductCategory, string> = {
   spray_refresher: 'Spray / Refresher',
   protein_treatment: 'Protein Treatment',
   scalp_treatment: 'Scalp Treatment',
+  dry_shampoo: 'Dry Shampoo',
 }
 
 export const PRODUCT_CATEGORY_DESCRIPTIONS: Record<ProductCategory, string> = {
@@ -67,6 +68,7 @@ export const PRODUCT_CATEGORY_DESCRIPTIONS: Record<ProductCategory, string> = {
   spray_refresher: 'Revives curls between wash days or provides flexible hold. Virtually weightless.',
   protein_treatment: 'Helps curls "bounce back." Best for high porosity, fine, or damaged hair. Use when curls feel mushy or lack elasticity.',
   scalp_treatment: 'Products specifically targeting scalp health — dryness, flakiness, irritation, or buildup.',
+  dry_shampoo: 'Absorbs oil and refreshes hair between wash days without water. Great for extending time between washes. Check ingredients — many contain silicones or drying alcohols.',
 }
 
 export const HAIR_GOALS = [
