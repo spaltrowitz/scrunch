@@ -7,6 +7,7 @@ import { PRODUCT_CATEGORY_LABELS, PRODUCT_CATEGORY_DESCRIPTIONS } from '../lib/c
 import { ProductImage } from '../hooks/useProductImage'
 import type { ProductReview, Profile } from '../lib/database.types'
 import { useProduct } from '../hooks/useProducts'
+import { useToast } from '../hooks/useToast'
 
 type TriedRating = 'loved' | 'liked' | 'ok' | 'disliked'
 
@@ -40,6 +41,7 @@ export function ProductDetail() {
   const { id } = useParams<{ id: string }>()
   const { user } = useAuth()
   const queryClient = useQueryClient()
+  const { addToast } = useToast()
   const { data: product, isLoading: productLoading, error: productError } = useProduct(id)
   const { data: reviewsData = [], isLoading: reviewsLoading, error: reviewsError } = useQuery({
     queryKey: ['product-reviews', id],
@@ -99,8 +101,10 @@ export function ProductDetail() {
     },
     onError: (error) => {
       console.error('Review upsert failed:', error)
+      addToast('Failed to save your review. Please try again.', 'error')
     },
     onSuccess: () => {
+      addToast('Review saved!', 'success')
       if (id) {
         queryClient.invalidateQueries({ queryKey: ['product', id] })
         queryClient.invalidateQueries({ queryKey: ['product-reviews', id] })

@@ -8,6 +8,7 @@ import { ProductCard } from '../components/products/ProductCard'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth'
 import { useProducts, useUserReviews } from '../hooks/useProducts'
+import { useToast } from '../hooks/useToast'
 
 type TriedRating = 'loved' | 'liked' | 'ok' | 'disliked'
 type ProductAction = 'tried' | 'bookmarked'
@@ -60,6 +61,7 @@ function storeNotes(notes: ProductNotes) {
 export function Products() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
+  const { addToast } = useToast()
   const { data, isLoading: productsLoading, error: productsError } = useProducts()
   const products = data?.products ?? []
   const { data: userReviews = [], isLoading: reviewsLoading, error: reviewsError } = useUserReviews(user?.id)
@@ -132,8 +134,10 @@ export function Products() {
     },
     onError: (error) => {
       console.error('Delete review failed:', error)
+      addToast('Failed to remove review. Please try again.', 'error')
     },
     onSuccess: () => {
+      addToast('Review removed.', 'success')
       if (userId) {
         queryClient.invalidateQueries({ queryKey: ['reviews', userId] })
       }
@@ -156,8 +160,10 @@ export function Products() {
     },
     onError: (error) => {
       console.error('Review upsert failed:', error)
+      addToast('Failed to save rating. Please try again.', 'error')
     },
     onSuccess: () => {
+      addToast('Rating saved!', 'success')
       if (userId) {
         queryClient.invalidateQueries({ queryKey: ['reviews', userId] })
       }
@@ -178,8 +184,10 @@ export function Products() {
     },
     onError: (error) => {
       console.error('Note upsert failed:', error)
+      addToast('Failed to save note. Please try again.', 'error')
     },
     onSuccess: () => {
+      addToast('Note saved!', 'success')
       if (userId) {
         queryClient.invalidateQueries({ queryKey: ['reviews', userId] })
       }

@@ -5,6 +5,8 @@ import { AuthProvider, useAuth } from './lib/auth'
 import { Header } from './components/layout/Header'
 import { Footer } from './components/layout/Footer'
 import { FeedbackButton } from './components/FeedbackButton'
+import { ToastProvider } from './hooks/useToast'
+import { ToastContainer } from './components/ui/ToastContainer'
 
 const Home = lazy(() => import('./pages/Home').then(m => ({ default: m.Home })))
 const Login = lazy(() => import('./pages/Login').then(m => ({ default: m.Login })))
@@ -59,16 +61,19 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <HashRouter>
-          <div className="min-h-screen flex flex-col bg-gray-50">
-            <Header />
-            <main className="flex-1">
-              <AppRoutes />
-            </main>
-            <Footer />
-            <FeedbackButton />
-          </div>
-        </HashRouter>
+        <ToastProvider>
+          <HashRouter>
+            <div className="min-h-screen flex flex-col bg-gray-50">
+              <Header />
+              <main className="flex-1">
+                <AppRoutes />
+              </main>
+              <Footer />
+              <FeedbackButton />
+              <ToastContainer />
+            </div>
+          </HashRouter>
+        </ToastProvider>
       </AuthProvider>
     </QueryClientProvider>
   )
