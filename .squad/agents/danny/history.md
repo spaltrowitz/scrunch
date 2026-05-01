@@ -108,6 +108,15 @@ Beta must-fix sprint (6 items) now complete across Frenchy + Danny. Scribe docum
 - **No duplicates:** All 7 products were confirmed missing before adding. Existing Rizos Curls products (Hydrating shampoo, Curl Defining Cream, Light Hold Gel, Volumizing Hairspray) and adwoa beauty Baomint Leave-In were already in catalog but are different products.
 - **Lesson:** Always validate category and field values against the TypeScript types before adding — task descriptions may use informal names that don't match the actual union type.
 
+### 2026-05-02: Instant Render Perf Fix (All Pages)
+- **Root cause:** Most React Query hooks (`useProducts`, `useUserReviews`, `useUserReviewCount`, `useUserProfile`, `useProduct`) had no `placeholderData` or `staleTime`. Pages blocked on Supabase cold start (~1.3s) showing loading spinners.
+- **Dashboard fix:** Removed the loading gate entirely. Page now renders instantly with defaults (profileComplete=false, reviewCount=0) and upgrades reactively when Supabase responds. No more "Loading..." blank screen.
+- **Hook fixes:** Added `placeholderData` to: `useProducts` (seed products), `useUserReviews` (empty array), `useUserReviewCount` (0). Added `staleTime: 5min` to ALL hooks including `useUserProfile`, `useProduct`, `useHomeProducts`.
+- **Recommendations page:** Already had correct loading gate (`productsLoading && !productsData`) and products hook had placeholderData. The staleTime additions to profile/reviews hooks prevent unnecessary re-fetches.
+- **Sequential queries:** Collaborative filtering in Recommendations has 3 sequential Supabase queries (profiles → reviews → products) but these have true data dependencies — each depends on the prior result. Already documented as unavoidable. They run in a background `useQuery` and don't block page render.
+- **Pattern established:** Every data hook should have: (1) `placeholderData` with sensible defaults from seed/static data, (2) `staleTime: 5 * 60 * 1000` to prevent unnecessary re-fetches, (3) pages should never block rendering on data — show defaults and upgrade.
+- **Lesson:** The "loading gate" anti-pattern (blocking render until all queries resolve) is the #1 perceived perf killer. Remove loading gates wherever possible — render with defaults immediately, let React Query swap in real data.
+
 
 ### 2026-05-02: Recommendations Page Instant Load Fix
 - **Root cause:** The loading gate `(productsLoading || profileLoading || reviewsLoading) && !errors` blocked ALL rendering until every Supabase query finished. Even though `useRecommendationProducts()` had `placeholderData` (renders instantly from seed data), the page showed "Loading recommendations…" waiting for profile and reviews to return from Supabase.
@@ -115,3 +124,8 @@ Beta must-fix sprint (6 items) now complete across Frenchy + Danny. Scribe docum
 - **Fix — Inline loading indicators:** Replaced the full-page spinner with subtle inline messages: "Personalizing your recommendations…" (while profile/reviews load) and "Finding people with similar hair…" (while collaborative filtering runs). Users see content immediately instead of a blank loading screen.
 - **Fix — Moved `loadCollaborativeRecs` outside component:** This async function had no component dependencies but was being recreated on every render inside the component body. Moved to module scope to avoid unnecessary allocations.
 - **Lesson:** `placeholderData` in React Query only helps if the loading gate doesn't block rendering anyway. The page had the right hook but the wrong gate — it was ANDing all three queries' loading states together, defeating the purpose of placeholder data.
+
+### 2025-07-25: Product Catalog Category Audit Fix
+- **7 products recategorized:** 3 bond-repair products (Olaplex No. 3, K18 Leave-In, Curlsmith Bond Curl Rehab Salve) moved from `protein_treatment` → `bond_repair`. 4 scalp-focused oils (As I Am Dry Itchy, Hollywood Beauty Tea Tree, Mielle Rosemary Mint, Eden Bodyworks Peppermint) moved from `oil_serum` → `scalp_care`.
+- **1 duplicate removed:** Acure Dry Shampoo appeared at line 292 (with image URL) and line 398 (without). Kept the one with the image.
+- **Lesson:** Bond-repair products (Olaplex, K18, bond rehab) are mechanistically different from protein treatments — they work on disulfide bonds, not keratin reinforcement. Scalp-targeted oils belong in `scalp_care` even if they're technically oils — category should reflect primary use case, not product format.
