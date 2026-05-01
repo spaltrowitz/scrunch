@@ -14,7 +14,7 @@ export function Credits() {
           <SourceCard
             name="r/curlyhair Holy Grail Product List"
             url="https://docs.google.com/spreadsheets/d/1gn6VnPsRU1H3ziElbWqNVFY5mev6GB1pwKKt_MNpoAY/"
-            description="Community-curated spreadsheet of CG-approved products loved by r/curlyhair users. Our initial product database is seeded from this list."
+            description="Community-curated spreadsheet of CG-approved products. Our product database is inspired by this list, plus additional community favorites."
           />
           <SourceCard
             name="Open Beauty Facts"

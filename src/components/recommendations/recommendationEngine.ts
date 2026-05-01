@@ -220,7 +220,7 @@ export function tierHeader(tier: Tier, profile: Profile | null): { title: string
         title: 'Popular CG-Approved Products',
         subtitle: profile?.cgm_experience === 'just_starting'
           ? 'Starting CGM? Your first step is a clarifying wash — we\'ve included one below'
-          : 'Complete your hair profile to get personalized recommendations',
+          : 'These are crowd favorites. Tell us about your hair and we\'ll match products to your curl pattern, porosity, and goals — no more guessing.',
       }
     case 2:
       return {

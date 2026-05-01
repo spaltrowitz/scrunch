@@ -11,23 +11,23 @@ export function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="min-h-screen flex flex-col items-center justify-center px-4 py-16 text-center bg-gradient-to-b from-violet-50 to-white">
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight max-w-3xl">
+      <section className="flex flex-col items-center justify-center px-4 py-16 md:py-24 text-center bg-gradient-to-b from-violet-50 to-white">
+        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight max-w-2xl">
           Your curly hair deserves better than a Google spreadsheet.
         </h1>
 
-        <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl leading-relaxed">
-          Scrunch is your personal curly hair assistant. Instantly check if any product is curl-safe, discover what works for YOUR hair type, and learn from 400K+ community members. All in one place.
+        <p className="text-sm md:text-base text-gray-600 mb-6 max-w-xl leading-relaxed">
+          Instantly check if any product is curl-safe, discover what works for YOUR hair type, and learn from 400K+ community members.
         </p>
 
         <Link
           to="/products"
-          className="px-8 py-4 min-h-[48px] flex items-center rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium text-lg transition-colors"
+          className="px-6 py-3 min-h-[44px] flex items-center rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium text-sm transition-colors"
         >
           Explore Products →
         </Link>
 
-        <p className="text-xs md:text-sm text-gray-500 mt-12 max-w-2xl">
+        <p className="text-[11px] text-gray-400 mt-8 max-w-lg">
           Built on data from r/curlyhair (339K members) · Powered by CurlScan, IsItCG, and CurlsBot
         </p>
       </section>
@@ -40,44 +40,44 @@ export function Home() {
       )}
 
       {/* Feature 1 — Check Ingredients */}
-      <section className="py-20 px-4 border-b border-gray-200">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <section className="py-12 px-4 border-b border-gray-200">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">
               Check any ingredient list in seconds
             </h2>
-            <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-              Paste or upload a product label. Scrunch instantly tells you if it's curl-safe — backed by r/curlyhair community standards. No more guessing in the aisle.
+            <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+              Paste a product label. Scrunch instantly tells you if it's curl-safe — backed by community standards.
             </p>
             <Link
               to="/ingredient-checker"
-              className="inline-flex items-center px-6 py-3 min-h-[44px] rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors"
+              className="inline-flex items-center text-sm px-4 py-2.5 min-h-[44px] rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors"
             >
               Try Ingredient Checker →
             </Link>
           </div>
-          <div className="flex items-center justify-center h-64 bg-gray-100 rounded-lg text-6xl">
+          <div className="flex items-center justify-center h-40 bg-gray-50 rounded-lg text-4xl">
             🔬
           </div>
         </div>
       </section>
 
       {/* Feature 2 — Community (alternating layout) */}
-      <section className="py-20 px-4 border-b border-gray-200">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div className="flex items-center justify-center h-64 bg-gray-100 rounded-lg text-6xl md:order-1 order-2">
+      <section className="py-12 px-4 border-b border-gray-200">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div className="flex items-center justify-center h-40 bg-gray-50 rounded-lg text-4xl md:order-1 order-2">
             💬
           </div>
           <div className="md:order-2 order-1">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">
               Learn from 400K+ curly heads
             </h2>
-            <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-              Stuck choosing between two products? Got a weird hair day? Ask in Community Q&A and get real answers from people who've been there.
+            <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+              Ask any question and get real answers from r/curlyhair, r/curlygirl, and r/wavyhair community members.
             </p>
             <Link
               to="/community"
-              className="inline-flex items-center px-6 py-3 min-h-[44px] rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors"
+              className="inline-flex items-center text-sm px-4 py-2.5 min-h-[44px] rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors"
             >
               Visit Community Q&A →
             </Link>
@@ -86,18 +86,18 @@ export function Home() {
       </section>
 
       {/* Feature 3 — Recommendations */}
-      <section className="py-20 px-4 border-b border-gray-200">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <section className="py-12 px-4 border-b border-gray-200">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">
               Personalized product picks based on YOUR hair
             </h2>
-            <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-              Not all curly hair is the same. Tell us about your waves, curls, or coils — Scrunch finds products that match your hair profile.
+            <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+              Tell us about your waves, curls, or coils — Scrunch finds products that match your hair profile.
             </p>
             <Link
               to="/recommendations"
-              className="inline-flex items-center px-6 py-3 min-h-[44px] rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors"
+              className="inline-flex items-center text-sm px-4 py-2.5 min-h-[44px] rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors"
             >
               Get Recommendations →
             </Link>
@@ -116,7 +116,7 @@ export function Home() {
               Popular Products
             </h2>
             <p className="text-gray-600">
-              Discover products loved by the community. Browse 200+ more on our full catalog.
+              Discover products loved by the community. Browse 410+ on our full catalog.
             </p>
           </div>
 

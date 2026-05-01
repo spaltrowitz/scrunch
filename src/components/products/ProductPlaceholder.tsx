@@ -35,21 +35,18 @@ export function ProductPlaceholder({ brand, name, category, className = 'w-16 h-
   const config = (category && CATEGORY_CONFIG[category]) || DEFAULT_CONFIG
 
   return (
-    <div className="relative group">
+    <div className={`relative group ${className} shrink-0`}>
       <div
-        className={`${className} bg-gradient-to-br ${config.accent} rounded-lg flex flex-col items-center justify-center gap-0.5 px-1.5 py-1 shrink-0 border border-gray-200/60 relative`}
+        className={`w-full h-full bg-gradient-to-br ${config.accent} rounded-lg flex flex-col items-center justify-center overflow-hidden px-1 py-0.5 border border-gray-200/60`}
       >
         <span className="text-base leading-none" aria-hidden="true">
           {config.icon}
         </span>
-        <span className="text-[9px] font-semibold text-gray-700 leading-tight text-center line-clamp-1">
+        <span className="text-[8px] font-semibold text-gray-700 leading-tight text-center line-clamp-1">
           {brand}
         </span>
-        <span className="text-[8px] text-gray-500 leading-tight text-center line-clamp-1">
+        <span className="text-[7px] text-gray-500 leading-tight text-center line-clamp-1">
           {name}
-        </span>
-        <span className="text-[7px] text-gray-400 leading-tight">
-          No image
         </span>
 
         {/* Mobile info icon */}

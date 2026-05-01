@@ -106,7 +106,7 @@ export function ProductImage({ brand, name, seedImageUrl, category, className = 
   const imageUrl = seedImageUrl || apiImageUrl
 
   return (
-    <div ref={containerRef} className={className}>
+    <div ref={containerRef} className={`${className} shrink-0 overflow-hidden`}>
       {imageUrl && !imgError ? (
         <img
           src={imageUrl}
