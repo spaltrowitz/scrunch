@@ -9,13 +9,29 @@ interface RedditResult {
   snippet: string
 }
 
+type SearchStatus = 'ok' | 'no_results' | 'error'
+
+interface SearchResponse {
+  results: RedditResult[]
+  status: SearchStatus
+  searchTerms: string
+}
+
 interface CommunityQuestion {
   id: string
   question: string
   aiAnswer: string | null
   redditResults: RedditResult[]
+  searchStatus: SearchStatus
+  searchTerms: string
   timestamp: string
 }
+
+const SUBREDDIT_LINKS = [
+  { name: 'r/curlyhair', url: 'https://www.reddit.com/r/curlyhair/', members: '339K' },
+  { name: 'r/curlygirl', url: 'https://www.reddit.com/r/curlygirl/', members: '61K' },
+  { name: 'r/wavyhair', url: 'https://www.reddit.com/r/wavyhair/', members: '32K' },
+]
 
 const STOP_WORDS = new Set([
   'i', 'me', 'my', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
@@ -149,9 +165,10 @@ function stripMarkdown(text: string): string {
     .trim()
 }
 
-async function searchReddit(query: string): Promise<RedditResult[]> {
+async function searchReddit(query: string): Promise<SearchResponse> {
   const { primary, fallback } = extractSearchTerms(query)
   const subreddits = ['curlyhair', 'curlygirl', 'wavyhair']
+  let hadError = false
 
   const fetchQuery = async (sub: string, q: string): Promise<RedditResult[]> => {
     try {
@@ -159,7 +176,7 @@ async function searchReddit(query: string): Promise<RedditResult[]> {
         `https://old.reddit.com/r/${sub}/search.json?q=${encodeURIComponent(q)}&restrict_sr=on&sort=relevance&limit=5`,
         { headers: { 'Accept': 'application/json' } }
       )
-      if (!res.ok) return []
+      if (!res.ok) { hadError = true; return [] }
       const data = await res.json()
       const posts = data?.data?.children || []
       return posts.map((post: { data: { title: string; permalink: string; score: number; num_comments: number; selftext?: string } }) => {
@@ -174,6 +191,7 @@ async function searchReddit(query: string): Promise<RedditResult[]> {
         } as RedditResult
       })
     } catch {
+      hadError = true
       return []
     }
   }
@@ -211,28 +229,68 @@ async function searchReddit(query: string): Promise<RedditResult[]> {
   scored.sort((a, b) => b.rank - a.rank)
   const results = scored.map(s => s.result).slice(0, 8)
 
-  if (results.length === 0) {
-    const encodedQuery = encodeURIComponent(primary)
-    return [
-      { title: `Search r/curlyhair for "${primary}"`, url: `https://www.reddit.com/r/curlyhair/search/?q=${encodedQuery}&restrict_sr=1`, subreddit: 'r/curlyhair', score: 0, num_comments: 0, snippet: 'Click to search r/curlyhair directly on Reddit' },
-      { title: `Search r/curlygirl for "${primary}"`, url: `https://www.reddit.com/r/curlygirl/search/?q=${encodedQuery}&restrict_sr=1`, subreddit: 'r/curlygirl', score: 0, num_comments: 0, snippet: 'Click to search r/curlygirl directly on Reddit' },
-      { title: `Search r/wavyhair for "${primary}"`, url: `https://www.reddit.com/r/wavyhair/search/?q=${encodedQuery}&restrict_sr=1`, subreddit: 'r/wavyhair', score: 0, num_comments: 0, snippet: 'Click to search r/wavyhair directly on Reddit' },
-    ]
+  if (results.length === 0 && hadError) {
+    return { results: [], status: 'error', searchTerms: primary }
   }
-
-  return results
+  if (results.length === 0) {
+    return { results: [], status: 'no_results', searchTerms: primary }
+  }
+  return { results, status: 'ok', searchTerms: primary }
 }
 
-function generateSummary(_question: string, redditResults: RedditResult[]): string {
-  const hasRealResults = redditResults.some(r => r.score > 0)
-
-  if (!hasRealResults) {
-    return `No matching discussions found via API. Click the links below to search Reddit's curly hair communities directly.`
-  }
-
+function generateSummary(redditResults: RedditResult[]): string {
   const count = redditResults.length
   const subs = [...new Set(redditResults.map(r => r.subreddit))].join(', ')
   return `Found ${count} related discussions across ${subs}. Browse the threads below for community advice and tips.`
+}
+
+function SubredditLinks({ searchTerms }: { searchTerms: string }) {
+  const encoded = encodeURIComponent(searchTerms)
+  return (
+    <div className="mb-4">
+      <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Browse communities directly</h4>
+      <div className="grid gap-2">
+        {SUBREDDIT_LINKS.map(sub => (
+          <a
+            key={sub.name}
+            href={`${sub.url}search/?q=${encoded}&restrict_sr=1`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-violet-300 hover:bg-violet-50/30 transition no-underline"
+          >
+            <div>
+              <span className="text-sm font-medium text-violet-600">{sub.name}</span>
+              <span className="text-xs text-gray-400 ml-2">{sub.members} members</span>
+            </div>
+            <span className="text-xs text-gray-400">Search →</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function AskCommunityPrompt() {
+  return (
+    <div className="bg-violet-50 border border-violet-200 rounded-lg p-4">
+      <p className="text-sm text-violet-800">
+        💬 Can't find what you're looking for? <span className="font-medium">Ask the community directly.</span>
+      </p>
+      <div className="flex flex-wrap gap-2 mt-2">
+        {SUBREDDIT_LINKS.map(sub => (
+          <a
+            key={sub.name}
+            href={`${sub.url}submit`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs px-3 py-1.5 rounded-full bg-white text-violet-600 border border-violet-200 hover:bg-violet-100 no-underline transition"
+          >
+            Post to {sub.name}
+          </a>
+        ))}
+      </div>
+    </div>
+  )
 }
 
 export function Community() {
@@ -249,14 +307,16 @@ export function Community() {
     const q = question.trim()
     setQuestion('')
 
-    const redditResults = await searchReddit(q)
-    const aiAnswer = generateSummary(q, redditResults)
+    const { results: redditResults, status, searchTerms } = await searchReddit(q)
+    const aiAnswer = status === 'ok' ? generateSummary(redditResults) : null
 
     const newQ: CommunityQuestion = {
       id: Date.now().toString(),
       question: q,
       aiAnswer,
       redditResults,
+      searchStatus: status,
+      searchTerms,
       timestamp: new Date().toISOString(),
     }
 
@@ -352,8 +412,43 @@ export function Community() {
               <p className="text-xs text-gray-500 mt-1">{new Date(item.timestamp).toLocaleTimeString()}</p>
             </div>
 
-            {/* Summary */}
-            {item.aiAnswer && (
+            {/* Error state */}
+            {item.searchStatus === 'error' && (
+              <div className="px-6 py-6">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                  <p className="text-sm font-medium text-red-800 mb-1">😕 Couldn't reach Reddit right now</p>
+                  <p className="text-sm text-red-700">The search didn't go through — Reddit may be temporarily unavailable. You can try again or browse the communities directly.</p>
+                </div>
+                <button
+                  onClick={() => { setQuestion(item.question); setShowSearchBox(true); }}
+                  className="mb-4 px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 cursor-pointer transition"
+                >
+                  🔄 Try again
+                </button>
+                <SubredditLinks searchTerms={item.searchTerms} />
+                <AskCommunityPrompt />
+              </div>
+            )}
+
+            {/* No results state */}
+            {item.searchStatus === 'no_results' && (
+              <div className="px-6 py-6">
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+                  <p className="text-sm font-medium text-amber-800 mb-1">🔍 No results found</p>
+                  <p className="text-sm text-amber-700 mb-2">We searched across all three curly hair communities but didn't find matching discussions.</p>
+                  <ul className="text-sm text-amber-700 list-disc list-inside space-y-0.5">
+                    <li>Try different keywords (e.g., "frizz" instead of "frizzy hair problems")</li>
+                    <li>Check spelling of product or ingredient names</li>
+                    <li>Use shorter, more specific terms</li>
+                  </ul>
+                </div>
+                <SubredditLinks searchTerms={item.searchTerms} />
+                <AskCommunityPrompt />
+              </div>
+            )}
+
+            {/* Success state — Summary */}
+            {item.searchStatus === 'ok' && item.aiAnswer && (
               <div className="px-6 py-4 border-b border-gray-100">
                 <div className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
                   {item.aiAnswer}
@@ -361,8 +456,8 @@ export function Community() {
               </div>
             )}
 
-            {/* Reddit Results */}
-            {item.redditResults.length > 0 && (
+            {/* Success state — Reddit Results */}
+            {item.searchStatus === 'ok' && item.redditResults.length > 0 && (
               <div className="px-6 py-4">
                 <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">
                   Community Discussions ({item.redditResults.length})
