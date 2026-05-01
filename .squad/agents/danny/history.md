@@ -69,3 +69,26 @@
   - "how often should I deep condition" → Primary: "deep condition", Fallback: "deep condition"
   - "curly girl method for beginners" → Primary: "curly girl method beginners", Fallback: "curly girl method"
 - **Lesson:** For domain-specific search over a dumb search engine (Reddit), you need a domain vocabulary to separate signal from noise. Generic NLP (stop word removal) isn't enough — you need to know what the domain cares about.
+
+### 2026-05-02: Community Fallback UI Fix (UX Item #6)
+- **Root cause:** When Reddit search returned 0 results, `searchReddit()` returned 3 fake "results" (score=0, 0 comments) as direct-search links. These rendered identically to real posts, confusing users — they couldn't tell the search failed. API errors also silently returned empty arrays with no user feedback.
+- **Fix — SearchStatus type:** Added `SearchStatus = 'ok' | 'no_results' | 'error'` to `searchReddit()` return value. The function now tracks `hadError` across fetch calls and returns the appropriate status.
+- **Fix — No results UI:** Clear amber banner with "No results found" message plus actionable suggestions (try different keywords, check spelling, use shorter terms). Below: direct subreddit links with pre-filled search, plus "Ask the community directly" prompt with post links.
+- **Fix — Error UI:** Red banner explaining Reddit may be temporarily unavailable. Prominent "Try again" button that re-populates the search box. Same subreddit links and community posting prompt below.
+- **Fix — Removed fake results:** Eliminated the old pattern of returning fake RedditResult objects with score=0 as fallback. These were the core confusion — users saw them as broken posts, not as navigation links.
+- **Components extracted:** `SubredditLinks` (direct links to subreddits with member counts and pre-filled search) and `AskCommunityPrompt` (post-to-community CTA). Both reused in error and no-results states.
+- **Lesson:** Never disguise navigation/fallback actions as content items. When search fails, users need to understand *what happened* and *what they can do next* — not see fake results masquerading as real ones.
+
+## 2026-05-01T20:58:00Z — Beta Must-Fix Sprint Complete
+
+### Outcomes
+- **Community Fallback UI (UX Item #6):** Deployed
+- **Search Quality:** Keyword extraction + domain vocabulary + multi-query strategy now returns relevant results
+- **User Feedback Loop:** "Did this solve what you were looking for?" feedback prompt integrated
+- **Honest Labeling:** Removed fake "AI Summary" branding, replaced with "Community Results" + plain-text summary
+- **Build Status:** Passing, 26 tests green (via cross-team support)
+- **Deployment:** GitHub Pages active
+
+### Orchestration
+Beta must-fix sprint (6 items) now complete across Frenchy + Danny. Scribe documented all changes, merged team decisions, and updated cross-agent history.
+

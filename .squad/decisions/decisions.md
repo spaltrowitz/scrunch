@@ -668,3 +668,65 @@ For the 47 remaining products, options:
 **Risk Identified:** Users would screenshot retailer product pages without knowing about ToS/copyright restrictions. Hosting screenshotted retail imagery on our storage is a liability risk (copyrighted content).
 
 **Rationale:** Legal risk mitigation — screenshots of retailer product pages would be copyrighted material hosted on our storage without permission.
+
+---
+
+### 2026-05-01T19:55:00Z: Homepage Design Reference — Prose.com
+
+**By:** Shari Paltrowitz (via Copilot)  
+**Date:** 2026-05-01T19:55:00Z
+
+**What:** Use Prose (prose.com) as a design reference for the homepage — make it sleeker, more tied to the mission. Less clutter, more narrative.
+
+**Status:** User directive captured for team memory.
+
+---
+
+### 2026-05-01T20:30:00Z: Community Search Feedback Loop
+
+**By:** Shari Paltrowitz (via Copilot)  
+**Date:** 2026-05-01T20:30:00Z
+
+**What:** Community search results should ask 'Did this solve what you were looking for?' If not, prompt the user to post to the Scrunch community. This creates a feedback loop and drives community engagement.
+
+**Status:** User directive captured. Danny implemented in community search beta fix.
+
+---
+
+### 2026-05-01: Homepage Performance — Lightweight Query Hook
+
+**By:** Cha-Cha (Performance Optimizer)  
+**Date:** 2026-05-01
+
+**Decision:** Homepage uses separate lightweight `useHomeProducts()` hook instead of `useProducts()`.
+
+**Spec:**
+- Fetches only 7 columns (vs 22 full product columns)
+- Limits to 20 rows
+- Orders by review_count
+- Shows bundled seed data instantly via `placeholderData`
+
+**Why:** Full product query took 1.3s+ on Supabase free tier cold starts. Homepage only needs display fields for product cards. Seed data placeholder eliminates blank loading state.
+
+**Trade-off:** Seed data (70KB) now loads with Home route chunk instead of only on error fallback. Accepted: instant perceived load > smaller bundle for landing page.
+
+**Impact:** Products page, ProductDetail, and Recommendations still use `useProducts()` / `useProduct()` with full column set (no change). Query keys are separate: `['products', 'home']` vs `['products']` → independent caches.
+
+---
+
+### 2026-05-02: Community Search — Keyword Extraction + Honest Summaries
+
+**By:** Danny (Backend Dev)  
+**Date:** 2026-05-02
+
+**Decision:** Three changes to Community.tsx search:
+
+1. **Keyword Extraction:** Extract 4-6 key terms from user queries before sending to Reddit API (stop word removal, dedup, truncation). Long natural language queries return irrelevant popular posts.
+2. **Preserve Relevance:** Removed the `sort by score` that was overriding Reddit's relevance ordering with popularity.
+3. **Honest Labeling:** Replaced fake "AI Summary" with honest "Community Results" label and plain-text summary. Added `stripMarkdown()` to clean Reddit selftext before display.
+
+**Why:** User tested with real query and got completely irrelevant results (viral posts about haircuts instead of bang-styling advice). The "AI summary" was misleading — it pretended to analyze but just quoted the first (wrong) result with raw markdown.
+
+**Impact:** Community.tsx search function, summary display, result ordering. No API or schema changes.
+
+**Status:** IMPLEMENTED — deployed to GitHub Pages as part of beta must-fix sprint.

@@ -124,3 +124,15 @@
 - Pattern: render-time state sync (track previous value via useState, compare during render, update if changed) is the idiomatic replacement for "sync external data into local state" useEffect patterns
 - Pattern: for fast refresh, keep provider components and their hooks in separate files — provider in `.tsx`, hook in `.utils.ts`
 - Pattern: `const x = data?.y ?? []` creates new arrays every render — wrap in `useMemo` when used as dependency of other hooks
+
+## 2026-05-01T20:58:00Z — Beta Must-Fix Sprint Complete
+
+### Outcomes
+- **Lint Issues (3/3):** useState-in-effect, fast refresh violations, exhaustive-deps — all resolved
+- **Empty States:** Products page now shows clear empty state with "Clear all filters" button when filters return 0 results
+- **Mobile CTAs:** Feature card CTAs now 44px tap targets on mobile (full-width) with responsive scaling down to desktop
+- **Build Status:** Passing, 26 tests green
+- **Deployment:** GitHub Pages active
+
+### Orchestration
+This sprint completed all 6 beta must-fix items across team (Frenchy + Danny + team supports). Scribe documented via orchestration logs and merged team decisions into shared decision log.
