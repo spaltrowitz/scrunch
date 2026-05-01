@@ -92,3 +92,12 @@
 ### Orchestration
 Beta must-fix sprint (6 items) now complete across Frenchy + Danny. Scribe documented all changes, merged team decisions, and updated cross-agent history.
 
+### 2025-07-25: HairTok Product Categories & Catalog Expansion
+- **New categories added:** `scalp_care` (scalp treatments, oils, serums) and `bond_repair` (bond-building treatments for damaged hair). Added to ProductCategory union type, PRODUCT_CATEGORY_LABELS, and PRODUCT_CATEGORY_DESCRIPTIONS.
+- **New SeedProduct field:** `hairtok_trending?: boolean` — optional flag for filtering HairTok-sourced products. Existing products also tagged via `#HairTok` in notes.
+- **3 new products added:** Generic Rosemary Oil (scalp_care), Olaplex No. 0 (bond_repair), AG Care Cloud Air Volumizing Mousse (mousse).
+- **6 existing products updated** with #HairTok notes and `hairtok_trending: true`: K18 Leave-In Molecular Repair Hair Mask, Olaplex No. 3, Mielle Rosemary Mint Oil, Briogeo Don't Despair Repair!, Rizos Curls Curl Defining Cream.
+- **Duplicates avoided:** 5 of 8 requested products already existed in the catalog (Mielle oil, K18, Olaplex No. 3, Briogeo deep conditioner, Rizos Curls cream). Updated their notes/tags instead of duplicating.
+- **Removed duplicate `dry_shampoo`** from ProductCategory union type (was listed twice).
+- **Lesson:** Always grep existing seed data before adding — the catalog is large (400+ lines) and brands like Mielle and Briogeo appear across multiple categories.
+
