@@ -75,12 +75,42 @@ export function Home() {
     <div className="min-h-screen">
       {/* Hero — clear value prop for first-time visitors */}
       <section className="py-8 md:py-12 px-4 text-center bg-gradient-to-b from-violet-50 to-white">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
           Find <span className="text-violet-600">curly hair products</span> that actually work
         </h1>
-        <p className="text-sm text-gray-600 max-w-lg mx-auto">
-          Browse {products.length || '200'}+ products rated by the curly hair community. No ads, no BS — just real reviews from people with hair like yours.
+        <p className="text-sm text-gray-600 max-w-2xl mx-auto mb-5">
+          Scrunch is your personal curly hair assistant — search, check, and discover products the community loves.
         </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto text-sm text-gray-700">
+          <div className="flex items-start justify-center gap-2">
+            <span className="text-lg">✅</span>
+            <span>Check any product's ingredients instantly</span>
+          </div>
+          <div className="flex items-start justify-center gap-2">
+            <span className="text-lg">💬</span>
+            <span>Get answers from 400K+ Reddit community members</span>
+          </div>
+          <div className="flex items-start justify-center gap-2">
+            <span className="text-lg">🎯</span>
+            <span>Personalized recommendations for your hair type</span>
+          </div>
+        </div>
+
+        <div className="mt-6 flex flex-wrap gap-3 justify-center">
+          <Link
+            to="/ingredient-checker"
+            className="px-6 py-3 min-h-[44px] flex items-center rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium text-sm"
+          >
+            Check Your Products →
+          </Link>
+          <a
+            href="#categories"
+            className="px-6 py-3 min-h-[44px] flex items-center rounded-lg bg-gray-100 text-gray-900 no-underline hover:bg-gray-200 font-medium text-sm"
+          >
+            Browse Products ↓
+          </a>
+        </div>
       </section>
 
       {/* Fallback banner — visible when Supabase is down */}
@@ -149,13 +179,48 @@ export function Home() {
         </div>
       </section>
 
+      {/* Feature Spotlight Row */}
+      <section className="max-w-6xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Link
+            to="/ingredient-checker"
+            className="flex flex-col items-center justify-center gap-3 p-6 rounded-lg border border-gray-200 hover:border-violet-300 hover:shadow-md transition-all no-underline hover:bg-violet-50"
+          >
+            <div className="text-5xl">🔬</div>
+            <h3 className="font-semibold text-base text-gray-900">Ingredient Checker</h3>
+            <p className="text-sm text-gray-600 text-center">Paste a product label, we'll tell you if it's curl-safe</p>
+            <span className="text-sm text-violet-600">Explore →</span>
+          </Link>
+
+          <Link
+            to="/community"
+            className="flex flex-col items-center justify-center gap-3 p-6 rounded-lg border border-gray-200 hover:border-violet-300 hover:shadow-md transition-all no-underline hover:bg-violet-50"
+          >
+            <div className="text-5xl">💬</div>
+            <h3 className="font-semibold text-base text-gray-900">Community Q&A</h3>
+            <p className="text-sm text-gray-600 text-center">Ask questions, see answers from 400K+ Redditors</p>
+            <span className="text-sm text-violet-600">Explore →</span>
+          </Link>
+
+          <Link
+            to="/recommendations"
+            className="flex flex-col items-center justify-center gap-3 p-6 rounded-lg border border-gray-200 hover:border-violet-300 hover:shadow-md transition-all no-underline hover:bg-violet-50"
+          >
+            <div className="text-5xl">🎯</div>
+            <h3 className="font-semibold text-base text-gray-900">Smart Recommendations</h3>
+            <p className="text-sm text-gray-600 text-center">Get personalized product picks based on your hair type</p>
+            <span className="text-sm text-violet-600">Explore →</span>
+          </Link>
+        </div>
+      </section>
+
       <div className="max-w-6xl mx-auto px-4 py-10">
         {/* Category cards — shown when no filter is active, sorted by popularity */}
         {!selectedCategory && !cgFilter && !brandFilter && (
-          <section className="mb-10">
+          <section id="categories" className="mb-10">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Browse by Category</h2>
             <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {(showAllCategories ? sortedCategories : sortedCategories.slice(0, 6)).map(([key, label]) => (
+              {(showAllCategories ? sortedCategories : sortedCategories.slice(0, 8)).map(([key, label]) => (
                 <button
                   key={key}
                   onClick={() => setSelectedCategory(key)}
@@ -179,19 +244,6 @@ export function Home() {
             )}
           </section>
         )}
-
-        {/* Persona quick-start paths — not gates, parallel entry points */}
-        <div className="flex flex-wrap gap-3 mb-10">
-          <Link to="/ingredient-checker" className="flex items-center gap-2 text-xs px-3 py-2 min-h-[44px] rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-100 no-underline">
-            🌱 New to curls? Check your products
-          </Link>
-          <Link to="/products" className="flex items-center gap-2 text-xs px-3 py-2 min-h-[44px] rounded-full bg-violet-50 text-violet-600 border border-violet-100 hover:bg-violet-100 no-underline">
-            🔍 Find curl-safe products
-          </Link>
-          <Link to="/products" className="flex items-center gap-2 text-xs px-3 py-2 min-h-[44px] rounded-full bg-gray-50 text-gray-500 border border-gray-100 hover:bg-gray-100 no-underline">
-            📋 Browse all {products.length || '200'}+ products
-          </Link>
-        </div>
 
         {/* Product grid */}
         <section>

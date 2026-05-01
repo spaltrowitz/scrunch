@@ -1,4 +1,5 @@
 # History
+# Danny — Backend Dev History
 
 ## Project Context
 - **Project:** Scrunch — curly hair care app
