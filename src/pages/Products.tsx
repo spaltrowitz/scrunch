@@ -405,7 +405,7 @@ export function Products() {
           <div className="text-4xl mb-4">🔍</div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No products found</h3>
           <p className="text-gray-500 mb-6 max-w-md mx-auto">
-            No products match your current filters. Try adjusting your search or filters to find what you're looking for.
+            No products match your current filters. Try adjusting your search or filters.
           </p>
           <button
             onClick={clearFilters}

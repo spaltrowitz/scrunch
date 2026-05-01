@@ -35,7 +35,7 @@ export function Home() {
         </h1>
 
         <p className="text-sm md:text-base text-gray-600 mb-6 max-w-xl leading-relaxed">
-          Find your holy grail products, check any ingredient list in seconds, and discover what actually works — backed by 400K+ Reddit members and millions of #HairTok views.
+          Find your perfect products, check any ingredient list in seconds, and discover what actually works — backed by 400K+ community members.
         </p>
 
         <div className="flex flex-col items-center gap-3">
@@ -63,7 +63,7 @@ export function Home() {
               Explore 410+ Products
             </h2>
             <p className="text-xs text-gray-600 mb-3 leading-relaxed flex-1">
-              Browse the catalog — from community holy grails to trending #HairTok picks. Filter by curl type, category, or brand.
+              Browse the catalog — filter by curl type, category, or brand. Community favorites and trending picks in one place.
             </p>
             <Link
               to="/products"
@@ -77,7 +77,7 @@ export function Home() {
               Your hair goals, your perfect routine
             </h2>
             <p className="text-xs text-gray-600 mb-3 leading-relaxed flex-1">
-              Whether you're building your first wash day routine or fine-tuning your protein-moisture balance — Scrunch matches products to your curl pattern, porosity, and goals.
+              Tell us about your hair and goals — Scrunch matches products to your curl pattern, porosity, and what you're looking for.
             </p>
             <Link
               to="/recommendations"
@@ -97,7 +97,7 @@ export function Home() {
               Explore Products
             </h2>
             <p className="text-gray-600">
-              410+ curl-safe products — from community holy grails to trending #HairTok picks.
+              410+ community-vetted products for curly and wavy hair.
             </p>
           </div>
 
@@ -142,7 +142,7 @@ export function Home() {
                 🎵 Trending on #HairTok
               </h2>
               <p className="text-gray-600">
-                The products going viral on #CurlyHairTikTok — checked for curl safety by Scrunch
+                Popular products from #CurlyHairTikTok — ingredient-checked by Scrunch.
               </p>
             </div>
 

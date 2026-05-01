@@ -329,7 +329,7 @@ export function Community() {
     <div className="max-w-3xl mx-auto px-4 py-12">
       <h1 className="text-2xl font-bold text-gray-900 mb-2">Community</h1>
       <p className="text-gray-600 mb-8">
-        Ask anything about curly or wavy hair care. We'll search r/curlyhair, r/curlygirl, and r/wavyhair for the best answers.
+        Ask anything about curly or wavy hair. We'll search the top Reddit communities for real answers.
       </p>
 
       {/* Ask a question — collapses after first submission */}
@@ -505,11 +505,7 @@ export function Community() {
                 >
                   🔄 Refine my search
                 </button>
-                <button className="text-xs px-3 py-1.5 rounded-full bg-violet-50 text-violet-700 border border-violet-200 hover:bg-violet-100 cursor-pointer transition">
-                  💬 Post to Scrunch community
-                </button>
               </div>
-              <p className="text-[10px] text-gray-400 mt-2">Community posting coming soon</p>
             </div>
           </div>
         ))}

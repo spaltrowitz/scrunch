@@ -52,27 +52,19 @@ export function About() {
           </p>
         </section>
 
-        <div className="bg-violet-50 rounded-lg px-4 py-3 text-sm text-gray-700">
-          🚫 No ads, ever. Community-driven recommendations only.
-        </div>
-
-        <section className="flex flex-col sm:flex-row items-center gap-3 bg-amber-50 rounded-lg px-4 py-3">
-          <p className="text-sm text-gray-700 mb-0">Scrunch is free and ad-free. Support development:</p>
-          <a
-            href="https://spaltrowitz.github.io/#support"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 inline-flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-lg font-medium text-sm hover:bg-violet-700 transition no-underline"
-          >
-            🧴 Buy my next curl cream
-          </a>
-        </section>
-
-        <div className="text-center pt-2">
-          <p className="text-sm text-gray-500">
-            Made with 🌀 by curly people, for curly people — wherever you scroll.
+        <section className="bg-violet-50 rounded-lg px-4 py-3 text-center">
+          <p className="text-sm text-gray-700">
+            Scrunch is free and ad-free.{' '}
+            <a
+              href="https://spaltrowitz.github.io/#support"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-violet-600 hover:text-violet-700 font-medium underline"
+            >
+              Support the project →
+            </a>
           </p>
-        </div>
+        </section>
 
         <details className="border-t border-gray-200 pt-6" id="credits">
           <summary className="text-sm font-semibold text-gray-900 cursor-pointer hover:text-violet-700 transition">
