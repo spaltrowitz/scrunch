@@ -136,3 +136,34 @@
 **CSS:** Tailwind v4 with Vite plugin — purging is automatic. 49KB (9KB gzip) is normal for a 14-page app.
 
 **Confidence: 7/10.** The app will feel fast for return visitors (cache warm, staleTime prevents refetch). First-visit and cold-start scenarios have 2-3 real issues.
+
+### 2026-01-15: Supabase vs Self-Hosted Postgres Analysis
+
+**Request:** Shari asking if migrating off Supabase to home-hosted Postgres would solve cold-start issues (1-3s blanks on first request after inactivity).
+
+**Current Usage Audit:**
+- Auth: Supabase Auth + Google OAuth (critical path)
+- Database: 6 tables with full RLS policies (public reads, authenticated writes)
+- Edge Functions: 3 functions (image search, issue creation, notifications)
+- Data: 280 seed products + user-generated reviews
+- Not used: Real-time subscriptions, Storage, Vector search
+- Hardcoded anon key as fallback (acceptable for public read-only)
+
+**Cold-Start Root Cause:** `AuthProvider` calls `supabase.auth.getSession()` on mount, blocks all routes until resolved. This is Supabase free-tier behavior (managed cloud function startup latency), not app code.
+
+**Evaluated 5 Options:**
+
+1. **Stay on Supabase:** Free tier works great for MVP. Pro tier ($25/mo) solves cold starts but adds cost.
+2. **Self-hosted Postgres:** 2-3 days work (custom auth, RLS → middleware, ops). Not worth it for side project unless you have DevOps skills.
+3. **Supabase self-hosted in Docker:** Same API, no code changes, but adds Docker/networking complexity and home ISP reliability risk.
+4. **Other managed (Neon, Railway, Turso):** Each has tradeoffs — Neon has same cold-start problem, Railway costs $12-15/mo, Turso requires schema rewrite.
+5. **Static MVP (seed-data-only, no backend):** Instant load, zero cold starts, but ratings are ephemeral (localStorage only).
+
+**Recommendation:** **PHASED APPROACH (E → A)**
+- **Phase 1 (Now):** Build MVP as offline-first (seed data, client-side filters, localStorage ratings). Costs $0, no server ops. Validates if users actually want persistence.
+- **Phase 2 (If validated):** Add Supabase backend when demand is clear. $25/mo Pro tier is justified if users are there.
+- **Reason:** Lowest risk validation path. If app flops, no wasted infrastructure. If succeeds, Supabase Pro pays for itself.
+
+**Honest Take:** Cold-start problem is real but overstated. Only affects first load after inactivity; subsequent loads instant. Seed data renders immediately *under* the blank screen (just not visible). If homepage didn't need auth gating, this wouldn't even be an issue. The real decision is whether ratings/reviews are MVP-critical (they are), which means backend eventually. Supabase free tier does that for $0 right now.
+
+**Decision Logged:** `.squad/decisions/inbox/sandy-db-analysis.md`
