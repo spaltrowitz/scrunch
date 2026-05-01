@@ -769,6 +769,23 @@ export function Recommendations() {
         Hey {firstName} ✨
       </h1>
 
+      {/* ───────── Products You Requested ───────── */}
+      {requestedProducts.length > 0 && (
+        <section className="mb-12">
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">
+            📦 Products You Requested
+          </h2>
+          <p className="text-sm text-gray-500 mb-4">
+            These products you asked for have been added — rate them!
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {requestedProducts.map(product => (
+              <QuickRateCard key={product.id} product={product} onRate={handleRate} />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* ───────── Tier-appropriate recommendations ───────── */}
       <section className="mb-12">
         <h2 className="text-lg font-semibold text-gray-900 mb-1">{recTitle}</h2>

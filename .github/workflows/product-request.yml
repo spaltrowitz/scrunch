@@ -5,8 +5,10 @@ on:
 
 jobs:
   process-product-request:
-    # Only run on issues with 'product-request' label
-    if: contains(github.event.issue.labels.*.name, 'product-request')
+    # Run on issues with 'product-request' or 'brand-scan' label
+    if: >
+      contains(github.event.issue.labels.*.name, 'product-request') ||
+      contains(github.event.issue.labels.*.name, 'brand-scan')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -94,10 +96,16 @@ jobs:
               console.log('Could not assign copilot:', e.message);
             }
 
+            const isBrandScan = context.payload.issue.labels.some(l => l.name === 'brand-scan')
+
             // Add processing comment
+            const message = isBrandScan
+              ? `🤖 **Scrunch Bot**: Scanning this brand's full product line!\n\nI'll:\n1. Search for all curly hair products from this brand\n2. Cross-reference against the existing database\n3. Create individual product requests for any missing products\n\nThis may take several minutes.`
+              : `🤖 **Scrunch Bot**: Processing this product request!\n\nI'll:\n1. Look up the product details and ingredients\n2. Find a product image\n3. Run CG ingredient analysis\n4. Create a PR to add it to the database\n\nThis usually takes a few minutes.`
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `🤖 **Scrunch Bot**: Processing this product request!\n\nI'll:\n1. Look up the product details and ingredients\n2. Find a product image\n3. Run CG ingredient analysis\n4. Create a PR to add it to the database\n\nThis usually takes a few minutes.`
+              body: message,
             });

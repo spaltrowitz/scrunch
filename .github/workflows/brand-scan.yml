@@ -1,0 +1,140 @@
+name: Brand scan on product merge
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  brand-scan:
+    # Only run when a product-request PR is merged (not just closed)
+    if: >
+      github.event.pull_request.merged == true &&
+      contains(github.event.pull_request.labels.*.name, 'product-request')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    
+    steps:
+      - name: Extract brand and create scan issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = context.payload.pull_request.title
+            // PR titles follow: "Add {Brand} {Product} to product database"
+            // Issue titles follow: "[Product Request] {Brand} — {Product}"
+            // Extract brand from the linked issue body
+            const prBody = context.payload.pull_request.body || ''
+            
+            // Find the linked issue number from "Closes #N"
+            const issueMatch = prBody.match(/[Cc]loses?\s+#(\d+)/)
+            if (!issueMatch) {
+              console.log('No linked issue found, skipping brand scan')
+              return
+            }
+            
+            const issueNumber = parseInt(issueMatch[1])
+            const { data: issue } = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+            })
+            
+            // Extract brand from issue body (### Brand\n{brand})
+            const brandMatch = issue.body?.match(/### Brand\n+(.+)/i)
+            if (!brandMatch) {
+              console.log('Could not extract brand from issue body')
+              return
+            }
+            const brand = brandMatch[1].trim()
+            
+            // Check if a brand-scan issue already exists for this brand
+            const { data: existingIssues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'brand-scan',
+              state: 'all',
+            })
+            
+            const alreadyScanned = existingIssues.some(
+              i => i.title.toLowerCase().includes(brand.toLowerCase())
+            )
+            
+            if (alreadyScanned) {
+              console.log(`Brand scan already exists for "${brand}", skipping`)
+              return
+            }
+            
+            // Create the brand scan issue
+            const scanBody = [
+              `### Brand\n${brand}`,
+              `### Triggered By\nPR #${context.payload.pull_request.number} (Issue #${issueNumber})`,
+              '---',
+              `*Auto-created by brand scan workflow on ${new Date().toISOString()}*`,
+            ].join('\n\n')
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[Brand Scan] ${brand}`,
+              body: scanBody,
+              labels: ['brand-scan'],
+            })
+            
+            console.log(`Created brand scan issue for "${brand}"`)
+
+      - name: Send product-added notification
+        uses: actions/github-script@v7
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        with:
+          script: |
+            const prBody = context.payload.pull_request.body || ''
+            const issueMatch = prBody.match(/[Cc]loses?\s+#(\d+)/)
+            if (!issueMatch) return
+            
+            const { data: issue } = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: parseInt(issueMatch[1]),
+            })
+            
+            // Extract email from hidden comment in issue body
+            const emailMatch = issue.body?.match(/<!-- notify_email: (.+?) -->/)
+            if (!emailMatch) {
+              console.log('No notification email found in issue')
+              return
+            }
+            
+            const email = emailMatch[1].trim()
+            const brandMatch = issue.body?.match(/### Brand\n+(.+)/i)
+            const nameMatch = issue.body?.match(/### Product Name\n+(.+)/i)
+            
+            if (!brandMatch || !nameMatch) return
+            
+            const supabaseUrl = process.env.SUPABASE_URL
+            if (!supabaseUrl) {
+              console.log('SUPABASE_URL not configured')
+              return
+            }
+            
+            // Call the notify edge function
+            const res = await fetch(`${supabaseUrl}/functions/v1/notify-product-added`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+              },
+              body: JSON.stringify({
+                email,
+                brand: brandMatch[1].trim(),
+                name: nameMatch[1].trim(),
+              }),
+            })
+            
+            if (res.ok) {
+              console.log(`Notification sent to ${email}`)
+            } else {
+              console.error('Failed to send notification:', await res.text())
+            }

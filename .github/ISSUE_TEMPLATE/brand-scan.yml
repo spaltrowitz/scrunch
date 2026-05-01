@@ -1,0 +1,17 @@
+name: 🔍 Brand Scan
+description: Scan a brand's full product line for missing curly hair products
+labels: ["brand-scan"]
+assignees: []
+body:
+  - type: input
+    id: brand
+    attributes:
+      label: Brand
+      placeholder: e.g., Bumble and Bumble
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes (optional)
+      placeholder: Any specific product lines or categories to focus on
