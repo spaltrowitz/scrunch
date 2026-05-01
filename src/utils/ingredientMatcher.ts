@@ -2,6 +2,8 @@
 // Ingredient-based product matching for the recommendation engine
 // ---------------------------------------------------------------------------
 
+import { HERO_INGREDIENTS } from '../lib/constants'
+
 export interface IngredientProfile {
   /** Ingredients appearing in 2+ loved products */
   commonIngredients: string[]
@@ -268,6 +270,23 @@ export function checkSensitivitiesWithStrictness(
     }
   }
   return { strict, flexible }
+}
+
+/**
+ * Build an ingredient profile from a user's custom brand hero ingredient selections.
+ * This allows Tier 2.5 matching without requiring rated products.
+ */
+export function buildCustomBrandProfile(
+  heroIngredientIds: string[],
+): IngredientProfile {
+  const commonIngredients: string[] = []
+  for (const id of heroIngredientIds) {
+    const hero = HERO_INGREDIENTS.find(h => h.id === id)
+    if (hero) {
+      commonIngredients.push(...hero.aliases)
+    }
+  }
+  return { commonIngredients, avoidIngredients: [] }
 }
 
 /**

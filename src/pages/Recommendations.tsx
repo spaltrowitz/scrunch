@@ -13,13 +13,15 @@ import {
   scoreProductByIngredients,
   checkSensitivitiesWithStrictness,
   formatIngredientList,
+  buildCustomBrandProfile,
 } from '../utils/ingredientMatcher'
+import { CUSTOM_BRANDS, HERO_INGREDIENTS } from '../lib/constants'
 
 // ---------------------------------------------------------------------------
 // Tier helpers
 // ---------------------------------------------------------------------------
 
-type Tier = 1 | 2 | 2.5 | 3 | 4
+type Tier = 1 | 2 | 2.5 | 'custom' | 3 | 4
 
 // A recommended product carries a reason string for display
 interface RecommendedProduct extends Product {
@@ -245,6 +247,75 @@ function buildIngredientTier(
   return { recs: scored.slice(0, 5), sensitivityFilterCount }
 }
 
+/** Build recommendations from custom brand hero ingredients (no ratings needed) */
+function buildCustomBrandTier(
+  allProducts: Product[],
+  heroIngredientIds: string[],
+  ratedIds: Set<string>,
+  sensitivities: string[],
+): { recs: RecommendedProduct[]; sensitivityFilterCount: number } {
+  const profile = buildCustomBrandProfile(heroIngredientIds)
+
+  if (profile.commonIngredients.length === 0) {
+    return { recs: [], sensitivityFilterCount: 0 }
+  }
+
+  const candidates = allProducts.filter(
+    p => p.cg_status === 'approved' && !ratedIds.has(p.id),
+  )
+
+  let sensitivityFilterCount = 0
+  const scored: (RecommendedProduct & { _score: number })[] = []
+
+  for (const product of candidates) {
+    if (sensitivities.length > 0) {
+      const { strict, flexible } = checkSensitivitiesWithStrictness(product, sensitivities)
+      if (strict.length > 0) {
+        sensitivityFilterCount++
+        continue
+      }
+      if (flexible.length > 0) {
+        const { score, matchedIngredients } = scoreProductByIngredients(product, profile)
+        if (score > 0 && matchedIngredients.length > 0) {
+          const heroLabels = matchedIngredientsToHeroLabels(matchedIngredients, heroIngredientIds)
+          const reason = heroLabels.length > 0
+            ? `Contains ${heroLabels.join(', ')} — from your custom formula`
+            : `Contains ${formatIngredientList(matchedIngredients)} — from your custom formula`
+          const warning = `⚠️ Contains ${formatIngredientList(flexible)} (you prefer to avoid)`
+          scored.push({ ...product, _score: score * 0.7, _reason: reason, _sensitivityWarning: warning })
+        }
+        continue
+      }
+    }
+
+    const { score, matchedIngredients } = scoreProductByIngredients(product, profile)
+    if (score > 0 && matchedIngredients.length > 0) {
+      const heroLabels = matchedIngredientsToHeroLabels(matchedIngredients, heroIngredientIds)
+      const reason = heroLabels.length > 0
+        ? `Contains ${heroLabels.join(', ')} — from your custom formula`
+        : `Contains ${formatIngredientList(matchedIngredients)} — from your custom formula`
+      scored.push({ ...product, _score: score, _reason: reason })
+    }
+  }
+
+  scored.sort((a, b) => b._score - a._score)
+  return { recs: scored.slice(0, 8), sensitivityFilterCount }
+}
+
+/** Map matched raw ingredient strings back to hero ingredient labels for display */
+function matchedIngredientsToHeroLabels(matchedIngredients: string[], heroIds: string[]): string[] {
+  const labels: string[] = []
+  for (const id of heroIds) {
+    const hero = HERO_INGREDIENTS.find(h => h.id === id)
+    if (!hero) continue
+    const hasMatch = hero.aliases.some(alias =>
+      matchedIngredients.some(m => m.includes(alias.toLowerCase()))
+    )
+    if (hasMatch) labels.push(hero.label)
+  }
+  return labels
+}
+
 // ---------------------------------------------------------------------------
 // Dismiss-reason chips
 // ---------------------------------------------------------------------------
@@ -287,6 +358,15 @@ function tierHeader(tier: Tier, profile: Profile | null): { title: string; subti
         title: 'Based on ingredients you love',
         subtitle: 'Products with similar ingredients to your favorites',
       }
+    case 'custom': {
+      const brandName = profile?.custom_brand
+        ? CUSTOM_BRANDS.find(b => b.id === profile.custom_brand)?.name || 'your custom brand'
+        : 'your custom brand'
+      return {
+        title: `Alternatives to your ${brandName} formula`,
+        subtitle: 'Off-the-shelf products with the same key ingredients — at a fraction of the price',
+      }
+    }
     case 3:
       return {
         title: 'Recommended for you',
@@ -327,6 +407,7 @@ export function Recommendations() {
   )
   const profileDone = !!profile?.onboarding_completed && !!profile?.porosity
   const sensitivities = profile?.sensitivities ?? []
+  const heroIngredients = profile?.custom_hero_ingredients ?? []
   const ratedProductIdList = useMemo(() => userReviews.map(r => r.product_id), [userReviews])
   const dislikedCategoriesKey = useMemo(() => (
     userReviews
@@ -352,6 +433,7 @@ export function Recommendations() {
     tier,
     recommendedProducts,
     ingredientRecs,
+    customBrandRecs,
     sensitivityFilterCount,
   } = useMemo(() => {
     if (popularProducts.length === 0) {
@@ -359,6 +441,7 @@ export function Recommendations() {
         tier: 1 as Tier,
         recommendedProducts: [],
         ingredientRecs: [],
+        customBrandRecs: [],
         sensitivityFilterCount: 0,
       }
     }
@@ -367,15 +450,43 @@ export function Recommendations() {
     let currentTier: Tier = 1
     let recs: RecommendedProduct[] = []
     let ingredientResults: RecommendedProduct[] = []
+    let customResults: RecommendedProduct[] = []
     let sensitivityFiltered = 0
+
+    // Always build custom brand recs if the user has hero ingredients
+    if (heroIngredients.length > 0) {
+      const { recs: cbRecs, sensitivityFilterCount: cbFilt } = buildCustomBrandTier(
+        popularProducts, heroIngredients, ratedIds, sensitivities,
+      )
+      customResults = cbRecs
+      sensitivityFiltered += cbFilt
+    }
+
     if (!profileDone) {
-      // Tier 1
-      currentTier = 1
-      recs = buildTier1(popularProducts, userProfile?.cgm_experience)
+      if (customResults.length > 0) {
+        currentTier = 'custom'
+        recs = customResults
+      } else {
+        currentTier = 1
+        recs = buildTier1(popularProducts, userProfile?.cgm_experience)
+      }
     } else if (reviewsWithRating.length < MIN_RATINGS_FOR_INGREDIENTS) {
-      // Tier 2 — now uses porosity + texture (not curl pattern)
-      currentTier = 2
-      recs = buildTier2(popularProducts, userProfile!, ratedIds)
+      if (customResults.length > 0) {
+        currentTier = 'custom'
+        const tier2Recs = buildTier2(popularProducts, userProfile!, ratedIds)
+        const seen = new Set(customResults.map(p => p.id))
+        const blended = [...customResults]
+        for (const p of tier2Recs) {
+          if (!seen.has(p.id)) {
+            blended.push(p)
+            seen.add(p.id)
+          }
+        }
+        recs = blended.slice(0, 8)
+      } else {
+        currentTier = 2
+        recs = buildTier2(popularProducts, userProfile!, ratedIds)
+      }
     } else if (reviewsWithRating.length < MIN_RATINGS_FOR_ADVANCED) {
       // Tier 2.5 — ingredient-based
       currentTier = 2.5
@@ -433,10 +544,12 @@ export function Recommendations() {
       tier: currentTier,
       recommendedProducts: recs,
       ingredientRecs: ingredientResults,
+      customBrandRecs: customResults,
       sensitivityFilterCount: sensitivityFiltered,
     }
   }, [
     collabData,
+    heroIngredients,
     popularProducts,
     profile,
     profileDone,
@@ -676,6 +789,20 @@ export function Recommendations() {
           </p>
         )}
 
+        {tier === 'custom' && profile?.custom_hero_ingredients && profile.custom_hero_ingredients.length > 0 && (
+          <div className="flex items-center gap-2 mb-4 flex-wrap">
+            <span className="text-xs text-violet-600">
+              💡 Matching: {profile.custom_hero_ingredients.map(id => HERO_INGREDIENTS.find(h => h.id === id)?.label).filter(Boolean).join(', ')}
+            </span>
+            <Link
+              to="/onboarding"
+              className="text-xs text-violet-500 hover:underline"
+            >
+              Edit ingredients →
+            </Link>
+          </div>
+        )}
+
         {sensitivityFilterCount > 0 && (
           <p className="text-xs text-amber-600 bg-amber-50 px-3 py-1.5 rounded-lg mb-4">
             Filtered out {sensitivityFilterCount} product{sensitivityFilterCount !== 1 ? 's' : ''} based on your sensitivities
@@ -782,10 +909,62 @@ export function Recommendations() {
         </>
       )}
 
+      {/* ───────── Custom brand alternatives (shown alongside Tier 3/4 if user has custom brand) ───────── */}
+      {tier !== 'custom' && customBrandRecs.length > 0 && (
+        <>
+          <hr className="border-gray-200 mb-12" />
+          <section className="mb-12">
+            <h2 className="text-lg font-semibold text-gray-900 mb-1">
+              Alternatives to your {profile?.custom_brand ? CUSTOM_BRANDS.find(b => b.id === profile.custom_brand)?.name || 'custom' : 'custom'} formula
+            </h2>
+            <p className="text-sm text-gray-500 mb-4">
+              Off-the-shelf products with the same key ingredients
+            </p>
+            <div className="space-y-3">
+              {customBrandRecs.map(product => (
+                <RecommendedCard
+                  key={product.id}
+                  product={product}
+                  reason={product._reason}
+                  sensitivityWarning={product._sensitivityWarning}
+                  showRatingPopup={showRatingPopup === product.id}
+                  onOpenRating={() => setShowRatingPopup(product.id)}
+                  onCloseRating={() => setShowRatingPopup(null)}
+                  onRate={handleRate}
+                  isDismissing={dismissingProduct === product.id}
+                  dismissReasons={dismissingProduct === product.id ? dismissReasons : new Set<string>()}
+                  dismissNote={dismissingProduct === product.id ? dismissNote : ''}
+                  onOpenDismiss={() => {
+                    setDismissingProduct(product.id)
+                    setDismissReasons(new Set())
+                    setDismissNote('')
+                    setShowRatingPopup(null)
+                  }}
+                  onCloseDismiss={() => {
+                    setDismissingProduct(null)
+                    setDismissReasons(new Set())
+                    setDismissNote('')
+                  }}
+                  onToggleDismissReason={(reason: string) => {
+                    setDismissReasons(prev => {
+                      const next = new Set(prev)
+                      if (next.has(reason)) next.delete(reason)
+                      else next.add(reason)
+                      return next
+                    })
+                  }}
+                  onDismissNoteChange={(val: string) => setDismissNote(val)}
+                  onSubmitDismiss={() => handleDismiss(product.id)}
+                  onBookmark={() => handleBookmark(product.id)}
+                />
+              ))}
+            </div>
+          </section>
+        </>
+      )}
+
       {/* ───────── separator ───────── */}
       <hr className="border-gray-200 mb-12" />
-
-      {/* ───────── Rate products you've used ───────── */}
       {popularProducts.filter(p => !ratedProductIds.has(p.id)).length > 0 && (
         <section className="mb-12">
           <h2 className="text-lg font-semibold text-gray-900 mb-1">
