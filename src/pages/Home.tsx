@@ -15,7 +15,6 @@ const FEATURED_CREATORS = [
 export function Home() {
   const { data } = useHomeProducts()
   const products = data?.products ?? []
-  const featuredProducts = products.slice(0, 6)
 
   // TODO: Switch to notes-based filter once Danny adds '#HairTok' tags
   const hairtokProducts = useMemo(() => {

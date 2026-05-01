@@ -19,7 +19,6 @@ import type { Tier, RecommendedProduct } from '../components/recommendations/rec
 import { RecommendedCard } from '../components/recommendations/RecommendedCard'
 import { RatingGroup } from '../components/recommendations/RatingGroup'
 import { SavedProducts } from '../components/recommendations/SavedProducts'
-import { RatePromptSection } from '../components/recommendations/RatePromptSection'
 import { IngredientRecsSection } from '../components/recommendations/IngredientRecsSection'
 
 const EMPTY_SET: Set<string> = new Set()
@@ -101,7 +100,7 @@ export function Recommendations() {
     return getLocalReviewsForRecs(products)
   }, [user, products])
 
-  const userReviews = user ? remoteReviews : localReviews as typeof remoteReviews
+  const userReviews = user ? remoteReviews : localReviews as unknown as typeof remoteReviews
   const [showRatingPopup, setShowRatingPopup] = useState<string | null>(null)
   const [dismissingProduct, setDismissingProduct] = useState<string | null>(null)
   const [dismissReasons, setDismissReasons] = useState<Set<string>>(new Set())
