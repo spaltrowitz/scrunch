@@ -413,4 +413,19 @@ export const SEED_PRODUCTS: SeedProduct[] = [
 
   // ── MOUSSE (from Marty's research) ──────────────────────────────────
   { brand: 'AG Care', name: 'Cloud Air Volumizing Mousse', category: 'mousse', cg_status: 'caution', cruelty_free: null, notes: '#HairTok recommended. Lightweight volumizing mousse. Needs ingredient verification', image_url: null, hairtok_trending: true },
+
+  // ── LEAVE-IN (HairTok additions) ────────────────────────────────────
+  { brand: 'Rizos Curls', name: 'Multivitamin Leave-In', category: 'leave_in_conditioner', cg_status: 'approved', cruelty_free: 'unclear', notes: '#HairTok trending. Lightweight multivitamin formula for defined curls', image_url: null, hairtok_trending: true },
+  { brand: 'adwoa beauty', name: 'Melonberry Hair Milk', category: 'leave_in_conditioner', cg_status: 'approved', cruelty_free: 'unclear', notes: '#HairTok trending. Lightweight moisturizer for all curl types', image_url: null, hairtok_trending: true },
+
+  // ── GEL (HairTok additions) ─────────────────────────────────────────
+  { brand: 'Rizos Curls', name: 'Strong Hold Gel', category: 'gel', cg_status: 'approved', cruelty_free: 'unclear', notes: '#HairTok trending. Strong hold without crunch', image_url: null, hairtok_trending: true },
+  { brand: 'The Doux', name: 'Big Poppa Defining Gel', category: 'gel', cg_status: 'approved', cruelty_free: 'unclear', notes: '#HairTok trending. Textured hair specialist brand', image_url: null, hairtok_trending: true },
+
+  // ── SCALP CARE (HairTok additions) ──────────────────────────────────
+  { brand: 'Act+Acre', name: 'Cold Processed Scalp Renew', category: 'scalp_care', cg_status: 'caution', cruelty_free: 'unclear', notes: '#HairTok trending. Cold-processed scalp treatment', image_url: null, hairtok_trending: true },
+  { brand: 'Nature Spell', name: 'Rosemary Oil for Hair & Skin', category: 'scalp_care', cg_status: 'approved', cruelty_free: 'unclear', notes: '#HairTok trending. Pure rosemary oil treatment', image_url: null, hairtok_trending: true },
+
+  // ── CURL CREAM (HairTok additions) ──────────────────────────────────
+  { brand: 'Davines', name: 'LOVE Curl Cream', category: 'curl_cream', cg_status: 'caution', cruelty_free: 'unclear', notes: '#HairTok trending. Salon-quality curl enhancer', image_url: null, hairtok_trending: true },
 ]
