@@ -59,6 +59,14 @@
 
 ## Learnings
 
+### 2026-07-14: Copy Refresh — Reddit + TikTok Unified Voice
+- **Inclusive framing > replacement framing** — "From Reddit threads to TikTok reels" works because it's additive. Saying "we now focus on TikTok" would alienate the OG Reddit community who built the product data we depend on. Always use "X to Y" spectrum framing.
+- **Shared vocabulary is the bridge** — terms like "wash day", "holy grails", "curl journey", and "protein-moisture balance" are used identically on both Reddit and TikTok. Using this shared language makes copy feel native to BOTH audiences simultaneously without having to split messaging.
+- **Dual social proof > single source** — "400K+ Reddit members AND millions of #HairTok views" is stronger than either number alone. Each audience validates the other.
+- **Recognition moments drive connection** — the line "discovered your hair is wavy from a TikTok" describes a real, specific experience thousands of people have. Specific > generic for emotional resonance.
+- **Discovery language for TikTok, depth language for Reddit** — TikTok users respond to "trending", "viral", "holy grail"; Reddit users respond to "deep-dives", "community wisdom", "vetted". Good copy uses both registers.
+- **Deliverable:** `.squad/designs/copy-refresh-hairtok-reddit.md` — 16 changes across Home.tsx and About.tsx, ready for Frenchy.
+
 ### 2025-01-30: Goal Capture Onboarding UX (v1 — SUPERSEDED)
 - **Bottom sheet > full-screen** for optional onboarding — it signals "quick interaction" and keeps discovery content visible behind it, reinforcing the app's core value immediately.
 - **"I don't know" must be a real option, not a skip** — treating it as a first-class choice (with its own UX path) respects the user and avoids the "you did something wrong by not answering" anti-pattern.

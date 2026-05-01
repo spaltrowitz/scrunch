@@ -52,3 +52,32 @@
   - **Key insight**: Store Scanner persona is ONLY persona arriving via Google SEO. All other 3 personas (Newbie, Budget, Optimizer) arrive via Reddit/TikTok/social. Prioritize SEO pages for differentiation, but community outreach is still table-stakes.
   - **Parallel workstreams recommended**: Sandy (auth + PRs), Frenchy (invisible onboarding + Recommendations decomposition), Cha-Cha (bundle monitoring), Shari (community outreach + image sourcing).
   - **Post-Beta roadmap**: Personalized category ordering, advanced community features (Discord, Reddit auto-posts), route prefetching, technical debt cleanup.
+
+### 2026-05-01: Homepage CTA Priority Decision — Kenickie
+
+**Context:** Shari flagged too many CTAs on homepage with 3 overlaps:
+- Hero "Explore Products" + Products Teaser "See All Products" → same destination
+- Ingredient Checker appears twice (Feature box + bottom section)
+- Recommendations positioned equal to discovery but gated behind hair profile form
+
+**Problem:** First-time visitor from Reddit/TikTok doesn't know what to do first.
+
+**Analysis:**
+- Fastest aha moment = **Ingredient Checker** (15 sec: paste label → instant pass/fail) vs. Product Discovery (need filters + context)
+- Zero friction = **Ingredient Checker** (no account, no onboarding) vs. Recommendations (3–5 min form required)
+- Aligns with invisible onboarding: "No gates before value"
+- Newbie personas (P0) are most vulnerable to overwhelm
+
+**Decision: Ingredient Checker = PRIMARY CTA**
+- **Hero button:** "Explore Products" → "Check Ingredients Now" (unmissable, builds trust on first impression)
+- **Feature grid (2 boxes):** Products + Community (removes Ingredient Checker duplicate + Recommendations)
+- **Products teaser:** Remove "See All Products" CTA (consolidates with hero)
+- **NEW section below #HairTok:** "Ready to get personalized?" → Recommendations repositioned as future value unlock
+
+**Rationale:** Visitor flow: Test (Ingredient Checker) → Trust → Explore (Products) → Community → Personalize (Recommendations later). Removes decision paralysis. Unique differentiator (Ingredient Checker) moves from buried feature to hero.
+
+**Spec:** Full CTA audit + implementation instructions → `.squad/decisions/inbox/kenickie-homepage-cta-priority.md` (6.2KB doc for Frenchy)
+
+**Key insight:** Ingredient Checker is what only Scrunch does (Reddit can't do this). It should be unmissable, not a feature in a grid.
+
+**Metrics to track:** Hero CTA click rate vs. old baseline; new → account conversion; repositioned Recommendations engagement.

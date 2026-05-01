@@ -23,13 +23,75 @@ import { IngredientRecsSection } from '../components/recommendations/IngredientR
 
 const EMPTY_SET: Set<string> = new Set()
 
+async function loadCollaborativeRecs(
+  userProfile: Profile,
+  reviews: (ProductReview & { products: Product })[],
+  ratedIds: Set<string>,
+): Promise<{ collabRecs: Product[]; hasSimilarUsers: boolean }> {
+  if (!userProfile.curl_pattern || !userProfile.porosity) {
+    return { collabRecs: [], hasSimilarUsers: false }
+  }
+
+  const { data: similarProfiles } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('curl_pattern', userProfile.curl_pattern)
+    .eq('porosity', userProfile.porosity)
+
+  const similarUserIds = ((similarProfiles as unknown as { id: string }[]) ?? [])
+    .map(p => p.id)
+    .filter(id => id !== userProfile.id)
+
+  if (similarUserIds.length === 0) return { collabRecs: [], hasSimilarUsers: false }
+
+  const { data: similarReviews } = await supabase
+    .from('product_reviews')
+    .select('product_id, rating')
+    .in('user_id', similarUserIds)
+    .gte('rating', 4)
+
+  const castReviews = (similarReviews as unknown as { product_id: string; rating: number }[]) ?? []
+  const dislikedCats = new Set(
+    reviews.filter(r => r.rating != null && r.rating <= 2).map(r => r.products.category),
+  )
+
+  const productCounts: Record<string, number> = {}
+  for (const review of castReviews) {
+    if (!ratedIds.has(review.product_id)) {
+      productCounts[review.product_id] = (productCounts[review.product_id] || 0) + 1
+    }
+  }
+
+  const rankedIds = Object.entries(productCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([id]) => id)
+
+  if (rankedIds.length === 0) return { collabRecs: [], hasSimilarUsers: true }
+
+  const { data: recProducts } = await supabase
+    .from('products')
+    .select('id,brand,name,category,cg_status,cruelty_free,image_url,avg_rating,review_count')
+    .in('id', rankedIds)
+
+  const recs = (recProducts as unknown as Product[]) ?? []
+  recs.sort((a, b) => {
+    const aDis = dislikedCats.has(a.category) ? 1 : 0
+    const bDis = dislikedCats.has(b.category) ? 1 : 0
+    if (aDis !== bDis) return aDis - bDis
+    return rankedIds.indexOf(a.id) - rankedIds.indexOf(b.id)
+  })
+
+  return { collabRecs: recs, hasSimilarUsers: true }
+}
+
 export function Recommendations() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
   const userId = user?.id
-  const { data: profile, isLoading: profileLoading, error: profileError } = useUserProfile(userId)
-  const { data: userReviews = [], isLoading: reviewsLoading, error: reviewsError } = useUserReviews(userId)
-  const { data: productsData, isLoading: productsLoading, error: productsError } = useRecommendationProducts()
+  const { data: profile, isLoading: profileLoading } = useUserProfile(userId)
+  const { data: userReviews = [], isLoading: reviewsLoading } = useUserReviews(userId)
+  const { data: productsData, isLoading: productsLoading } = useRecommendationProducts()
   const products = useMemo(() => productsData?.products ?? [], [productsData])
   const [showRatingPopup, setShowRatingPopup] = useState<string | null>(null)
   const [dismissingProduct, setDismissingProduct] = useState<string | null>(null)
@@ -54,7 +116,7 @@ export function Recommendations() {
   ), [userReviews])
   const shouldLoadCollab = !!user && profileDone && !!profile?.curl_pattern
     && reviewsWithRating.length >= MIN_RATINGS_FOR_ADVANCED
-  const { data: collabData, isLoading: collabLoading, error: collabError } = useQuery({
+  const { data: collabData, isLoading: collabLoading } = useQuery({
     queryKey: ['collab-recs', userId, profile?.curl_pattern, profile?.porosity, ratedProductIdList, dislikedCategoriesKey],
     enabled: shouldLoadCollab,
     queryFn: async () => {
@@ -62,9 +124,9 @@ export function Recommendations() {
       return await loadCollaborativeRecs(profile!, userReviews, ratedIds)
     },
   })
-  const baseLoading = (productsLoading || profileLoading || reviewsLoading)
-    && !(productsError || profileError || reviewsError)
-  const loading = baseLoading || (shouldLoadCollab && collabLoading && !collabError)
+  // Only block rendering if we have zero products (no placeholder either).
+  // Profile/reviews load in the background — the tier upgrades reactively.
+  const loading = productsLoading && !productsData
 
   const {
     tier,
@@ -131,68 +193,6 @@ export function Recommendations() {
     }
     return { tier: currentTier, recommendedProducts: recs, ingredientRecs: ingredientResults, sensitivityFilterCount: sensitivityFiltered }
   }, [collabData, popularProducts, profile, profileDone, ratedProductIds, reviewsWithRating.length, sensitivities, userReviews])
-
-  const loadCollaborativeRecs = async (
-    userProfile: Profile,
-    reviews: (ProductReview & { products: Product })[],
-    ratedIds: Set<string>,
-  ): Promise<{ collabRecs: Product[]; hasSimilarUsers: boolean }> => {
-    if (!userProfile.curl_pattern || !userProfile.porosity) {
-      return { collabRecs: [], hasSimilarUsers: false }
-    }
-
-    const { data: similarProfiles } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('curl_pattern', userProfile.curl_pattern)
-      .eq('porosity', userProfile.porosity)
-
-    const similarUserIds = ((similarProfiles as unknown as { id: string }[]) ?? [])
-      .map(p => p.id)
-      .filter(id => id !== userProfile.id)
-
-    if (similarUserIds.length === 0) return { collabRecs: [], hasSimilarUsers: false }
-
-    const { data: similarReviews } = await supabase
-      .from('product_reviews')
-      .select('product_id, rating')
-      .in('user_id', similarUserIds)
-      .gte('rating', 4)
-
-    const castReviews = (similarReviews as unknown as { product_id: string; rating: number }[]) ?? []
-    const dislikedCats = new Set(
-      reviews.filter(r => r.rating != null && r.rating <= 2).map(r => r.products.category),
-    )
-
-    const productCounts: Record<string, number> = {}
-    for (const review of castReviews) {
-      if (!ratedIds.has(review.product_id)) {
-        productCounts[review.product_id] = (productCounts[review.product_id] || 0) + 1
-      }
-    }
-
-    const rankedIds = Object.entries(productCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-      .map(([id]) => id)
-
-    if (rankedIds.length === 0) return { collabRecs: [], hasSimilarUsers: true }
-
-    const { data: recProducts } = await supabase
-      .from('products')
-      .select('id,brand,name,category,cg_status,cruelty_free,image_url,avg_rating,review_count')
-      .in('id', rankedIds)
-
-    const recs = (recProducts as unknown as Product[]) ?? []
-    recs.sort((a, b) => {
-      const aDis = dislikedCats.has(a.category) ? 1 : 0
-      const bDis = dislikedCats.has(b.category) ? 1 : 0
-      if (aDis !== bDis) return aDis - bDis
-      return rankedIds.indexOf(a.id) - rankedIds.indexOf(b.id)
-    })
-
-    return { collabRecs: recs, hasSimilarUsers: true }
-  }
 
   // ----- mutations -----
 
@@ -317,6 +317,12 @@ export function Recommendations() {
         )}
         {tier === 2 && (
           <p className="text-xs text-gray-400 mb-4">Rate products you've tried for even better recommendations</p>
+        )}
+        {(profileLoading || reviewsLoading) && (
+          <p className="text-xs text-violet-500 mb-4 animate-pulse">Personalizing your recommendations…</p>
+        )}
+        {shouldLoadCollab && collabLoading && (
+          <p className="text-xs text-violet-500 mb-4 animate-pulse">Finding people with similar hair…</p>
         )}
         {sensitivityFilterCount > 0 && (
           <p className="text-xs text-amber-600 bg-amber-50 px-3 py-1.5 rounded-lg mb-4">
