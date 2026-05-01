@@ -50,3 +50,69 @@
 
 ### 2026-05-01: Toast System Wired by Frenchy
 - Frenchy completed toast notification system addressing Sandy's code review note #2. All 7 mutations wired (ProductDetail, Products, Recommendations, OnboardingWizard). Convention established: all future mutations must include success/error toast feedback. Build/tests clean.
+
+### 2026-05-01: TikTok Hair Routine Integration — Legal Analysis
+- **Request:** Shari asked if Scrunch can integrate viral TikTok hair routine content (Abbey Yung / #HairTok) without legal risk.
+- **Legal findings:**
+  - ✅ **Product names** (K18, Olaplex, Redken) are factual data, not copyrightable. Descriptor use is fair use. Safe to catalog.
+  - ✅ **Influencer mentions & routine references** are safe if paraphrased (functional instructions, not creative expression copied).
+  - ✅ **Attribution is essential** — transforms relationship from "plagiarism" to "curation." Credit the creator on every view.
+  - ❌ **Video/images/media** are copyright-protected. Never embed, screenshot, or host creator media without written permission.
+  - ❌ **Implied endorsement** is risky. Never say "Abbey Yung endorses Scrunch" unless explicitly stated. Use "as featured in" instead.
+- **Safe approach:** Build "Trending on TikTok" collection with routine descriptions + product links + creator attribution links. Zero media reproduction.
+- **MVP roadmap:**
+  - Phase 1 (1-2 days): Mock data, Abbey Yung routine, TrendingRoutines.tsx component, sidebar nav
+  - Phase 2 (2-3 days): Supabase schema + CRUD, scale to 5-10 routines, admin panel
+  - Phase 3 (optional): Community submissions + moderation
+- **Prohibited:** Never host creator videos, use their images, copy captions, combine routines without permission, imply endorsement, or scrape #HairTok content.
+- **Decision:** APPROVED. Written analysis uploaded to `.squad/decisions/inbox/sandy-hairtok-integration.md` with full legal summary, checklist, and sample routine.
+- **Next:** Shari approves, assign Phase 1 to Frenchy (frontend) for MVP launch.
+
+### 2026-05-01: #HairTok Content Integration — Legal Framework & Implementation Roadmap
+
+**Request:** Analyze legal risks for integrating influencer content (routines, product mentions) from #HairTok creators. Define safe practices and phased implementation.
+
+**Legal Analysis:**
+
+✅ **SAFE (Green Light):**
+- Product names/data in catalog — Factual, not copyrightable; descriptive fair use
+- Routine descriptions — Functional instructions (own words), not creative works
+- Influencer attribution — Proper credit + links mitigate all risk
+- Links to TikTok videos — Drives traffic; creator-approved practice
+
+❌ **HIGH RISK (Red Flags):**
+- Video/image reproduction — Copyrighted; requires written permission
+- Implied endorsement ("She recommends Scrunch") — False advertising liability
+- Copy-pasted captions — Derivative work; paraphrase instead
+- Combining routines without attribution — Derivative work infringement
+
+**Decision: Approved** — Scrunch can build "Trending on TikTok" feature with attribution-first approach.
+
+**Phased Implementation:**
+
+**Phase 1 (MVP): Week 1 — 1-2 engineer-days**
+- Component: TrendingRoutines.tsx
+- Content: Abbey Yung's 5-step routine (manually transcribed from video)
+- Links: Each step links to 2-3 products in existing catalog
+- Navigation: "Trending on TikTok" section in sidebar
+- No backend changes; mock data
+
+**Phase 2 (Scale): Week 2-3 — 2-3 engineer-days**
+- Schema: routines + routine_steps + routine_step_products tables (Supabase)
+- Admin UI: CRUD for Shari to add/edit/remove routines
+- Badge: "As Seen On" on product cards
+- Support: 5–10 routines
+
+**Phase 3 (Community): Month 2+ — Optional 3-5 days**
+- User submissions + moderation queue
+- Contributor attribution
+
+**Attribution Checklist (MVP):**
+- Creator name + username visible on every routine
+- Link to original TikTok (working, tested)
+- Routine steps paraphrased in own words
+- No video embeds, screenshots, or images without permission
+- "As featured in" positioning (not "endorsed by")
+- Product links accurate and verified
+
+**Outcome:** Legal approval granted. Phase 1 MVP roadmap created. Ready for dev assignment (Frenchy for frontend, Danny for Phase 2 backend).

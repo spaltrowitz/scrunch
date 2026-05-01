@@ -730,3 +730,89 @@ For the 47 remaining products, options:
 **Impact:** Community.tsx search function, summary display, result ordering. No API or schema changes.
 
 **Status:** IMPLEMENTED — deployed to GitHub Pages as part of beta must-fix sprint.
+
+---
+
+### 2026-05-01: #HairTok Product Integration — CGM Compatibility Assessment
+
+**By:** Marty (Domain Expert)  
+**Date:** 2026-05-01  
+**Request:** Shari Paltrowitz — analyze viral #HairTok routine (Abbey Yung) for product integration into Scrunch catalog
+
+**Decision:** Add 2–3 products, skip 6–7, propose 2 new categories.
+
+**Products to Add:**
+1. **Rosemary Oil (generic/plant-based)** — Pure, CG-approved, scalp stimulation + nutrient delivery without buildup. Already fits `oil_serum` category.
+2. **K18 Leave-In Conditioner** — Bond-repair treatment, trending on TikTok, silicone-light (verify formula before adding). Appeals to Optimizers. Requires research.
+3. **Olaplex Weightless Mask** — Bond-repair mask, community-trusted, water-soluble silicones (verify type). Popular with Optimizers.
+
+**Products to Skip (Anti-CGM):**
+- Dove Derma, Tresemmé Keratin Smooth, Redken Acidic Growth, Redken Hair Masks — All contain harsh sulfates + non-water-soluble silicones, marketed for straight/smoothing, zero curly community adoption.
+- Pureology Smooth Gloss — Water-soluble silicones but "Smooth" line emphasizes smoothness over curl; defer unless wavy-specific variant exists.
+
+**Category Expansion Recommendations:**
+1. **`scalp_care`** (NEW) — Scalp serums, oils, masks. Currently zero products. TikTok + CGM community signal high demand. Start with: Dr. Groot, rosemary oils.
+2. **`bond_repair`** (NEW) — Keratin + peptide treatments. Currently zero products. K18 + Olaplex trending. Appeals to Optimizers + color-treated curls common.
+3. **`heat_protectant`** (DEFER) — Lower curly demand; wavy use only. Phase 2.
+
+**Strategic Insight:**
+- HairTok routine is wavy-forward (2A–2C: light, scalp-focused) vs. Scrunch's curly-forward (3A+). Reveals Scrunch underserves wavies.
+- When adding new categories, frame for wavies: "Especially great for wavies (2A–2C)."
+- Abbey Yung routine products **don't fit Scrunch** broadly (mainstream anti-CGM), but reveals gaps. Good signal: Scrunch has clear identity; not chasing trends blindly.
+
+**Impact:** 2–3 products added to catalog, 2 category proposals to PM, wavy-hair positioning opportunity identified.
+
+**Status:** DECISION READY — Awaiting PM (Kenickie) approval on new categories + research verification on K18/Olaplex/Dr. Groot before implementation.
+
+---
+
+### 2026-05-01: #HairTok Content Integration — Legal & Attribution Framework
+
+**By:** Sandy (Lead Engineer)  
+**Date:** 2026-05-01  
+**Request:** Shari Paltrowitz — Assess legal risks for integrating influencer routines, define safe practices
+
+**Decision:** Approved ✅ — Scrunch can build "Trending on TikTok" feature with clear guardrails.
+
+**Safe (Green Light):**
+- ✅ Product names/data in catalog — Factual, not copyrightable; descriptive fair use
+- ✅ Routine descriptions — Functional instructions (own words), not creative works
+- ✅ Influencer attribution — Proper credit + links reduce all risk
+- ✅ Links to TikTok — Drives traffic; creator-approved practice
+
+**High Risk (Red Flags):**
+- ❌ Video/image reproduction — Copyrighted; requires written permission
+- ❌ Implied endorsement ("She recommends Scrunch") — False advertising liability
+- ❌ Copy-pasted captions — Derivative work; paraphrase instead
+- ❌ Combining routines without attribution — Derivative work infringement
+
+**Attribution Checklist (MVP):**
+- Creator name + username visible on every routine
+- Link to original TikTok (working, tested)
+- Routine steps paraphrased in own words
+- No video embeds, screenshots, or images without permission
+- "As featured in" positioning (not "endorsed by")
+- Product links accurate and verified
+
+**Phased Implementation:**
+
+**Phase 1 (MVP): Week 1 — 1-2 engineer-days**
+- Component: TrendingRoutines.tsx
+- Mock data: Abbey Yung's 5-step routine (manually transcribed)
+- Navigation: Add "Trending on TikTok" section
+- Links: Each step links to 2-3 products in existing catalog
+- No backend changes
+
+**Phase 2 (Scale): Week 2-3 — 2-3 engineer-days**
+- Schema: routines + routine_steps + routine_step_products tables
+- Admin UI: CRUD for Shari (add/edit/remove)
+- Badge: "As Seen On" on product cards
+- Support: 5–10 routines
+
+**Phase 3 (Community): Month 2+ — Optional 3-5 days**
+- User submissions + moderation queue
+- Contributor attribution
+
+**Impact:** Feature roadmap defined, legal risk cleared, implementation path set (MVP → Scale → Community).
+
+**Status:** APPROVED — Ready for dev assignment. Assign Phase 1 MVP to Frenchy (frontend), Phase 2 to Danny (backend).
