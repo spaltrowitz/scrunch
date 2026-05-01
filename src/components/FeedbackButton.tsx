@@ -16,7 +16,7 @@ const PLACEHOLDERS: Record<FeedbackType, string> = {
   love: "What do you love about Scrunch? We'd love to hear!",
 }
 
-export function FeedbackButton() {
+export function FeedbackButton({ inline }: { inline?: boolean }) {
   const [isOpen, setIsOpen] = useState(false)
   const [type, setType] = useState<FeedbackType>('love')
   const [title, setTitle] = useState('')
@@ -99,14 +99,22 @@ export function FeedbackButton() {
 
   return (
     <>
-      {/* Floating feedback button */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 w-12 h-12 bg-violet-600 text-white rounded-full shadow-lg hover:bg-violet-700 cursor-pointer flex items-center justify-center text-xl z-50 transition-transform hover:scale-110"
-        title="Send feedback"
-      >
-        💬
-      </button>
+      {inline ? (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="text-sm text-gray-600 hover:text-violet-600 cursor-pointer"
+        >
+          Feedback
+        </button>
+      ) : (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-6 right-6 w-12 h-12 bg-violet-600 text-white rounded-full shadow-lg hover:bg-violet-700 cursor-pointer flex items-center justify-center text-xl z-50 transition-transform hover:scale-110"
+          title="Send feedback"
+        >
+          💬
+        </button>
+      )}
 
       {/* Modal */}
       {isOpen && (

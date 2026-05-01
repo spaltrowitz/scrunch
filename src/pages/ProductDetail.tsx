@@ -163,7 +163,7 @@ export function ProductDetail() {
       <Link to="/products" className="text-sm text-violet-600 hover:underline mb-6 inline-block">← Back to browse</Link>
 
       {/* Product Header */}
-      <div className="flex gap-6 mb-6">
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-6">
         <ProductImage
           brand={product.brand}
           name={product.name}
@@ -213,7 +213,7 @@ export function ProductDetail() {
               return (
                 <div key={i} className="flex items-start gap-2">
                   <span className="mt-0.5 shrink-0">{flagged ? (flagged.severity === 'bad' ? '🔴' : '🟡') : '🟢'}</span>
-                  <span className={flagged ? 'text-gray-900 font-medium' : 'text-gray-600'}>
+                  <span className={`break-words ${flagged ? 'text-gray-900 font-medium' : 'text-gray-600'}`}>
                     {ing}
                     {flagged && <span className="text-gray-500 font-normal"> — {flagged.reason}</span>}
                   </span>
@@ -262,12 +262,12 @@ export function ProductDetail() {
           {ratingPopup && (
             <div className="mt-4 p-4 bg-violet-50 border border-violet-200 rounded-xl">
               <p className="text-sm font-medium text-gray-700 mb-3">How was it for your hair?</p>
-              <div className="flex gap-2 mb-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
                 {RATING_OPTIONS.map(opt => (
                   <button
                     key={opt.value}
                     onClick={() => setSelectedRating(opt.value)}
-                    className={`flex-1 text-xs py-2.5 rounded-lg border cursor-pointer font-medium transition ${
+                    className={`text-xs py-2.5 rounded-lg border cursor-pointer font-medium transition ${
                       selectedRating === opt.value
                         ? `${opt.bg} ${opt.border} ${opt.text} ring-2 ring-offset-1 ring-violet-400`
                         : `${opt.bg} ${opt.border} ${opt.text} hover:opacity-80`

@@ -5,7 +5,6 @@ import { AuthProvider } from './lib/auth'
 import { useAuth } from './lib/auth.utils'
 import { Header } from './components/layout/Header'
 import { Footer } from './components/layout/Footer'
-import { FeedbackButton } from './components/FeedbackButton'
 import { ToastProvider } from './hooks/useToast'
 import { ToastContainer } from './components/ui/ToastContainer'
 
@@ -70,7 +69,6 @@ function App() {
                 <AppRoutes />
               </main>
               <Footer />
-              <FeedbackButton />
               <ToastContainer />
             </div>
           </HashRouter>

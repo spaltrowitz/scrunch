@@ -7,7 +7,7 @@ export function Footer() {
         <p className="text-xs text-gray-400">
           Scrunch — Made by curly people, for curly people.
         </p>
-        <div className="flex items-center gap-3 text-xs text-gray-400">
+        <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400">
           <Link to="/about" className="hover:text-violet-600 no-underline">About</Link>
           <span>·</span>
           <Link to="/products" className="hover:text-violet-600 no-underline">Products</Link>

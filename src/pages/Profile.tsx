@@ -19,7 +19,7 @@ export function ProfilePage() {
         <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
         <button
           onClick={() => navigate('/onboarding')}
-          className="text-sm px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 cursor-pointer"
+          className="text-sm px-4 py-2 min-h-[44px] bg-violet-600 text-white rounded-lg hover:bg-violet-700 cursor-pointer"
         >
           {isProfileEmpty ? 'Set Up Profile' : 'Edit Profile'}
         </button>
@@ -43,7 +43,7 @@ export function ProfilePage() {
         <div className="space-y-6">
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h2 className="font-semibold text-gray-900 mb-4">Hair Profile</h2>
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
               {[
                 { label: 'Curl Pattern', value: profile!.curl_pattern ? `${profile!.curl_pattern} — ${CURL_PATTERNS.find(c => c.value === profile!.curl_pattern)?.description}` : null },
                 { label: 'Porosity', value: profile!.porosity ? POROSITY_OPTIONS.find(p => p.value === profile!.porosity)?.label : null },

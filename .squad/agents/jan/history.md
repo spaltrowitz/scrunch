@@ -159,3 +159,64 @@
 - **Stack, don't squeeze** — the ratings prompt banner, search form controls, and brand/region dropdowns all used `flex` row layout that overflowed on mobile. Changed to `flex-col sm:flex-row` pattern everywhere.
 - **Pre-existing TS errors from other sessions can block deploys** — found unused `featuredProducts` variable in Home.tsx and unused `RatePromptSection` import in Recommendations.tsx from prior session's changes. These blocked `tsc -b`. Always clean up unused code before committing.
 
+### 2025-05-01: Comprehensive Mobile Responsiveness Audit
+
+**Context:** Completed full mobile audit of Scrunch covering all 15 page components, 2 layout components, and key shared components.
+
+**Key Findings:**
+
+1. **Overall Mobile Readiness: 8.5/10** — Strong mobile-first foundation with a few critical fixes needed
+
+2. **Mobile Design Patterns Observed:**
+   - Consistent `px-4` mobile padding across all pages
+   - Excellent use of responsive breakpoints: `sm:`, `md:`, `lg:`
+   - Grid collapsing patterns: 6 → 3 → 2 columns for product grids
+   - Touch targets: Most buttons properly sized at 44px minimum
+   - Sticky header with mobile menu — best-in-class implementation
+   - Typography scales responsively (e.g., `text-xl md:text-2xl lg:text-3xl`)
+
+3. **Critical Issues Identified:**
+   - **ProductDetail ingredient list** (line 206-224): Long ingredient names cause horizontal scroll on <375px screens. Needs `break-words` class.
+   - **Auth forms** (Login/SignUp): Input fields use `py-2` (~40px height), below 44px touch target minimum. Should use `py-3`.
+   - **ProductDetail rating buttons** (line 267-274): 4 buttons side-by-side cramped on mobile. Should use `grid grid-cols-2 sm:grid-cols-4`.
+   - **Community post buttons** (line 286): Touch target is 36px, should be 44px minimum.
+
+4. **File Paths for Reference:**
+   - Pages: `src/pages/{Home,Products,Recommendations,Dashboard,Profile,Community,About,IngredientCheckerPage,Login,SignUp,ProductDetail,MyProducts,Onboarding}.tsx`
+   - Layout: `src/components/layout/{Header,Footer}.tsx`
+   - Key components: `src/components/products/ProductCard.tsx`, `src/components/onboarding/OnboardingWizard.tsx`
+
+5. **Best Practices Observed:**
+   - Header mobile menu implementation (`Header.tsx` lines 63-92) — perfect touch targets with explicit `min-h-[44px]` and `min-w-[44px]`
+   - Product grid responsive patterns: `grid-cols-2 sm:grid-cols-3 lg:grid-cols-6`
+   - Proper truncation with `truncate` class to prevent text overflow
+   - Flex wrapping on tags and badges: `flex-wrap gap-2`
+   - Single-column layouts (Recommendations, Dashboard) naturally mobile-friendly
+
+6. **Tech Stack:**
+   - React 19 with TypeScript
+   - Tailwind CSS 4 for styling
+   - Deployed to GitHub Pages (static hosting)
+   - Responsive design uses Tailwind breakpoints: sm (640px), md (768px), lg (1024px)
+
+7. **Quick Wins Identified:**
+   - Add explicit `grid-cols-1` to implicit grids (Products page line 419)
+   - Add `min-h-[44px]` to Dashboard CTA (line 37) and Profile edit button (line 22)
+   - Add `flex-wrap` to Footer nav links (line 10)
+   - Stack ProductDetail header on mobile: change to `flex-col sm:flex-row`
+
+8. **Mobile Testing Recommendations:**
+   - Test on iOS Safari: iPhone SE (375px), iPhone 14 (390px)
+   - Test on Android Chrome: 360px small device
+   - Test edge cases at 320px width (smallest modern phones)
+   - Key interactions: product browsing, rating flow, ingredient list scrolling, auth forms
+
+9. **Component Patterns to Reuse:**
+   - Mobile menu toggle pattern from Header.tsx
+   - Responsive grid: `grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3`
+   - Touch-friendly button: `px-4 py-3 min-h-[44px]`
+   - Responsive text: `text-sm md:text-base`
+   - Card stacking: `flex flex-col gap-4` (natural mobile stack)
+
+**Output:** Detailed audit report saved to `mobile-audit-report.md` with page-by-page analysis, critical issues prioritized, and mobile readiness scoring.
+

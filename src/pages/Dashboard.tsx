@@ -33,7 +33,7 @@ export function Dashboard() {
             </p>
             <Link
               to="/onboarding"
-              className="inline-block px-5 py-2.5 bg-violet-600 text-white font-medium rounded-lg hover:bg-violet-700 no-underline"
+              className="inline-block px-5 py-2.5 min-h-[44px] bg-violet-600 text-white font-medium rounded-lg hover:bg-violet-700 no-underline"
             >
               Start Hair Quiz →
             </Link>

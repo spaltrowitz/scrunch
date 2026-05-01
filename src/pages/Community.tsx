@@ -283,7 +283,7 @@ function AskCommunityPrompt() {
             href={`${sub.url}submit`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs px-3 py-2 min-h-[36px] rounded-full bg-white text-violet-600 border border-violet-200 hover:bg-violet-100 no-underline transition"
+            className="text-xs px-3 py-2 min-h-[44px] rounded-full bg-white text-violet-600 border border-violet-200 hover:bg-violet-100 no-underline transition"
           >
             Post to {sub.name}
           </a>
@@ -496,12 +496,12 @@ export function Community() {
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
               <p className="text-sm text-gray-700 mb-2">Did this answer your question?</p>
               <div className="flex flex-wrap items-center gap-2">
-                <button className="text-xs px-3 py-2 min-h-[36px] rounded-full bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 cursor-pointer transition">
+                <button className="text-xs px-3 py-2 min-h-[44px] rounded-full bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 cursor-pointer transition">
                   👍 Yes, thanks!
                 </button>
                 <button
                   onClick={() => { setQuestion(item.question); setShowSearchBox(true); }}
-                  className="text-xs px-3 py-2 min-h-[36px] rounded-full bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 cursor-pointer transition"
+                  className="text-xs px-3 py-2 min-h-[44px] rounded-full bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 cursor-pointer transition"
                 >
                   🔄 Refine my search
                 </button>
