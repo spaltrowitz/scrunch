@@ -266,7 +266,7 @@ export const SEED_PRODUCTS: SeedProduct[] = [
   { brand: 'Rizos Curls', name: 'Volumizing Hairspray', category: 'spray_refresher', cg_status: 'approved', cruelty_free: null, notes: null, image_url: 'https://cdn.shopify.com/s/files/1/1822/5087/files/RizosCurls_HairSpray_Breakage_KernelOil.webp?v=1762468270' },
 
   // ══════════════════════════════════════════════════════════════════════
-  // REDDIT-SOURCED PRODUCTS (r/curlyhair & r/curlygirl community picks)
+  // REDDIT-SOURCED PRODUCTS (r/curlyhair, r/curlygirl & r/wavyhair community picks)
   // ══════════════════════════════════════════════════════════════════════
 
   // ── CLARIFYING SHAMPOO ─────────────────────────────────────────────

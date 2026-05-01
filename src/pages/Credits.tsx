@@ -80,6 +80,11 @@ export function Credits() {
             url="https://www.reddit.com/r/curlygirl/"
             description="61K weekly visitors. Focused on the Curly Girl Method with beginner guides and community support."
           />
+          <SourceCard
+            name="r/wavyhair"
+            url="https://www.reddit.com/r/wavyhair/"
+            description="Wavy hair community on Reddit — techniques, product recommendations, and support for 2A-2C hair types."
+          />
         </div>
       </section>
 
