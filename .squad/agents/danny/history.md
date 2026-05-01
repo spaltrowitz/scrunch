@@ -57,3 +57,15 @@
 - **Fix (summary honesty):** Replaced fake "AI Summary" (`generateAiAnswer`) with honest `generateSummary` — plain text like "Found 8 related discussions across r/curlyhair, r/wavyhair." No markdown, no pretend analysis. Badge changed from "🤖 AI Summary" to "📋 Community Results".
 - **Fix (markdown leaking):** Added `stripMarkdown()` utility that removes `**bold**`, `_italic_`, `> blockquotes`, `# headings`, `[links](url)`, and `` `code` `` from Reddit selftext snippets before display. Applied during result mapping.
 - **Lesson:** Reddit search works best with 4-6 keyword terms. Natural language queries return noise. Always extract terms before hitting their API.
+
+### 2026-05-02: Community Search Relevance Redesign (v2)
+- **Root cause:** `extractSearchTerms()` was naive — stripped stop words and took first 6 remaining words. For long natural-language queries like "how can i make my bangs dry well when they dry naturally... taylor swift folklore era", it produced garbage terms like "bangs dry naturally place wavy taylor" that Reddit couldn't match.
+- **Fix — Domain-aware keyword extraction:** Added `HAIR_TERMS` set (~80 hair-domain words) and `COMPOUND_TERMS` list (~30 multi-word phrases like "air dry", "deep condition", "low porosity", "curly girl"). Extraction now: (1) finds compound terms first, (2) prioritizes hair domain terms, (3) drops celebrity/pop culture noise via `NOISE_WORDS`, (4) pads with remaining terms up to 5 total.
+- **Fix — Multi-query strategy:** Each subreddit now gets searched with TWO queries — a primary (up to 5 domain terms) and a fallback (just the top 2 terms). Results are deduped by URL. This doubles the chance of finding relevant posts since Reddit's simple keyword matching often misses on longer queries.
+- **Fix — Relevance filtering:** Posts with 0 comments are deprioritized (nobody engaged = not useful). Results are ranked by: title keyword matches (×100 boost per match) + comment count (capped at 50, ×2). Posts whose titles contain search terms float to top.
+- **Test results after fix:**
+  - "bangs dry naturally... taylor swift folklore" → Primary: "bangs dry wavy", Fallback: "bangs dry" (was: "bangs dry naturally place wavy taylor")
+  - "best gel for 3B low porosity hair" → Primary: "low porosity gel 3b", Fallback: "low porosity gel"
+  - "how often should I deep condition" → Primary: "deep condition", Fallback: "deep condition"
+  - "curly girl method for beginners" → Primary: "curly girl method beginners", Fallback: "curly girl method"
+- **Lesson:** For domain-specific search over a dumb search engine (Reddit), you need a domain vocabulary to separate signal from noise. Generic NLP (stop word removal) isn't enough — you need to know what the domain cares about.
