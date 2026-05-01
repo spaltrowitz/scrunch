@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth'
 import type { Product, ProductReview, Profile } from '../lib/database.types'
-import { useProducts, useUserProfile, useUserReviews } from '../hooks/useProducts'
+import { useRecommendationProducts, useUserProfile, useUserReviews } from '../hooks/useProducts'
 import {
   buildTier1,
   buildTier2,
@@ -29,7 +29,7 @@ export function Recommendations() {
   const userId = user?.id
   const { data: profile, isLoading: profileLoading, error: profileError } = useUserProfile(userId)
   const { data: userReviews = [], isLoading: reviewsLoading, error: reviewsError } = useUserReviews(userId)
-  const { data: productsData, isLoading: productsLoading, error: productsError } = useProducts()
+  const { data: productsData, isLoading: productsLoading, error: productsError } = useRecommendationProducts()
   const products = productsData?.products ?? []
   const [showRatingPopup, setShowRatingPopup] = useState<string | null>(null)
   const [dismissingProduct, setDismissingProduct] = useState<string | null>(null)
@@ -180,7 +180,7 @@ export function Recommendations() {
 
     const { data: recProducts } = await supabase
       .from('products')
-      .select('id,brand,name,category,cg_status,cruelty_free,notes,image_url')
+      .select('id,brand,name,category,cg_status,cruelty_free,image_url,avg_rating,review_count')
       .in('id', rankedIds)
 
     const recs = (recProducts as unknown as Product[]) ?? []
