@@ -79,3 +79,12 @@
 - Sandy merged 3 PRs this batch; PR #9 and #15 required rebasing to React Query patterns per architecture-first conflict resolution policy
 - Cha-Cha decomposed Recommendations.tsx (1173→399 lines) with memo-wrapped sub-components
 - Toast system establishes pattern for all future mutation feedback
+
+### Homepage Declutter (2026-07-25)
+- Reduced initial category grid from all 14 to top 6 (by popularity), with "Show all categories →" toggle
+- Reduced initial product grid from 40 to 12 items; "View all products →" link triggers at 12+
+- Moved persona pills below category grid to reduce hero-area visual competition
+- Toned down persona pill styling (lighter borders/text) so they read as secondary navigation
+- Capped category grid at 4 columns max (was 5 on lg), 3 on mobile (was 2)
+- Added more vertical spacing between sections (py-8 → py-10, mb-6 → mb-10)
+- Build passes, 26/26 tests green
