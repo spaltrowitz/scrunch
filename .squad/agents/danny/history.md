@@ -101,3 +101,10 @@ Beta must-fix sprint (6 items) now complete across Frenchy + Danny. Scribe docum
 - **Removed duplicate `dry_shampoo`** from ProductCategory union type (was listed twice).
 - **Lesson:** Always grep existing seed data before adding — the catalog is large (400+ lines) and brands like Mielle and Briogeo appear across multiple categories.
 
+### 2025-07-25: HairTok Product Catalog Expansion (Batch 2)
+- **7 new products added** from Marty's HairTok research: Rizos Curls Multivitamin Leave-In, Rizos Curls Strong Hold Gel, adwoa beauty Melonberry Hair Milk, Act+Acre Cold Processed Scalp Renew, Davines LOVE Curl Cream, The Doux Big Poppa Defining Gel, Nature Spell Rosemary Oil for Hair & Skin.
+- **Category mapping:** Task specified `leave_in` and `styling_cream` which don't exist in the ProductCategory type — mapped to `leave_in_conditioner` and `curl_cream` respectively.
+- **cruelty_free mapping:** Task specified `'unknown'` but type only allows `'yes' | 'no' | 'unclear' | null` — used `'unclear'` as the closest semantic match.
+- **No duplicates:** All 7 products were confirmed missing before adding. Existing Rizos Curls products (Hydrating shampoo, Curl Defining Cream, Light Hold Gel, Volumizing Hairspray) and adwoa beauty Baomint Leave-In were already in catalog but are different products.
+- **Lesson:** Always validate category and field values against the TypeScript types before adding — task descriptions may use informal names that don't match the actual union type.
+
