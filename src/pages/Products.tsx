@@ -358,7 +358,7 @@ export function Products() {
       </p>
 
       {user && ratingsNeeded > 0 && (
-        <div className="mb-6 p-4 bg-violet-50 border border-violet-200 rounded-xl flex items-center justify-between">
+        <div className="mb-6 p-4 bg-violet-50 border border-violet-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <p className="text-sm font-medium text-violet-900">
               Rate {ratingsNeeded} more product{ratingsNeeded !== 1 ? 's' : ''} to unlock personalized suggestions ✨
@@ -367,7 +367,7 @@ export function Products() {
               {userRatingCount}/10 rated — click "Tried it?" on products you've used
             </p>
           </div>
-          <div className="w-24 h-2 bg-violet-200 rounded-full shrink-0 ml-4">
+          <div className="w-full sm:w-24 h-2 bg-violet-200 rounded-full shrink-0">
             <div className="h-2 bg-violet-500 rounded-full transition-all" style={{ width: `${Math.min(100, userRatingCount * 10)}%` }} />
           </div>
         </div>
@@ -409,14 +409,14 @@ export function Products() {
           </p>
           <button
             onClick={clearFilters}
-            className="px-5 py-2.5 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 cursor-pointer transition-colors"
+            className="px-5 py-3 min-h-[44px] text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 cursor-pointer transition-colors"
           >
             Clear all filters
           </button>
         </div>
       ) : (
         <>
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid gap-4 md:grid-cols-2">
             {visibleProducts.map((product, i) => {
               const key = productKey(product)
               return (
@@ -445,7 +445,7 @@ export function Products() {
             <div className="text-center mt-6">
               <button
                 onClick={() => setVisibleCount(prev => prev + PRODUCTS_PER_PAGE)}
-                className="px-6 py-2.5 text-sm font-medium text-violet-600 border border-violet-200 rounded-lg hover:bg-violet-50 cursor-pointer transition"
+                className="px-6 py-3 min-h-[44px] text-sm font-medium text-violet-600 border border-violet-200 rounded-lg hover:bg-violet-50 cursor-pointer transition"
               >
                 Show more ({filteredProducts.length - visibleCount} remaining)
               </button>

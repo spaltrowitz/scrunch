@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import type { Product, ProductReview, Profile } from '../lib/database.types'
 import type { SeedProduct } from '../data/seedProducts'
 import { SEED_PRODUCTS } from '../data/seedProducts'
+import { getLocalProfile } from '../lib/localProfile'
 
 type ReviewWithProduct = ProductReview & { products: Product }
 
@@ -191,17 +192,18 @@ export function useUserReviewCount(userId?: string) {
 
 export function useUserProfile(userId?: string) {
   return useQuery({
-    queryKey: ['profile', userId],
-    enabled: !!userId,
+    queryKey: ['profile', userId ?? 'local'],
+    enabled: true,
     queryFn: async () => {
-      if (!userId) return null
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('display_name,curl_pattern,porosity,hair_density,hair_width,scalp_type,hair_length,color_treatment,climate,heat_tool_usage,workout_frequency,cgm_experience,fragrance_preference,water_type,hair_goals,sensitivities,onboarding_completed,profile_public')
-        .eq('id', userId)
-        .single()
-      if (error) throw error
-      return data as unknown as Profile
+      if (userId) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('display_name,curl_pattern,porosity,hair_density,hair_width,scalp_type,hair_length,color_treatment,climate,heat_tool_usage,workout_frequency,cgm_experience,fragrance_preference,water_type,hair_goals,sensitivities,onboarding_completed,profile_public')
+          .eq('id', userId)
+          .single()
+        if (!error && data) return data as unknown as Profile
+      }
+      return getLocalProfile()
     },
     staleTime: 5 * 60 * 1000,
   })

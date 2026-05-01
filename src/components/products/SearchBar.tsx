@@ -28,7 +28,7 @@ export function SearchBar({ search, onSearchChange, suggestions }: SearchBarProp
         value={search}
         onChange={(e) => { onSearchChange(e.target.value); setShowSuggestions(true) }}
         onFocus={() => setShowSuggestions(true)}
-        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+        className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
       />
       {showSuggestions && suggestions.length > 0 && (
         <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto">
@@ -36,7 +36,7 @@ export function SearchBar({ search, onSearchChange, suggestions }: SearchBarProp
             <button
               key={i}
               onClick={() => { onSearchChange(s); setShowSuggestions(false) }}
-              className="w-full text-left px-3 py-2 text-sm hover:bg-violet-50 cursor-pointer border-b border-gray-50 last:border-0"
+              className="w-full text-left px-3 py-2.5 min-h-[44px] text-sm hover:bg-violet-50 cursor-pointer border-b border-gray-50 last:border-0"
             >
               <span className="text-gray-400">🔍 </span>
               {s}

@@ -9,21 +9,6 @@ export function ProfilePage() {
   const { data: profile, isLoading, error } = useUserProfile(user?.id)
   const loading = isLoading && !error
 
-  if (!user) {
-    return (
-      <div className="max-w-2xl mx-auto px-4 py-12 text-center">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">My Profile</h1>
-        <p className="text-gray-600 mb-4">Sign in to view and edit your hair profile.</p>
-        <button
-          onClick={() => navigate('/login')}
-          className="px-6 py-2.5 bg-violet-600 text-white font-medium rounded-lg hover:bg-violet-700 cursor-pointer"
-        >
-          Sign In
-        </button>
-      </div>
-    )
-  }
-
   if (loading) return <div className="text-center py-12 text-gray-500">Loading...</div>
 
   const isProfileEmpty = !profile || (!profile.porosity && !profile.curl_pattern && !profile.onboarding_completed)

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../../lib/auth.utils'
 import { supabase } from '../../lib/supabase'
+import { setLocalProfile } from '../../lib/localProfile'
 import {
   CURL_PATTERNS, POROSITY_OPTIONS, HAIR_GOALS, HAIR_GOAL_LABELS,
   INGREDIENT_PREFERENCES, INGREDIENT_PREFERENCE_LABELS,
@@ -61,10 +62,11 @@ export function OnboardingWizard() {
   })
   const loadingProfile = profileLoading && !profileError
 
-  // Render-time sync: load profile data when it arrives
+  // Render-time sync: load profile data when it arrives (from Supabase or localStorage)
   const [prevProfileId, setPrevProfileId] = useState<string | null>(null)
-  if (user && profile?.onboarding_completed && profile.id !== prevProfileId) {
-    setPrevProfileId(profile.id)
+  const profileId = user ? profile?.id : (profile?.onboarding_completed ? 'local' : null)
+  if (profile?.onboarding_completed && profileId && profileId !== prevProfileId) {
+    setPrevProfileId(profileId)
     if (!isEditing) {
       setIsEditing(true)
       setData({
@@ -130,14 +132,30 @@ export function OnboardingWizard() {
 
   const saveProfileMutation = useMutation({
     mutationFn: async (payload: OnboardingData) => {
-      if (!user) return
-      const { error } = await supabase.from('profiles').upsert({
-        id: user.id,
-        display_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Curly Friend',
+      // Always save to localStorage
+      setLocalProfile({
         ...payload,
+        id: user?.id ?? 'local',
+        display_name: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Curly Friend',
         onboarding_completed: true,
-      } as never)
-      if (error) throw error
+        profile_public: false,
+        avatar_url: null,
+        country: null,
+        zip_code: null,
+        wash_frequency: null,
+        created_at: '',
+        updated_at: '',
+      })
+      // Also save to Supabase if logged in
+      if (user) {
+        const { error } = await supabase.from('profiles').upsert({
+          id: user.id,
+          display_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Curly Friend',
+          ...payload,
+          onboarding_completed: true,
+        } as never)
+        if (error) throw error
+      }
     },
     onError: (error) => {
       console.error('Profile upsert failed:', error)
@@ -145,38 +163,18 @@ export function OnboardingWizard() {
     },
     onSuccess: () => {
       addToast('Profile saved!', 'success')
-      if (user) {
-        queryClient.invalidateQueries({ queryKey: ['profile', user.id] })
-      }
+      queryClient.invalidateQueries({ queryKey: ['profile', user?.id ?? 'local'] })
       navigate('/profile')
     },
   })
 
   const handleSave = async () => {
-    if (!user) return
     setSaving(true)
     try {
       await saveProfileMutation.mutateAsync(data)
     } finally {
       setSaving(false)
     }
-  }
-
-  if (!user) {
-    return (
-      <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-lg text-center">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Sign in to set up your hair profile</h2>
-          <p className="text-sm text-gray-500 mb-6">Create an account or sign in to save your hair profile and get personalized recommendations.</p>
-          <button
-            onClick={() => navigate('/login')}
-            className="px-6 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 cursor-pointer"
-          >
-            Sign In →
-          </button>
-        </div>
-      </div>
-    )
   }
 
   if (loadingProfile) return <div className="text-center py-12 text-gray-500">Loading...</div>

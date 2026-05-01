@@ -60,7 +60,7 @@ export function Header() {
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden text-gray-600 hover:text-violet-600 cursor-pointer p-1"
+            className="md:hidden text-gray-600 hover:text-violet-600 cursor-pointer p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? '✕' : '☰'}
@@ -70,11 +70,19 @@ export function Header() {
 
       {/* Mobile nav */}
       {mobileMenuOpen && (
-        <nav className="md:hidden border-t border-gray-100 bg-white px-4 py-3 flex flex-col gap-3 text-sm">
-          {navLinks}
-          {user && (
-            <Link to="/profile" className={`no-underline ${isActive('/profile')}`} onClick={() => setMobileMenuOpen(false)}>Profile</Link>
-          )}
+        <nav className="md:hidden border-t border-gray-100 bg-white px-4 py-3 flex flex-col gap-1 text-sm">
+          <div className="flex flex-col">
+            <Link to="/about" className={`no-underline py-3 min-h-[44px] flex items-center ${isActive('/about')}`} onClick={() => setMobileMenuOpen(false)}>About</Link>
+            <Link to="/products" className={`no-underline py-3 min-h-[44px] flex items-center ${isActive('/products')}`} onClick={() => setMobileMenuOpen(false)}>Browse</Link>
+            <Link to="/ingredient-checker" className={`no-underline py-3 min-h-[44px] flex items-center ${isActive('/ingredient-checker')}`} onClick={() => setMobileMenuOpen(false)}>Ingredient Checker</Link>
+            {user && (
+              <Link to="/recommendations" className={`no-underline py-3 min-h-[44px] flex items-center ${isActive('/recommendations')}`} onClick={() => setMobileMenuOpen(false)}>For You</Link>
+            )}
+            <Link to="/community" className={`no-underline py-3 min-h-[44px] flex items-center ${isActive('/community')}`} onClick={() => setMobileMenuOpen(false)}>Community</Link>
+            {user && (
+              <Link to="/profile" className={`no-underline py-3 min-h-[44px] flex items-center ${isActive('/profile')}`} onClick={() => setMobileMenuOpen(false)}>Profile</Link>
+            )}
+          </div>
         </nav>
       )}
     </header>

@@ -1,25 +1,22 @@
 import { useAuth } from '../lib/auth.utils'
 import { Link } from 'react-router-dom'
 import { useUserProfile, useUserReviewCount } from '../hooks/useProducts'
+import { getLocalRatingCount } from '../lib/localProfile'
 
 export function Dashboard() {
   const { user } = useAuth()
   const { data: profile } = useUserProfile(user?.id)
-  const { data: reviewCount = 0 } = useUserReviewCount(user?.id)
+  const { data: remoteReviewCount = 0 } = useUserReviewCount(user?.id)
+  const localRatingCount = getLocalRatingCount()
+  const reviewCount = user ? remoteReviewCount : localRatingCount
   const profileComplete = profile ? !!profile.onboarding_completed && !!profile.porosity : false
   const ratingCount = reviewCount
   const cgmExperience = profile?.cgm_experience ?? null
 
   const firstName = user?.user_metadata?.full_name?.split(' ')[0]
     || user?.email?.split('@')[0]
+    || profile?.display_name?.split(' ')[0]
     || 'friend'
-
-  // Not logged in
-  if (!user) return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
-      <p className="text-gray-500">Sign in to see your dashboard.</p>
-    </div>
-  )
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">

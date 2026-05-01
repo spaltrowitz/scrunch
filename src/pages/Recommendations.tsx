@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth.utils'
 import type { Product, ProductReview, Profile } from '../lib/database.types'
 import { useRecommendationProducts, useUserProfile, useUserReviews } from '../hooks/useProducts'
+import { getLocalReviewsForRecs, getLocalRatings } from '../lib/localProfile'
 import {
   buildTier1,
   buildTier2,
@@ -90,9 +91,17 @@ export function Recommendations() {
   const queryClient = useQueryClient()
   const userId = user?.id
   const { data: profile, isLoading: profileLoading } = useUserProfile(userId)
-  const { data: userReviews = [], isLoading: reviewsLoading } = useUserReviews(userId)
+  const { data: remoteReviews = [], isLoading: reviewsLoading } = useUserReviews(userId)
   const { data: productsData, isLoading: _productsLoading } = useRecommendationProducts()
   const products = useMemo(() => productsData?.products ?? [], [productsData])
+
+  // For logged-out users, build reviews from localStorage ratings
+  const localReviews = useMemo(() => {
+    if (user || products.length === 0) return []
+    return getLocalReviewsForRecs(products)
+  }, [user, products])
+
+  const userReviews = user ? remoteReviews : localReviews as typeof remoteReviews
   const [showRatingPopup, setShowRatingPopup] = useState<string | null>(null)
   const [dismissingProduct, setDismissingProduct] = useState<string | null>(null)
   const [dismissReasons, setDismissReasons] = useState<Set<string>>(new Set())
@@ -213,9 +222,17 @@ export function Recommendations() {
   })
 
   const handleRate = useCallback(async (productId: string, rating: number) => {
-    if (!userId) return
-    try { await rateMutation.mutateAsync({ productId, rating }) }
-    finally { setShowRatingPopup(null) }
+    if (userId) {
+      try { await rateMutation.mutateAsync({ productId, rating }) }
+      finally { setShowRatingPopup(null) }
+    } else {
+      // Save to localStorage for logged-out users
+      const ratingLabel = rating >= 5 ? 'loved' : rating >= 4 ? 'liked' : rating >= 2 ? 'ok' : 'disliked'
+      const localRatings = getLocalRatings()
+      localRatings[productId] = ratingLabel
+      localStorage.setItem('scrunch_ratings', JSON.stringify(localRatings))
+      setShowRatingPopup(null)
+    }
   }, [userId, rateMutation])
 
   const handleBookmark = useCallback((productId: string) => {
@@ -275,16 +292,6 @@ export function Recommendations() {
 
   // ----- render gates -----
 
-  if (!user) {
-    return (
-      <div className="max-w-4xl mx-auto px-4 py-12 text-center">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">For You</h1>
-        <p className="text-gray-600 mb-4">Sign in to get personalized product recommendations.</p>
-        <Link to="/login" className="text-violet-600 hover:underline">Sign in →</Link>
-      </div>
-    )
-  }
-
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12">
@@ -314,9 +321,6 @@ export function Recommendations() {
           <Link to="/onboarding" className="inline-block mb-4 text-sm font-medium text-violet-600 hover:underline">
             Complete your hair profile →
           </Link>
-        )}
-        {tier === 2 && (
-          <p className="text-xs text-gray-400 mb-4">Rate products you've tried for even better recommendations</p>
         )}
         {(profileLoading || reviewsLoading) && (
           <p className="text-xs text-violet-500 mb-4 animate-pulse">Personalizing your recommendations…</p>
@@ -380,10 +384,6 @@ export function Recommendations() {
           onBookmark={handleBookmark}
         />
       )}
-
-      <hr className="border-gray-200 mb-12" />
-
-      <RatePromptSection products={popularProducts} ratedProductIds={ratedProductIds} onRate={handleRate} />
 
       <hr className="border-gray-200 mb-12" />
 

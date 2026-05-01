@@ -60,16 +60,16 @@ export function Home() {
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="p-5 rounded-xl border border-gray-200 hover:border-violet-200 transition flex flex-col">
             <h2 className="text-sm font-semibold text-gray-900 mb-1.5">
-              Explore 410+ Products
+              Check any ingredient list
             </h2>
             <p className="text-xs text-gray-600 mb-3 leading-relaxed flex-1">
-              Browse the catalog — filter by curl type, category, or brand. Community favorites and trending picks in one place.
+              Paste a product label and instantly find out if it's curl-safe — no guesswork, no Googling.
             </p>
             <Link
-              to="/products"
+              to="/ingredients"
               className="inline-flex items-center justify-center w-full md:w-auto text-sm md:text-xs px-4 md:px-3 py-3 md:py-2 min-h-[44px] md:min-h-0 rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors mt-auto"
             >
-              Browse Products →
+              Try Ingredient Checker →
             </Link>
           </div>
           <div className="p-5 rounded-xl border border-gray-200 hover:border-violet-200 transition flex flex-col">
@@ -84,50 +84,6 @@ export function Home() {
               className="inline-flex items-center justify-center w-full md:w-auto text-sm md:text-xs px-4 md:px-3 py-3 md:py-2 min-h-[44px] md:min-h-0 rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors mt-auto"
             >
               Get Personalized Picks →
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Products Teaser */}
-      <section className="py-16 px-4 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-              Explore Products
-            </h2>
-            <p className="text-gray-600">
-              410+ community-vetted products for curly and wavy hair.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-            {featuredProducts.map((product, i) => (
-              <Link
-                key={product.id || `${product.brand}-${product.name}-${i}`}
-                to={product.id ? `/products/${product.id}` : '/products'}
-                className="flex flex-col gap-2 p-3 rounded-lg border border-gray-200 bg-white hover:border-violet-300 hover:shadow-sm transition-all no-underline group"
-              >
-                <ProductImage
-                  brand={product.brand}
-                  name={product.name}
-                  seedImageUrl={product.image_url}
-                  className="w-full h-24 object-cover"
-                />
-                <p className="text-sm font-medium text-gray-900 truncate group-hover:text-violet-700">
-                  {product.name}
-                </p>
-                <p className="text-xs text-gray-500 truncate">{product.brand}</p>
-              </Link>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <Link
-              to="/products"
-              className="text-violet-600 hover:text-violet-800 font-medium no-underline"
-            >
-              See All Products →
             </Link>
           </div>
         </div>
