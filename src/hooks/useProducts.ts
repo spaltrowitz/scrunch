@@ -2,10 +2,13 @@ import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import type { Product, ProductReview, Profile } from '../lib/database.types'
 import type { SeedProduct } from '../data/seedProducts'
+import { SEED_PRODUCTS } from '../data/seedProducts'
 
 type ReviewWithProduct = ProductReview & { products: Product }
 
 const PRODUCT_SELECT = 'id,brand,name,category,ingredients,cg_status,flagged_ingredients,curlscan_status,isitcg_status,country_availability,price_range,protein_free,fragrance_free,key_ingredients,avg_rating,review_count,verified,submitted_by,image_url,notes,cruelty_free,created_at,updated_at'
+
+const REC_PRODUCT_SELECT = 'id,brand,name,category,cg_status,image_url,cruelty_free,ingredients,key_ingredients,protein_free,fragrance_free,avg_rating,review_count'
 
 function dedupeProducts(products: Product[]): Product[] {
   const seen = new Map<string, boolean>()
@@ -68,7 +71,32 @@ export function useProducts() {
   })
 }
 
+const recSeedPlaceholder: { products: Product[]; isFallback: boolean } = {
+  products: SEED_PRODUCTS.map(seedToProduct),
+  isFallback: true,
+}
 
+export function useRecommendationProducts() {
+  return useQuery({
+    queryKey: ['products', 'recommendations'],
+    queryFn: async (): Promise<{ products: Product[]; isFallback: boolean }> => {
+      try {
+        const { data: rawData, error } = await supabase
+          .from('products')
+          .select(REC_PRODUCT_SELECT)
+        const data = rawData as unknown as Product[] | null
+        if (!error && data && data.length > 0) {
+          return { products: dedupeProducts(data), isFallback: false }
+        }
+        return { products: await loadSeedProducts(), isFallback: true }
+      } catch {
+        return { products: await loadSeedProducts(), isFallback: true }
+      }
+    },
+    placeholderData: recSeedPlaceholder,
+    staleTime: 5 * 60 * 1000,
+  })
+}
 
 export function useProduct(id?: string) {
   return useQuery({

@@ -20,7 +20,7 @@ export function About() {
           <div className="grid md:grid-cols-2 gap-4">
             <div className="p-4 bg-white rounded-xl border border-gray-200">
               <h3 className="font-semibold text-gray-900 mb-1 text-sm">🔍 Search & Discover</h3>
-              <p className="text-xs text-gray-500">Browse 200+ community-vetted products. Check any ingredient list instantly. Filter by your hair type.</p>
+              <p className="text-xs text-gray-500">Browse 410+ community-vetted products. Check any ingredient list instantly. Filter by your hair type.</p>
             </div>
             <div className="p-4 bg-white rounded-xl border border-gray-200">
               <h3 className="font-semibold text-gray-900 mb-1 text-sm">👩‍🦱 Personalized</h3>
@@ -32,7 +32,7 @@ export function About() {
             </div>
             <div className="p-4 bg-white rounded-xl border border-gray-200">
               <h3 className="font-semibold text-gray-900 mb-1 text-sm">💬 Community</h3>
-              <p className="text-xs text-gray-500">Get answers sourced from r/curlyhair (339K) and r/curlygirl (61K).</p>
+              <p className="text-xs text-gray-500">Get answers sourced from r/curlyhair (339K), r/curlygirl (61K), and r/wavyhair.</p>
             </div>
           </div>
         </section>
@@ -95,6 +95,7 @@ export function About() {
             <SourceGroup title="💬 Community" sources={[
               { name: 'r/curlyhair', url: 'https://www.reddit.com/r/curlyhair/' },
               { name: 'r/curlygirl', url: 'https://www.reddit.com/r/curlygirl/' },
+              { name: 'r/wavyhair', url: 'https://www.reddit.com/r/wavyhair/' },
             ]} />
             <SourceGroup title="✨ Design Inspiration" sources={[
               { name: 'Yuka', url: 'https://yuka.io/' },

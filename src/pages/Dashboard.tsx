@@ -91,8 +91,8 @@ export function Dashboard() {
           <h3 className="font-semibold text-gray-900 mb-1">🔍 Browse Products</h3>
           <p className="text-xs text-gray-500">
             {ratingCount > 0
-              ? `${285 - ratingCount}+ products to discover`
-              : '285+ curly hair products to explore'}
+              ? `${410 - ratingCount}+ products to discover`
+              : '410+ curly hair products to explore'}
           </p>
         </Link>
 

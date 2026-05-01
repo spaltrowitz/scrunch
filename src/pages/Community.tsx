@@ -165,7 +165,7 @@ export function Community() {
           />
           <div className="flex items-center justify-between mt-2">
             <p className="text-xs text-gray-400">
-              🔍 Searches r/curlyhair (339K), r/curlygirl (61K), and r/wavyhair
+              🔍 Searches r/curlyhair (339K), r/curlygirl (61K), and r/wavyhair (32K)
             </p>
             <button
               type="submit"
