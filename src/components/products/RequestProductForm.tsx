@@ -1,15 +1,12 @@
 import { useState } from 'react'
 import { PRODUCT_CATEGORY_LABELS } from '../../lib/constants'
 import type { ProductCategory } from '../../lib/database.types'
-import { supabase } from '../../lib/supabase'
-import { useAuth } from '../../lib/auth'
 
 interface ProductRequest {
   brand: string
   name: string
   category: ProductCategory | ''
   link: string
-  email: string
 }
 
 // Basic client-side validation for hair care product submissions
@@ -35,7 +32,7 @@ export function RequestProductForm({ onClose }: { onClose: () => void }) {
   const [validationError, setValidationError] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
     const error = validateProductRequest(request)
@@ -55,66 +52,27 @@ export function RequestProductForm({ onClose }: { onClose: () => void }) {
       `*Submitted via Scrunch app on ${new Date().toISOString()}*`,
     ].filter(Boolean).join('\n\n')
 
-    try {
-      const { data, error: fnError } = await supabase.functions.invoke('create-product-issue', {
-        body: {
-          brand: request.brand.trim(),
-          name: request.name.trim(),
-          category: request.category || undefined,
-          link: request.link.trim() || undefined,
-          email: request.email.trim() || undefined,
-        },
-      })
-
-      if (fnError) throw new Error(fnError.message || 'Failed to submit request')
-      if (data?.error) throw new Error(data.error)
-
-      // Track the request in the DB so we can surface it in "For You" later
-      if (user) {
-        await supabase.from('product_requests').insert({
-          brand: request.brand.trim(),
-          name: request.name.trim(),
-          category: request.category || null,
-          link: request.link.trim() || null,
-          requested_by: user.id,
-        }).then(() => {})  // fire-and-forget; don't block UX
-      }
-
-      setSubmittedProduct({ brand: request.brand.trim(), name: request.name.trim() })
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
-    } finally {
-      setSubmitting(false)
-    }
+    const params = new URLSearchParams({
+      title: `[Product Request] ${request.brand} — ${request.name}`,
+      body: issueBody,
+      labels: 'product-request,from-app',
+    })
+    window.open(`https://github.com/spaltrowitz/scrunch/issues/new?${params}`, '_blank')
+    setSubmitted(true)
   }
 
-  const handleAddAnother = () => {
-    setSubmittedProduct(null)
-    setRequest(EMPTY_REQUEST)
-    setError(null)
-  }
-
-  if (submittedProduct) {
+  if (submitted) {
     return (
       <div className="p-6 bg-white rounded-xl border border-gray-200 shadow-sm text-center">
         <div className="text-3xl mb-3">🎉</div>
         <h3 className="font-semibold text-gray-900 mb-1">Request submitted!</h3>
         <p className="text-sm text-gray-500 mb-4">
-          <strong>{submittedProduct.brand} {submittedProduct.name}</strong> has been submitted.
-          Copilot will automatically look up the product details, find an image, run ingredient analysis, and add it to the database.
-          {request.email && ' We'll email you when it's live!'}
+          A GitHub issue has been created for <strong>{request.brand} {request.name}</strong>.
+          Copilot will automatically look up the product details, find an image, run ingredient analysis, and create a PR to add it.
         </p>
-        <div className="flex items-center justify-center gap-4">
-          <button
-            onClick={handleAddAnother}
-            className="text-sm bg-violet-600 text-white px-4 py-2 rounded-lg hover:bg-violet-700 cursor-pointer"
-          >
-            Add Another Product
-          </button>
-          <button onClick={onClose} className="text-sm text-gray-500 hover:underline cursor-pointer">
-            Close
-          </button>
-        </div>
+        <button onClick={onClose} className="text-sm text-violet-600 hover:underline cursor-pointer">
+          Close
+        </button>
       </div>
     )
   }
@@ -128,12 +86,6 @@ export function RequestProductForm({ onClose }: { onClose: () => void }) {
         </div>
         <button onClick={onClose} className="text-gray-400 hover:text-gray-600 cursor-pointer text-lg">✕</button>
       </div>
-
-      {error && (
-        <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
-          {error}
-        </div>
-      )}
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <div className="grid grid-cols-2 gap-3">
@@ -200,7 +152,7 @@ export function RequestProductForm({ onClose }: { onClose: () => void }) {
           disabled={!request.brand.trim() || !request.name.trim() || !confirmed}
           className="w-full py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 disabled:opacity-50 cursor-pointer"
         >
-          {submitting ? 'Submitting...' : 'Submit Request'}
+          Submit Request
         </button>
       </form>
     </div>
