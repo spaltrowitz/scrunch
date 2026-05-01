@@ -5,7 +5,7 @@ import type { SeedProduct } from '../data/seedProducts'
 
 type ReviewWithProduct = ProductReview & { products: Product }
 
-const PRODUCT_SELECT = 'id,brand,name,category,ingredients,cg_status,flagged_ingredients,curlscan_status,isitcg_status,status_conflict,country_availability,price_range,protein_free,fragrance_free,key_ingredients,avg_rating,review_count,verified,submitted_by,image_url,notes,cruelty_free,created_at,updated_at'
+const PRODUCT_SELECT = 'id,brand,name,category,ingredients,cg_status,flagged_ingredients,curlscan_status,isitcg_status,country_availability,price_range,protein_free,fragrance_free,key_ingredients,avg_rating,review_count,verified,submitted_by,image_url,notes,cruelty_free,created_at,updated_at'
 
 function dedupeProducts(products: Product[]): Product[] {
   const seen = new Map<string, boolean>()
@@ -28,7 +28,6 @@ function seedToProduct(seed: SeedProduct, index: number): Product {
     flagged_ingredients: [],
     curlscan_status: null,
     isitcg_status: null,
-    status_conflict: false,
     country_availability: ['US'],
     price_range: null,
     protein_free: null,
