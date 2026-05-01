@@ -136,3 +136,16 @@
 
 ### Orchestration
 This sprint completed all 6 beta must-fix items across team (Frenchy + Danny + team supports). Scribe documented via orchestration logs and merged team decisions into shared decision log.
+
+### Trending on #HairTok Section (2026-07-25)
+- Added "Trending on #HairTok" section to Home.tsx between Explore Products and the closer
+- Product grid filters by `notes` field containing 'HairTok'; falls back to hardcoded names (K18, Olaplex, Rosemary Oil) until Danny tags products
+- Featured Creators cards (Manes by Mell, Ali Noskowiak, BiancaReneeToday) with TikTok links, no images per legal rules
+- Mobile-first: creator cards stack vertically on mobile, 3-col on desktop
+- Section uses gray-50 bg, same product card pattern as Explore Products
+- Build passes
+
+## Learnings
+- Legal constraints for TikTok integration: no embeds, no creator images, no verbatim captions — text-only cards with links are the safe path
+- `useMemo` with dual filter strategy (notes field → hardcoded fallback) lets us ship UI before data migration is complete
+- Reusing the exact same product card markup keeps visual consistency without extracting a shared component (would be worth extracting if a 3rd grid appears)
