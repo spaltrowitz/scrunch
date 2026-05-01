@@ -126,7 +126,7 @@ export function Recommendations() {
   })
   // Only block rendering if we have zero products (no placeholder either).
   // Profile/reviews load in the background — the tier upgrades reactively.
-  const loading = productsLoading && !productsData
+  const loading = !productsData
 
   const {
     tier,
