@@ -40,16 +40,16 @@ export function Home() {
 
         <div className="flex flex-col items-center gap-3">
           <Link
-            to="/products"
+            to="/recommendations"
             className="px-6 py-3 min-h-[44px] flex items-center rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium text-sm transition-colors"
           >
-            Browse Products →
+            Take the Hair Quiz →
           </Link>
           <Link
-            to="/recommendations"
+            to="/products"
             className="text-sm text-violet-600 hover:text-violet-800 no-underline font-medium"
           >
-            Get Personalized Picks →
+            Browse Products →
           </Link>
         </div>
 
@@ -58,30 +58,30 @@ export function Home() {
       {/* Features — 2 columns */}
       <section className="py-10 px-4 border-b border-gray-200">
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-5 rounded-xl border border-gray-200 hover:border-violet-200 transition">
+          <div className="p-5 rounded-xl border border-gray-200 hover:border-violet-200 transition flex flex-col">
             <h2 className="text-sm font-semibold text-gray-900 mb-1.5">
               Explore 410+ Products
             </h2>
-            <p className="text-xs text-gray-600 mb-3 leading-relaxed">
+            <p className="text-xs text-gray-600 mb-3 leading-relaxed flex-1">
               Browse the catalog — from community holy grails to trending #HairTok picks. Filter by curl type, category, or brand.
             </p>
             <Link
               to="/products"
-              className="inline-flex items-center justify-center w-full md:w-auto text-sm md:text-xs px-4 md:px-3 py-3 md:py-2 min-h-[44px] md:min-h-0 rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors"
+              className="inline-flex items-center justify-center w-full md:w-auto text-sm md:text-xs px-4 md:px-3 py-3 md:py-2 min-h-[44px] md:min-h-0 rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors mt-auto"
             >
               Browse Products →
             </Link>
           </div>
-          <div className="p-5 rounded-xl border border-gray-200 hover:border-violet-200 transition">
+          <div className="p-5 rounded-xl border border-gray-200 hover:border-violet-200 transition flex flex-col">
             <h2 className="text-sm font-semibold text-gray-900 mb-1.5">
               Your hair goals, your perfect routine
             </h2>
-            <p className="text-xs text-gray-600 mb-3 leading-relaxed">
+            <p className="text-xs text-gray-600 mb-3 leading-relaxed flex-1">
               Whether you're building your first wash day routine or fine-tuning your protein-moisture balance — Scrunch matches products to your curl pattern, porosity, and goals.
             </p>
             <Link
               to="/recommendations"
-              className="inline-flex items-center justify-center w-full md:w-auto text-sm md:text-xs px-4 md:px-3 py-3 md:py-2 min-h-[44px] md:min-h-0 rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors"
+              className="inline-flex items-center justify-center w-full md:w-auto text-sm md:text-xs px-4 md:px-3 py-3 md:py-2 min-h-[44px] md:min-h-0 rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors mt-auto"
             >
               Get Personalized Picks →
             </Link>
@@ -197,26 +197,6 @@ export function Home() {
         </section>
       )}
 
-      {/* Starting your curl journey — discoverable closer */}
-      <section className="py-16 px-4">
-        <div className="max-w-3xl mx-auto p-8 rounded-2xl bg-violet-50 border border-violet-100">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="text-3xl">🌱</div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-gray-900 mb-1">Starting your curl journey?</h3>
-              <p className="text-sm text-gray-600">
-                Whether you just discovered your hair is wavy from a TikTok or you've been deep in Reddit threads — browse our catalog to find products that actually work for your hair type.
-              </p>
-            </div>
-            <Link
-              to="/products"
-              className="text-sm px-4 py-2.5 min-h-[44px] flex items-center rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 whitespace-nowrap"
-            >
-              Browse Products →
-            </Link>
-          </div>
-        </div>
-      </section>
     </div>
   )
 }
