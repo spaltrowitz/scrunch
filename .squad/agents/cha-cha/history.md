@@ -100,3 +100,25 @@
 - **Future opportunity:** SearchBar and FilterPanel extracted components are not memo-wrapped — functional but could reduce re-renders if Products page performance becomes an issue.
 
 **Commit:** `e797818`
+
+### 2025-07-26 — Recommendations.tsx Decomposition (1173→399 lines orchestrator)
+
+**What shipped:**
+Decomposed `src/pages/Recommendations.tsx` from 1173 lines into 7 files:
+- `src/components/recommendations/recommendationEngine.ts` (246 lines) — all pure scoring/tier functions (buildTier1-3, buildIngredientTier, tierHeader)
+- `src/components/recommendations/RecommendedCard.tsx` (228 lines) — product card with dismiss form, wrapped in `React.memo()`
+- `src/components/recommendations/RatingGroup.tsx` (57 lines) — RatingGroup + RatingRow, both `React.memo()`
+- `src/components/recommendations/SavedProducts.tsx` (54 lines) — bookmarked products section, `React.memo()`
+- `src/components/recommendations/RatePromptSection.tsx` (34 lines) — "Rate products you've used" prompt, `React.memo()`
+- `src/components/recommendations/IngredientRecsSection.tsx` (78 lines) — ingredient-based recs section, `React.memo()`
+- `src/pages/Recommendations.tsx` (399 lines) — orchestrator with queries, mutations, tier logic
+
+**Performance wins:**
+- All 5 extracted components wrapped in `React.memo()` — eliminates sibling re-renders when dismiss/rating popup state changes
+- Event handlers wrapped in `useCallback` — stable references for memo boundaries
+- `EMPTY_SET` constant preserved for stable reference on non-dismissing cards
+- Scoring engine extracted to pure functions — tree-shakeable and independently testable
+
+**Orchestrator at 399 lines (vs 300 cap):** Justified because it manages 5 data queries, 3 mutations, collaborative filtering (Supabase-coupled), and complex tier selection logic. Further extraction would require passing Supabase client through abstraction layers with no performance benefit.
+
+**Verification:** `npm run build` ✅, `npx tsc --noEmit` ✅, `npm test` (26 tests) ✅
