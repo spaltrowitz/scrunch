@@ -81,3 +81,18 @@
 **Key insight:** Ingredient Checker is what only Scrunch does (Reddit can't do this). It should be unmissable, not a feature in a grid.
 
 **Metrics to track:** Hero CTA click rate vs. old baseline; new → account conversion; repositioned Recommendations engagement.
+
+## Cross-Project PM/Strategist Knowledge (injected 2026-05-02)
+
+### From EatDiscounted (Kobayashi)
+- **Single-use retention problem:** Users search once and leave. Solved with: (1) permalink pages for SEO + shareability, (2) saved items + alerts converting lookup into monitoring, (3) location-based discovery as 10x expansion. Scrunch faces similar risk — users check one product and leave.
+- **Monetization: affiliate links first.** Passive revenue that validates signal. Scrunch could explore brand affiliate links for products in catalog.
+- **Partnership outreach for app-only platforms:** Position as distribution channel (free user acquisition) not competitor. Scrunch could partner with brands for exclusive data/images.
+- **Audience: community-first growth.** Reddit/Twitter > paid ads for niche products. Scrunch's r/curlyhair community strategy aligns perfectly.
+
+### From Slotted (Mai)
+- **State-aware progressive UI:** Same sections for every user = "too busy." Show different content based on user stage (new visitor vs. returning vs. power user). Scrunch's invisible onboarding already heads this direction — formalize it.
+- **Smart features are Week 4, not Day 1:** Personalized recommendations require behavioral data. Don't show them to first-time visitors who have no history. Scrunch should defer Recommendations until user has rated ≥3 products.
+- **Empty states cascade:** Multiple empty sections = "app has nothing for me." Show one section with one CTA instead.
+- **Dual CTA anti-pattern:** Two equal-weight CTAs = decision paralysis. Scrunch homepage had this exact problem (Explore + Ingredient Checker competing). Resolved by making Ingredient Checker primary.
+- **Day 1 experience matters most:** OAuth → one action → immediate value → done in <3 min. Scrunch equivalent: land → check ingredient OR browse products → see result → value delivered.

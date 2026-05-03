@@ -1,144 +1,62 @@
-# History
-# Danny — Backend Dev History
+# Danny — History
 
-## Project Context
-- **Project:** Scrunch — curly hair care app
-- **Stack:** React 19, TypeScript, Vite, Tailwind CSS 4, Supabase, React Query, React Router, Vitest
-- **Deployment:** GitHub Pages
-- **User:** Shari Paltrowitz
+## Key Patterns & Corrections
 
-## Learnings
+### Product Image Sourcing
+- **INCIDecoder GCS** is the #1 source (highest hit rate, clean product-on-white photos).
+- **Priority waterfall:** INCIDecoder → Ulta media CDN (`?w=400`, check placeholder hash) → Sephora CDN (SKU from product page) → Sally Beauty Scene7 → Garnier USA CDN → Shopify brand stores.
+- **Sources that DON'T work:** Amazon (403), Walmart (404), Target (403), SheaMoisture Demandware (403), Open Beauty Facts (near-zero curly hair coverage).
+- **Ulta caveat:** Without `?w=400` returns tiny thumbnail. Verify against placeholder hash `43eed7447d66573a67e2bc6e10858ab5`.
+- **Current coverage:** ~98% (only 5 null: Monday Curl Define, TJ Conditioner, Ouai Hydrating Cream, Cantu Flaxseed Oil, SM Coconut Oil).
 
-### 2025-07-24: Product Image Audit
-- **Open Beauty Facts** covers ~23% of our curly hair products (25/108 missing). Best for mass-market brands that have been scanned (SheaMoisture, Cantu, Garnier, Aussie, Herbal Essences).
-- **Shopify CDN** is the dominant pattern — most indie curly brands (DevaCurl, Kristin Ess, Seen, Innersense, Ouai, Pattern, Mielle, etc.) use Shopify. URL pattern: `{brand-domain}/cdn/shop/files/{filename}.jpg` or `cdn.shopify.com/s/files/1/{shop-id}/files/{filename}.jpg`.
-- **L'Oréal brands** (Mizani, Redken, Pureology, Kérastase, Bumble and Bumble) use proprietary CDNs that block automated access — need manual image sourcing.
-- **Mass-market brands** (Suave, VO5, LA Looks, Wetline Xtreme) typically only have product images on retailer sites (prohibited sources).
-- **Giovanni** uses Shopify but blocks automated og:image extraction on most product pages.
-- DevaCurl CDN filenames follow pattern: `{Product-Name-Size}.jpg` (e.g., `No-Poo-Original-12oz.jpg`).
+### Performance Fixes
+- **Dashboard count query:** `select('id', { count: 'exact', head: true })` — zero row transfer for count-only use cases.
+- **Product dedup:** O(n²) `filter+findIndex` → O(n) Map-based dedup in `useProducts`.
+- **Reddit API parallelization:** Sequential `for` loop → `Promise.all()` for concurrent subreddit fetches.
+- **Supabase fallback fix:** `PRODUCT_SELECT` included nonexistent `status_conflict` column → PostgREST 42703 error → silent seed data fallback. Removed the column from select/types/mapper.
+- **Instant render:** Added `placeholderData` to hooks (seed products, empty array, 0), `staleTime: 5min` to ALL hooks. Removed loading gates — render with defaults, upgrade reactively.
+- **Recommendations instant load:** Changed loading gate to only block if zero products available. Inline loading indicators replace full-page spinners.
 
-### 2025-07-24: Image URL Application (Phase 1)
-- Applied 28 verified product image URLs to seedProducts.ts (out of 108 null entries).
-- Sources: DevaCurl Shopify CDN (5), Open Beauty Facts API (8), Shopify /products.json endpoint (5), og:image scraping (10).
-- **SheaMoisture** site uses JavaScript-rendered pages — OBF is the only viable source, but coverage is sparse.
-- **Curls (curls.biz)** blocked /products.json and og:image extraction — neither Shopify API nor page scraping works.
-- **Kristin Ess** returns connection timeouts — site may block automated requests entirely.
-- **Pattern Beauty** has >160 products on Shopify but product naming doesn't match our DB entries well (e.g., "Indigo Rain Leave-In Conditioner" vs "Leave-In Conditioner").
-- **Giovanni Cosmetics** redirects all product pages to the same og:image (banner) — only the L.A. Hold Gel had a unique product-specific CDN file.
-- Many brands (Mizani, Redken, Pureology, Aveda, Bumble and Bumble) block all automated access — need manual sourcing or brand outreach.
-- 80 products remain with null images. Next steps: manual sourcing for L'Oréal family, brand outreach for indie brands, deeper OBF barcode search.
+### Community Search
+- **Domain-aware keyword extraction:** `HAIR_TERMS` set (~80 words) + `COMPOUND_TERMS` (~30 phrases). Drops celebrity/noise words. Limits to 5 terms.
+- **Multi-query strategy:** Primary (5 domain terms) + fallback (top 2 terms) per subreddit. Dedup by URL.
+- **Relevance ranking:** Title keyword matches (×100 boost) + comment count (capped 50, ×2). Zero-comment posts deprioritized.
+- **Honest labeling:** Replaced fake "AI Summary" with plain-text "Community Results" summary. `stripMarkdown()` utility for Reddit selftext.
+- **Fallback UI:** `SearchStatus = 'ok' | 'no_results' | 'error'`. Amber banner (no results) vs red banner (error) with retry. Never disguise navigation as content.
 
-### 2026-04-30: Image URL Recovery (Phase 2)
-- Recovered 24 additional product image URLs from Shopify CDNs and Open Beauty Facts.
-- Current coverage: **80% (224/280 products)** — up from 73% (204/280).
-- Sources: Shopify /products.json (12 URLs: DevaCurl, Innersense, Ouai, Pattern, Mielle), OBF API (8 URLs: SheaMoisture, Cantu, Garnier, Aussie, Herbal Essences), og:image extraction (4 URLs).
-- Remaining blockers for 56 null entries: L'Oréal family (proprietary CDNs), Curls/Kristin Ess (dynamic rendering), Giovanni (Shopify blocks extraction), retailer-only brands (no brand CDNs).
-- Recommendation: Manual sourcing for L'Oréal family, brand outreach for indie blockers, retailer partnerships for mass-market bottlenecks.
+### Catalog & Categories
+- **New categories:** `scalp_care` and `bond_repair`. 3 new products added, 6 existing tagged as HairTok trending.
+- **Category audit:** 7 products recategorized (3 protein_treatment→bond_repair, 4 oil_serum→scalp_care). 1 duplicate removed.
+- **Lesson:** Bond-repair ≠ protein treatment (disulfide bonds vs keratin). Category = primary use case, not product format.
+- **Before adding products:** Always grep existing seed data — catalog is 400+ lines.
+- **Type validation:** Task descriptions use informal category names — always validate against TypeScript union type.
 
-### 2026-04-30: Backend/Data Performance Fixes
-- **Dashboard count query**: Created `useUserReviewCount` hook using `select('id', { count: 'exact', head: true })` — transfers zero rows instead of all review rows. Dashboard only needs the count, not the data.
-- **Product dedup**: Replaced O(n²) `filter+findIndex` approach in `dedupeProducts()` with O(n) Map-based dedup. Used in `useProducts` hook shared by Home and Products pages.
-- **Reddit API parallelization**: Converted sequential `for` loop over subreddits to `Promise.all()` in Community.tsx `searchReddit()`. Both subreddit fetches now run concurrently.
-- **Already fixed (no changes needed)**: Recommendations `rateMutation` and ProductDetail `submitRatingMutation` both already use `queryClient.invalidateQueries()` with proper query keys — no manual re-fetch happening.
-- **Collaborative filtering**: Confirmed the 3 sequential queries (profiles → reviews → products) have true data dependencies — each query's parameters depend on the previous result. Cannot be parallelized without restructuring the algorithm.
-- **Pattern established**: For count-only use cases, always use `select('id', { count: 'exact', head: true })` and read the `count` from the response instead of fetching rows and using `.length`.
+## Cross-Project Backend Knowledge (injected 2026-05-02)
 
-### 2026-05-01: Supabase Fallback Banner Fix
-- **Root cause:** The `PRODUCT_SELECT` string in `useProducts.ts` included a `status_conflict` column that doesn't exist in the Supabase `products` table. PostgREST returned error code 42703 ("column does not exist"), which the query handler treated as a failure and fell back to seed data.
-- **Why curl worked:** Direct curl without the bad column select returned data fine. The issue was specifically in the column list the app was requesting.
-- **Fix:** Removed `status_conflict` from the select string, the Product type interface, the seedToProduct mapper, and the Database type definitions.
-- **Lesson:** When TypeScript types drift from the actual DB schema, the app can silently degrade. The `as unknown as Product[]` cast masked the real error. Consider using `supabase gen types` to keep types in sync with the actual schema.
-- **CORS verified:** Supabase correctly returns `access-control-allow-origin: https://spaltrowitz.github.io` — no CORS issues.
-- **RLS verified:** Anonymous reads work fine with the anon key — RLS policies allow public read on products.
+### From EatDiscounted (Fenster)
+- **Rate limiting:** Per-IP sliding window. Return 429 + `Retry-After`. Verify rate limits are wired in, not dead code.
+- **In-memory caching:** TTL-based (1hr API, 5min sitemaps). Key: `entity::source`. Lost on deploy — needs Redis for serverless.
+- **Search API migration:** Google CSE (100/day) → Brave Search (2,000/month). Always have fallback + know quota ceiling.
+- **Direct API integrations:** Check for public REST APIs before search-scraping.
+- **Security:** `.env.local` in `.gitignore`. Check git history for exposure. Rotate keys.
 
-### 2026-05-02: Community Search Relevance Fix
-- **Root cause (relevance):** Two compounding issues — (1) long natural language queries confuse Reddit's search engine, returning popular posts instead of relevant ones; (2) results were re-sorted by upvote score (`sort by b.score - a.score`), destroying Reddit's relevance ordering and surfacing viral posts over topical matches.
-- **Fix (relevance):** Added `extractSearchTerms()` that strips stop words and limits to 6 key terms (e.g., "bangs wavy dry styling taylor swift" from a full paragraph). Removed the score-based re-sort — results now stay in Reddit's relevance order.
-- **Fix (summary honesty):** Replaced fake "AI Summary" (`generateAiAnswer`) with honest `generateSummary` — plain text like "Found 8 related discussions across r/curlyhair, r/wavyhair." No markdown, no pretend analysis. Badge changed from "🤖 AI Summary" to "📋 Community Results".
-- **Fix (markdown leaking):** Added `stripMarkdown()` utility that removes `**bold**`, `_italic_`, `> blockquotes`, `# headings`, `[links](url)`, and `` `code` `` from Reddit selftext snippets before display. Applied during result mapping.
-- **Lesson:** Reddit search works best with 4-6 keyword terms. Natural language queries return noise. Always extract terms before hitting their API.
+### From MyDailyWin (Daruk, alumni)
+- **Firebase Auth + Firestore:** Document ownership via `ownerEmail` + admins subcollection. Never trust localStorage for authorization.
+- **CSP headers:** Enforced in `firebase.json`. Update `connect-src` when switching APIs.
+- **Firestore rules:** `request.auth != null` alone is too permissive — need ownership scoping + field validation.
 
-### 2026-05-02: Community Search Relevance Redesign (v2)
-- **Root cause:** `extractSearchTerms()` was naive — stripped stop words and took first 6 remaining words. For long natural-language queries like "how can i make my bangs dry well when they dry naturally... taylor swift folklore era", it produced garbage terms like "bangs dry naturally place wavy taylor" that Reddit couldn't match.
-- **Fix — Domain-aware keyword extraction:** Added `HAIR_TERMS` set (~80 hair-domain words) and `COMPOUND_TERMS` list (~30 multi-word phrases like "air dry", "deep condition", "low porosity", "curly girl"). Extraction now: (1) finds compound terms first, (2) prioritizes hair domain terms, (3) drops celebrity/pop culture noise via `NOISE_WORDS`, (4) pads with remaining terms up to 5 total.
-- **Fix — Multi-query strategy:** Each subreddit now gets searched with TWO queries — a primary (up to 5 domain terms) and a fallback (just the top 2 terms). Results are deduped by URL. This doubles the chance of finding relevant posts since Reddit's simple keyword matching often misses on longer queries.
-- **Fix — Relevance filtering:** Posts with 0 comments are deprioritized (nobody engaged = not useful). Results are ranked by: title keyword matches (×100 boost per match) + comment count (capped at 50, ×2). Posts whose titles contain search terms float to top.
-- **Test results after fix:**
-  - "bangs dry naturally... taylor swift folklore" → Primary: "bangs dry wavy", Fallback: "bangs dry" (was: "bangs dry naturally place wavy taylor")
-  - "best gel for 3B low porosity hair" → Primary: "low porosity gel 3b", Fallback: "low porosity gel"
-  - "how often should I deep condition" → Primary: "deep condition", Fallback: "deep condition"
-  - "curly girl method for beginners" → Primary: "curly girl method beginners", Fallback: "curly girl method"
-- **Lesson:** For domain-specific search over a dumb search engine (Reddit), you need a domain vocabulary to separate signal from noise. Generic NLP (stop word removal) isn't enough — you need to know what the domain cares about.
+### From Slotted (Zuko, alumni)
+- **Security:** Fail-closed admin auth. Strip sensitive fields from all responses. Always add new token fields to sensitive list.
+- **OAuth token storage:** Supabase Vault encryption. Old columns renamed `_deprecated` for rollback.
+- **Google webhooks:** Always return 200 or Google deactivates endpoint. Stale sync (410) → clear and retry.
+- **Race conditions:** AFTER UPDATE trigger + FOR UPDATE lock. Use `ON CONFLICT` upserts.
+- **Account deletion:** CASCADE + cancel meetups + notify + clear OAuth + delete blocked_users.
 
-### 2026-05-02: Community Fallback UI Fix (UX Item #6)
-- **Root cause:** When Reddit search returned 0 results, `searchReddit()` returned 3 fake "results" (score=0, 0 comments) as direct-search links. These rendered identically to real posts, confusing users — they couldn't tell the search failed. API errors also silently returned empty arrays with no user feedback.
-- **Fix — SearchStatus type:** Added `SearchStatus = 'ok' | 'no_results' | 'error'` to `searchReddit()` return value. The function now tracks `hadError` across fetch calls and returns the appropriate status.
-- **Fix — No results UI:** Clear amber banner with "No results found" message plus actionable suggestions (try different keywords, check spelling, use shorter terms). Below: direct subreddit links with pre-filled search, plus "Ask the community directly" prompt with post links.
-- **Fix — Error UI:** Red banner explaining Reddit may be temporarily unavailable. Prominent "Try again" button that re-populates the search box. Same subreddit links and community posting prompt below.
-- **Fix — Removed fake results:** Eliminated the old pattern of returning fake RedditResult objects with score=0 as fallback. These were the core confusion — users saw them as broken posts, not as navigation links.
-- **Components extracted:** `SubredditLinks` (direct links to subreddits with member counts and pre-filled search) and `AskCommunityPrompt` (post-to-community CTA). Both reused in error and no-results states.
-- **Lesson:** Never disguise navigation/fallback actions as content items. When search fails, users need to understand *what happened* and *what they can do next* — not see fake results masquerading as real ones.
+### From HealthStitch (Wash)
+- **Sync:** WHOOP = backend-pull, Apple Watch = iOS-push. Different strategies per source.
+- **Metric normalization:** WHOOP RMSSD ≠ Apple SDNN for HRV. Separate baselines per source.
+- **PostgreSQL migration:** `datetime('now')` → `NOW()`, `INSERT OR IGNORE` → `ON CONFLICT DO NOTHING`.
 
-## 2026-05-01T20:58:00Z — Beta Must-Fix Sprint Complete
+## Session Archive Summary
 
-### Outcomes
-- **Community Fallback UI (UX Item #6):** Deployed
-- **Search Quality:** Keyword extraction + domain vocabulary + multi-query strategy now returns relevant results
-- **User Feedback Loop:** "Did this solve what you were looking for?" feedback prompt integrated
-- **Honest Labeling:** Removed fake "AI Summary" branding, replaced with "Community Results" + plain-text summary
-- **Build Status:** Passing, 26 tests green (via cross-team support)
-- **Deployment:** GitHub Pages active
-
-### Orchestration
-Beta must-fix sprint (6 items) now complete across Frenchy + Danny. Scribe documented all changes, merged team decisions, and updated cross-agent history.
-
-### 2025-07-25: HairTok Product Categories & Catalog Expansion
-- **New categories added:** `scalp_care` (scalp treatments, oils, serums) and `bond_repair` (bond-building treatments for damaged hair). Added to ProductCategory union type, PRODUCT_CATEGORY_LABELS, and PRODUCT_CATEGORY_DESCRIPTIONS.
-- **New SeedProduct field:** `hairtok_trending?: boolean` — optional flag for filtering HairTok-sourced products. Existing products also tagged via `#HairTok` in notes.
-- **3 new products added:** Generic Rosemary Oil (scalp_care), Olaplex No. 0 (bond_repair), AG Care Cloud Air Volumizing Mousse (mousse).
-- **6 existing products updated** with #HairTok notes and `hairtok_trending: true`: K18 Leave-In Molecular Repair Hair Mask, Olaplex No. 3, Mielle Rosemary Mint Oil, Briogeo Don't Despair Repair!, Rizos Curls Curl Defining Cream.
-- **Duplicates avoided:** 5 of 8 requested products already existed in the catalog (Mielle oil, K18, Olaplex No. 3, Briogeo deep conditioner, Rizos Curls cream). Updated their notes/tags instead of duplicating.
-- **Removed duplicate `dry_shampoo`** from ProductCategory union type (was listed twice).
-- **Lesson:** Always grep existing seed data before adding — the catalog is large (400+ lines) and brands like Mielle and Briogeo appear across multiple categories.
-
-### 2025-07-25: HairTok Product Catalog Expansion (Batch 2)
-- **7 new products added** from Marty's HairTok research: Rizos Curls Multivitamin Leave-In, Rizos Curls Strong Hold Gel, adwoa beauty Melonberry Hair Milk, Act+Acre Cold Processed Scalp Renew, Davines LOVE Curl Cream, The Doux Big Poppa Defining Gel, Nature Spell Rosemary Oil for Hair & Skin.
-- **Category mapping:** Task specified `leave_in` and `styling_cream` which don't exist in the ProductCategory type — mapped to `leave_in_conditioner` and `curl_cream` respectively.
-- **cruelty_free mapping:** Task specified `'unknown'` but type only allows `'yes' | 'no' | 'unclear' | null` — used `'unclear'` as the closest semantic match.
-- **No duplicates:** All 7 products were confirmed missing before adding. Existing Rizos Curls products (Hydrating shampoo, Curl Defining Cream, Light Hold Gel, Volumizing Hairspray) and adwoa beauty Baomint Leave-In were already in catalog but are different products.
-- **Lesson:** Always validate category and field values against the TypeScript types before adding — task descriptions may use informal names that don't match the actual union type.
-
-### 2026-05-02: Instant Render Perf Fix (All Pages)
-- **Root cause:** Most React Query hooks (`useProducts`, `useUserReviews`, `useUserReviewCount`, `useUserProfile`, `useProduct`) had no `placeholderData` or `staleTime`. Pages blocked on Supabase cold start (~1.3s) showing loading spinners.
-- **Dashboard fix:** Removed the loading gate entirely. Page now renders instantly with defaults (profileComplete=false, reviewCount=0) and upgrades reactively when Supabase responds. No more "Loading..." blank screen.
-- **Hook fixes:** Added `placeholderData` to: `useProducts` (seed products), `useUserReviews` (empty array), `useUserReviewCount` (0). Added `staleTime: 5min` to ALL hooks including `useUserProfile`, `useProduct`, `useHomeProducts`.
-- **Recommendations page:** Already had correct loading gate (`productsLoading && !productsData`) and products hook had placeholderData. The staleTime additions to profile/reviews hooks prevent unnecessary re-fetches.
-- **Sequential queries:** Collaborative filtering in Recommendations has 3 sequential Supabase queries (profiles → reviews → products) but these have true data dependencies — each depends on the prior result. Already documented as unavoidable. They run in a background `useQuery` and don't block page render.
-- **Pattern established:** Every data hook should have: (1) `placeholderData` with sensible defaults from seed/static data, (2) `staleTime: 5 * 60 * 1000` to prevent unnecessary re-fetches, (3) pages should never block rendering on data — show defaults and upgrade.
-- **Lesson:** The "loading gate" anti-pattern (blocking render until all queries resolve) is the #1 perceived perf killer. Remove loading gates wherever possible — render with defaults immediately, let React Query swap in real data.
-
-
-### 2026-05-02: Recommendations Page Instant Load Fix
-- **Root cause:** The loading gate `(productsLoading || profileLoading || reviewsLoading) && !errors` blocked ALL rendering until every Supabase query finished. Even though `useRecommendationProducts()` had `placeholderData` (renders instantly from seed data), the page showed "Loading recommendations…" waiting for profile and reviews to return from Supabase.
-- **Fix — Progressive rendering:** Changed loading gate to only block if zero products are available (no placeholder either). The page now renders Tier 1 recommendations instantly with seed product data, then reactively upgrades to Tier 2/3/4 as profile and reviews arrive from Supabase.
-- **Fix — Inline loading indicators:** Replaced the full-page spinner with subtle inline messages: "Personalizing your recommendations…" (while profile/reviews load) and "Finding people with similar hair…" (while collaborative filtering runs). Users see content immediately instead of a blank loading screen.
-- **Fix — Moved `loadCollaborativeRecs` outside component:** This async function had no component dependencies but was being recreated on every render inside the component body. Moved to module scope to avoid unnecessary allocations.
-- **Lesson:** `placeholderData` in React Query only helps if the loading gate doesn't block rendering anyway. The page had the right hook but the wrong gate — it was ANDing all three queries' loading states together, defeating the purpose of placeholder data.
-
-### 2025-07-25: Product Catalog Category Audit Fix
-- **7 products recategorized:** 3 bond-repair products (Olaplex No. 3, K18 Leave-In, Curlsmith Bond Curl Rehab Salve) moved from `protein_treatment` → `bond_repair`. 4 scalp-focused oils (As I Am Dry Itchy, Hollywood Beauty Tea Tree, Mielle Rosemary Mint, Eden Bodyworks Peppermint) moved from `oil_serum` → `scalp_care`.
-- **1 duplicate removed:** Acure Dry Shampoo appeared at line 292 (with image URL) and line 398 (without). Kept the one with the image.
-- **Lesson:** Bond-repair products (Olaplex, K18, bond rehab) are mechanistically different from protein treatments — they work on disulfide bonds, not keratin reinforcement. Scalp-targeted oils belong in `scalp_care` even if they're technically oils — category should reflect primary use case, not product format.
-
-### 2025-07-25: Product Image Sourcing (Phase 3) — 64/69 Found
-- **Result:** Applied 64 verified product image URLs to seedProducts.ts. 5 products remain imageless (discontinued/unavailable: Monday Curl Define, TJ Conditioner, Ouai Hydrating Cream, Cantu Flaxseed Oil, SM Coconut Oil).
-- **Total catalog coverage:** Now ~98% of products have images (only 5 null out of ~280 products).
-- **Best image source: INCIDecoder GCS** (`incidecoder-content.storage.googleapis.com`) — covers nearly every hair product with clean product-on-white photos. Consistent URL pattern, no hotlinking blocks, good image quality. This is the go-to source for future image sourcing.
-- **Ulta media CDN** (`media.ulta.com/i/ulta/{sku}?w=400`) — works well for products currently sold at Ulta. Catches: (1) returns a specific placeholder image for unavailable SKUs (md5 hash `43eed7447d66573a67e2bc6e10858ab5` at `?w=400`), (2) without `?w=400` returns a tiny 4572-byte thumbnail. Always append `?w=400` and verify against placeholder hash.
-- **Sephora CDN** (`sephora.com/productimages/sku/s{id}-main-zoom.jpg?imwidth=612`) — works reliably but finding the SKU ID requires fetching the product page HTML and extracting from `<link rel="preload">` tag. Sephora blocks automated access after a few requests.
-- **Sally Beauty Scene7** (`s7d9.scene7.com/is/image/SallyBeauty/{sku}`) — good for salon/professional products (Beyond the Zone, Hask, Nutress, Ion).
-- **Garnier USA CDN** — direct CDN URLs from garnierusa.com work for all Garnier/Fructis products.
-- **Shopify brand stores** — best for indie/DTC brands (Harry's, Taliah Waajid, Nature Spell, Bed Head, Vanicream retailers).
-- **Sources that DON'T work:** Amazon (403), Walmart (404 on direct image URLs), Target scene7 (403), SheaMoisture.com (403 on Demandware CDN), brand sites using JS rendering (most return empty og:image).
-- **Open Beauty Facts** — near-zero coverage for curly hair products. Only found 1 out of 69 searches (Batiste). Not useful for this category.
-- **Lesson:** For bulk image sourcing, check INCIDecoder first (highest hit rate), then Ulta media CDN (for mainstream products), then Sephora (for prestige brands), then Sally Beauty (for professional brands). Always verify URLs return real images, not placeholders.
+Danny completed 10+ sessions: product image sourcing across 3 phases (28→52→64 URLs applied, reaching ~98% coverage), backend performance fixes (count queries, O(n) dedup, Reddit parallelization), Supabase fallback diagnosis (status_conflict column), community search relevance redesign (domain-aware extraction, multi-query strategy, honest labeling, fallback UI), instant render optimization (placeholderData + staleTime across all hooks, removed loading gates), HairTok product catalog expansion (2 batches, 10 new products, 2 new categories), and product categorization audit (7 recategorized, 1 duplicate removed).

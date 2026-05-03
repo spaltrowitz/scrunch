@@ -142,3 +142,13 @@ Decomposed `src/pages/Recommendations.tsx` from 1173 lines into 7 files:
 - Sandy merged 3 PRs this batch with architecture-first conflict resolution policy; PR #9 and #15 required rebasing to React Query patterns
 - Frenchy wired toast notification system to all 7 mutations, establishing feedback convention
 - Decomposition follows same pattern as Products.tsx extraction (Sandy's PR #13)
+
+## Cross-Project Optimizer Knowledge (injected 2026-05-02)
+
+### From MyDailyWin (Impa)
+- **Inline CSS bloat is the #1 token cost driver:** app.html had 425 lines of inline `<style>`, home.html had 104 inline `style=""` attributes. Extract to external CSS files for both performance and AI token savings (~30-40% reduction when working across files).
+- **Cross-file duplication compounds cost:** Firebase config (3 copies), SW registration (4 copies), shared utility functions (2+ copies). Each page served to AI includes all redundancy. Consolidate into shared modules.
+- **Dead code audit saves build overhead:** Unused functions, deprecated functions still present, defined-but-never-called utilities (like `slugVariants()`) — remove or integrate.
+- **Service worker cache versioning for multi-agent work:** When multiple agents modify assets in parallel, each bumps cache version independently — latest wins. Always include new files (JS, CSS) in SW precache list.
+- **CSS consolidation gains are smaller when already per-page:** Intentionally distinct page designs mean shared `.btn` base in shared.css + page-specific overrides is the right pattern. Real value = token reduction for AI context, not line count.
+- **Suffix/helper pattern duplication:** When a pattern repeats 10+ times (like profile suffix calculation), extract to a single helper function.

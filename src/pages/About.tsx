@@ -52,6 +52,23 @@ export function About() {
           </p>
         </section>
 
+        <section className="relative bg-violet-50/70 rounded-xl px-6 py-6">
+          <span className="absolute top-3 left-4 text-5xl leading-none text-violet-300 font-serif select-none" aria-hidden="true">"</span>
+          <div className="pl-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">The Story Behind Scrunch</h2>
+            <p className="text-sm text-gray-700 leading-relaxed mb-3">
+              I grew up thinking straight hair was the beauty standard — so I straightened mine for years. It wasn't until college, when friends told me how much they loved my natural curls, that something clicked. I started embracing my texture and dove headfirst into figuring out what products actually work for curly hair.
+            </p>
+            <p className="text-sm text-gray-700 leading-relaxed mb-3">
+              That journey — the Reddit rabbit holes, the ingredient decoding, the trial and error — is something so many of us with curls and waves share. I built Scrunch because I wanted one place where our community's collective wisdom lives together, not scattered across a dozen tabs.
+            </p>
+            <p className="text-sm text-gray-700 leading-relaxed">
+              This app is my way of giving back. Whether you're just discovering your natural texture or you're deep into your curl journey, I hope Scrunch makes it a little easier — and a lot more fun.
+            </p>
+            <p className="text-xs text-gray-500 mt-3">— Shari, founder of Scrunch</p>
+          </div>
+        </section>
+
         <section className="bg-violet-50 rounded-lg px-4 py-3 text-center">
           <p className="text-sm text-gray-700">
             Scrunch is free and ad-free.{' '}

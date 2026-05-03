@@ -17,6 +17,6 @@
 | Rizzo | Tester | Vitest, quality, edge cases | 🧪 |
 | Marty | Domain Expert | r/curlyhair knowledge, CGM methods, product recs | 💇 |
 | Jan | Product Design | UX, visual design, user flows | 🎨 |
-| Kenickie | Product Manager | Roadmap, prioritization, user stories | 📦 |
+| Kenickie | Product Manager | Roadmap, prioritization, user stories | 📦 Merged → Sandy |
 | Scribe | Session Logger | Memory, decisions, session logs | 📋 |
-| Ralph | Work Monitor | Work queue, backlog, keep-alive | 🔄 |
+| Ralph | Work Monitor | Work queue, backlog, keep-alive | ⏸️ Removed |
