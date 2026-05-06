@@ -440,7 +440,7 @@ export function Community() {
                 value={question}
                 onChange={(e) => handleInputChange(e.target.value)}
                 placeholder="Ask a question... e.g., 'Best gel for 3B low porosity hair?' or 'How often should I deep condition?'"
-                className="w-full h-24 border-0 resize-none text-sm focus:outline-none placeholder-gray-400"
+                className="w-full h-20 sm:h-24 border-0 resize-none text-sm focus:outline-none placeholder-gray-400"
               />
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between mt-2 gap-2">
                 <p className="text-xs text-gray-400">

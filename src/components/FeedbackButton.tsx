@@ -135,7 +135,7 @@ export function FeedbackButton({ inline }: { inline?: boolean }) {
               <form onSubmit={handleSubmit} className="p-3 sm:p-4">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-gray-900">Send Feedback</h3>
-                  <button type="button" onClick={handleClose} className="text-gray-400 hover:text-gray-600 cursor-pointer text-lg">✕</button>
+                  <button type="button" onClick={handleClose} className="text-gray-400 hover:text-gray-600 cursor-pointer text-lg min-h-[44px] min-w-[44px] flex items-center justify-center">✕</button>
                 </div>
 
                 {/* Type selector */}

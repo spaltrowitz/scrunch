@@ -126,7 +126,7 @@ function SourceCard({ name, url, description }: { name: string; url: string; des
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block p-4 bg-white rounded-lg border border-gray-200 hover:border-violet-300 transition no-underline"
+      className="block p-3 sm:p-4 bg-white rounded-lg border border-gray-200 hover:border-violet-300 transition no-underline"
     >
       <h3 className="font-medium text-gray-900 text-sm mb-1">{name}</h3>
       <p className="text-xs text-gray-500">{description}</p>

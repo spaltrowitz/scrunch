@@ -82,7 +82,7 @@ export function Dashboard() {
       )}
 
       {/* Main actions - always show but adapt */}
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Link to="/products" className="block p-5 bg-white rounded-xl border border-gray-200 hover:border-violet-300 hover:shadow-sm transition no-underline">
           <h3 className="font-semibold text-gray-900 mb-1">🔍 Browse Products</h3>
           <p className="text-xs text-gray-500">

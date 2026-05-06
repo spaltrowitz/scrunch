@@ -63,58 +63,37 @@
 - Feedback form label changes touch 6 points: union, LABELS, PLACEHOLDERS, default, reset, conditional renders
 
 ### Homepage Enrichment (2026-05-06 session)
-- **Added 3 new sections to Home.tsx:** "How It Works" (3-step education cards: Browse → Rate → Get Matches), "Why Scrunch?" (3 differentiation cards vs. competitors), and enhanced hero with sub-heading + soft anchor link ("See how it works").
-- **Section order:** Hero -> How It Works -> Why Scrunch? -> Trending on #HairTok (HairTok repositioned per Sandy's plan).
-- **Pattern:** New sections use consistent card styling (border border-gray-200, bg-white, rounded-lg, p-6) and grid pattern (grid-cols-1 md:grid-cols-3).
-- **Anchor linking:** "See how it works" in hero links to `#how-it-works` section ID. Note: HashRouter may interfere with anchor scroll - test in browser.
-- **Implementation:** No new components extracted - all JSX inline in Home.tsx for readability.
-- **Validation:** TypeScript clean, build succeeds, no lint errors.
-- **Implements:** Sandy's homepage enrichment plan (sections 1-4), addressing adoption gap and clarifying visitor flow.
-
-## Session Archive Summary
-
-Frenchy completed 13+ sessions: homepage redesign (discovery-first → Prose-inspired), performance decomposition (Products.tsx 661→280 lines), ProductPlaceholder tooltip, toast notification system (7 mutations wired), Jan's UX recommendations (10/13 implemented), homepage declutter, HairTok section, community page polish, beta UX fixes (empty state, mobile CTAs), lint fixes (setState-in-effect, fast refresh, exhaustive-deps), SEO improvements (CategoryPage, dynamic titles, deep links), copy/visual polish passes, and homepage enrichment (How It Works + Why Scrunch sections). All sessions maintained 26/26 tests green.
+- **Added 3 new sections to Home.tsx:** "How It Works" (3-step education cards), "Why Scrunch?" (3 differentiation cards), enhanced hero with sub-heading + anchor link
+- **Section order:** Hero → How It Works → Why Scrunch? → HairTok (reordered per Sandy)
+- **Pattern:** Consistent card styling (border, rounded-lg, p-6) + grid-cols-1 md:grid-cols-3
+- **Anchor linking:** "#how-it-works" ID for scroll navigation
+- **No new components** - pure JSX additions to Home.tsx
 
 ## Learnings
 
-### SEO & Landing Pages (2026 session)
-- **SPA SEO limitations:** HashRouter means Google won't deeply index hash-fragment routes. JSON-LD structured data in `index.html` helps surface the app in search results as a WebApplication + FAQPage.
-- **Category landing pages:** Created `CategoryPage.tsx` with route `/category/:slug`. Slugs are auto-derived from `ProductCategory` keys (underscores → hyphens). Reuses `useCatalogProducts()` hook.
-- **Dynamic page titles:** `usePageTitle` hook in `src/hooks/usePageTitle.ts` — route-based title map with override support. Wired globally via `PageTitleUpdater` component inside `AppRoutes`. ProductDetail and CategoryPage use override for dynamic titles.
-- **Products page deep links:** Added `useSearchParams` to Products.tsx so `?category=curl_cream` pre-selects the filter. CategoryPage CTA links to this.
-- **`ProductImage` component signature:** Takes `{ brand, name, seedImageUrl, category, className }` — not a product object. `seedImageUrl` maps to product's `image_url` field.
-- **Vite base path:** `base: '/scrunch/'` in vite.config.ts — all absolute URLs in meta tags must include this prefix.
 
-### Homepage Enrichment (2026 session)
-- **Added 3 new sections to Home.tsx:** "How It Works" (3-step education cards), "Why Scrunch?" (3 differentiation cards), and enhanced hero with sub-heading + anchor link.
-- **Section order:** Hero -> How It Works -> Why Scrunch? -> Trending on #HairTok (HairTok moved down per Sandy's plan).
-- **Pattern:** New sections use same card styling (border border-gray-200, bg-white, rounded-lg, p-6) and grid pattern (grid-cols-1 md:grid-cols-3).
-- **Anchor linking:** "See how it works" in hero links to `#how-it-works` section ID. Note: HashRouter may interfere with anchor scroll - test in browser.
-- **No new components or dependencies added** - pure JSX additions to Home.tsx.
-- **No em dashes used** - hard rule across the app.
+### SEO & Landing Pages
+- SPA limitations: HashRouter prevents deep indexing; JSON-LD in index.html helps
+- CategoryPage.tsx with `/category/:slug` routes (slugs auto-derived from ProductCategory keys)
+- usePageTitle hook with route-based title map + override support
+- ?category=curl_cream deep linking to pre-select filters
+- Vite base: '/scrunch/' applies to all meta URLs
 
-### PWA Support (2026 session)
-- **Created `public/manifest.json`** with app name, theme color (#7c3aed violet), standalone display mode, and icons (SVG + PNG 192/512 + maskable variants).
-- **Updated `index.html`** with manifest link, apple-touch-icon, theme-color meta, apple-mobile-web-app-capable/title metas.
-- **Generated PNG icons** from favicon.svg using sharp-cli (192px and 512px, plus maskable copies).
-- **Added "Add to Home Screen" instructions** to About.tsx - a card section above the credits with iPhone/iPad and Android steps in a 2-column grid.
-- **No service worker added** - that's a bigger task. Current setup enables basic PWA metadata and "Add to Home Screen" prompts on Android Chrome. iOS Safari will use the apple-mobile-web-app-* metas.
-- **Base path:** All manifest/icon paths use `/scrunch/` prefix matching vite.config.ts `base`.
+### Homepage Enrichment + PWA + Mobile Audit (2026 sessions)
+- Added "How It Works" + "Why Scrunch?" sections to Home.tsx, reordered HairTok below
+- PWA: manifest.json (theme #7c3aed), PNG icons (192×512px + maskable), "Add to Home Screen" card
+- Mobile audit: Fixed 20 issues—touch targets min-h-[44px], responsive grids (grid-cols-1 sm:grid-cols-2 md:grid-cols-3), padding (p-3 sm:p-5), rating popup overflow fix
 
-## 2026-05-06: PWA Implementation (Baseline)
+## 2026-05-06: Mobile Polish Cleanup
 
-- Added manifest.json with app metadata (name, theme color, icons)
-- Generated PNG icons (192x192, 512x512) from SVG favicon
-- Added "Add to Home Screen" install instructions to About page
-- Deliberately deferred service worker (offline caching) to avoid complexity; documented trade-off
-- Key decision: PWA basics now, offline layer later
+- Fixed 10 nice-to-have mobile items: responsive image heights, padding consistency, textarea sizing
+- Grid columns adaptive breakpoints, container heights, close button touch targets (min-h-[44px])
+- Files: 10 modified (ProductCard, QuickRateCard, RecommendedCard, FilterPanel, Community, Dashboard, Products, About, Credits, Recommendations)
+- TypeScript clean ✓
 
-## 2026-05-07: Mobile Audit Fixes (Rizzo's Audit - 20 Issues)
+## Pattern: Mobile-First Responsive Classes
 
-- Fixed all 6 blockers and 14 should-fix items from Rizzo's mobile accessibility audit
-- All touch targets now meet 44px minimum height (buttons, links, inputs across 15 files)
-- Key patterns: `min-h-[44px]` on interactive elements, responsive grids (`grid-cols-1 sm:grid-cols-2`), responsive padding (`p-3 sm:p-5`), responsive max-width (`max-w-[200px] sm:max-w-[260px]`)
-- Rating popup overflow fix: `right-0 sm:right-4` + `max-w-[calc(100vw-2rem)]`
-- ProductCard/FilterPanel buttons upgraded from min-h-[36px] to min-h-[44px]
-- Footer links given touch target sizing with `py-2 min-h-[44px] inline-flex items-center`
-- TypeScript clean, no functionality changes
+- Use `h-auto sm:h-[200px]` for responsive image heights instead of fixed heights
+- Padding: `p-3 sm:p-4 md:p-5` for scalable spacing
+- Touch targets: Always `min-h-[44px]` + `inline-flex items-center justify-center` for buttons
+- Grids: `grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4` for adaptive layouts

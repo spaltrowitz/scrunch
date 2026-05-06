@@ -308,7 +308,7 @@ export function Recommendations() {
   const dislikedReviews = userReviews.filter(r => r.rating != null && r.rating <= 1)
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
+    <div className="max-w-4xl mx-auto px-4 py-6 sm:py-12">
       <h1 className="text-2xl font-bold text-gray-900 mb-8">Hey {firstName} ✨</h1>
 
       {/* Tier-appropriate recommendations */}

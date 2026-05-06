@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { ProductImage } from '../hooks/useProductImage'
 import { useHomeProducts } from '../hooks/useHomeProducts'
 
-// TODO: Remove hardcoded list once Danny adds '#HairTok' to product notes in Supabase
+// Fallback product names for HairTok section. Auto-bypassed when Supabase products have 'hairtok' in notes.
 const HAIRTOK_PRODUCT_NAMES = ['K18', 'Olaplex', 'Rosemary Oil']
 
 const FEATURED_CREATORS = [
@@ -16,7 +16,7 @@ export function Home() {
   const { data } = useHomeProducts()
   const products = data?.products ?? []
 
-  // TODO: Switch to notes-based filter once Danny adds '#HairTok' tags
+  // Primary: notes-based filter. Falls back to hardcoded list until products are tagged in Supabase.
   const hairtokProducts = useMemo(() => {
     const byNotes = products.filter(p => p.notes?.toLowerCase().includes('hairtok'))
     if (byNotes.length > 0) return byNotes.slice(0, 6)
@@ -146,7 +146,7 @@ export function Home() {
                     brand={product.brand}
                     name={product.name}
                     seedImageUrl={product.image_url}
-                    className="w-full h-24 object-cover"
+                    className="w-full h-20 sm:h-24 object-cover"
                   />
                   <p className="text-sm font-medium text-gray-900 truncate group-hover:text-violet-700">
                     {product.name}

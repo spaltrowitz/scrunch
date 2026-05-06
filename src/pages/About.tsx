@@ -12,7 +12,7 @@ export function About() {
       </div>
 
       <div className="space-y-8">
-        <section className="relative bg-violet-50/70 rounded-xl px-6 py-6">
+        <section className="relative bg-violet-50/70 rounded-xl px-4 sm:px-6 py-6">
           <span className="absolute top-3 left-4 text-5xl leading-none text-violet-300 font-serif select-none" aria-hidden="true">"</span>
           <div className="pl-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-3">The Story Behind Scrunch</h2>
