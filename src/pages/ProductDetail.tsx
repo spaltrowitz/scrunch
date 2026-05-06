@@ -236,7 +236,7 @@ export function ProductDetail() {
           {ratingPopup && (
             <div className="mt-4 p-4 bg-violet-50 border border-violet-200 rounded-xl">
               <p className="text-sm font-medium text-gray-700 mb-3">How was it for your hair?</p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 mb-4">
                 {RATING_OPTIONS.map(opt => (
                   <button
                     key={opt.value}

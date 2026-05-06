@@ -33,7 +33,7 @@ export function Dashboard() {
             </p>
             <Link
               to="/onboarding"
-              className="inline-block px-5 py-2.5 min-h-[44px] bg-violet-600 text-white font-medium rounded-lg hover:bg-violet-700 no-underline"
+              className="inline-flex items-center px-5 py-2.5 min-h-[44px] bg-violet-600 text-white font-medium rounded-lg hover:bg-violet-700 no-underline"
             >
               Start Hair Quiz →
             </Link>
@@ -68,7 +68,7 @@ export function Dashboard() {
             </p>
             <Link
               to="/products"
-              className="inline-block px-5 py-2.5 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 no-underline"
+              className="inline-flex items-center px-5 py-2.5 min-h-[44px] bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 no-underline"
             >
               Browse & Rate Products →
             </Link>

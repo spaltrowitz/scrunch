@@ -49,21 +49,21 @@ export function QuickRateCard({ product, onRate, currentRating }: QuickRateCardP
           <button
             onClick={() => handleRate(5)}
             disabled={saving}
-            className="flex-1 text-xs py-1.5 rounded-lg bg-green-50 text-green-700 hover:bg-green-100 transition cursor-pointer disabled:opacity-50 border-0"
+            className="flex-1 text-xs py-2.5 min-h-[44px] rounded-lg bg-green-50 text-green-700 hover:bg-green-100 transition cursor-pointer disabled:opacity-50 border-0"
           >
             👍
           </button>
           <button
             onClick={() => handleRate(3)}
             disabled={saving}
-            className="flex-1 text-xs py-1.5 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 transition cursor-pointer disabled:opacity-50 border-0"
+            className="flex-1 text-xs py-2.5 min-h-[44px] rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 transition cursor-pointer disabled:opacity-50 border-0"
           >
             😐
           </button>
           <button
             onClick={() => handleRate(1)}
             disabled={saving}
-            className="flex-1 text-xs py-1.5 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 transition cursor-pointer disabled:opacity-50 border-0"
+            className="flex-1 text-xs py-2.5 min-h-[44px] rounded-lg bg-red-50 text-red-700 hover:bg-red-100 transition cursor-pointer disabled:opacity-50 border-0"
           >
             👎
           </button>

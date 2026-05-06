@@ -85,7 +85,7 @@ export function FilterPanel({
                   key={value}
                   onClick={() => onToggleCategory(cat)}
                   title={PRODUCT_CATEGORY_DESCRIPTIONS[cat]}
-                  className={`text-xs px-3 py-2 min-h-[36px] rounded-full border cursor-pointer transition ${
+                  className={`text-xs px-3 py-2 min-h-[44px] rounded-full border cursor-pointer transition ${
                     isSelected
                       ? 'bg-violet-100 border-violet-300 text-violet-700 font-medium'
                       : 'border-gray-200 text-gray-500 hover:border-gray-300'

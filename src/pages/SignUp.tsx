@@ -45,7 +45,7 @@ export function SignUp() {
 
         <button
           onClick={() => signInWithGoogle()}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 mb-4 cursor-pointer"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 min-h-[44px] border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 mb-4 cursor-pointer"
         >
           Continue with Google
         </button>

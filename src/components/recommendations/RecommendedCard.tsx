@@ -124,19 +124,19 @@ export const RecommendedCard = memo(function RecommendedCard({
         <div className="shrink-0 flex items-center gap-2">
           <button
             onClick={onBookmark}
-            className="text-xs px-3 py-1.5 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition cursor-pointer border-0"
+            className="text-xs px-3 py-2 min-h-[44px] rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition cursor-pointer border-0"
           >
             👍 Try it
           </button>
           <button
             onClick={onOpenRating}
-            className="text-xs px-3 py-1.5 rounded-lg bg-violet-50 text-violet-600 hover:bg-violet-100 transition cursor-pointer border-0"
+            className="text-xs px-3 py-2 min-h-[44px] rounded-lg bg-violet-50 text-violet-600 hover:bg-violet-100 transition cursor-pointer border-0"
           >
             Tried it?
           </button>
           <button
             onClick={isDismissing ? onCloseDismiss : onOpenDismiss}
-            className={`text-xs px-3 py-1.5 rounded-lg transition cursor-pointer border-0 ${
+            className={`text-xs px-3 py-2 min-h-[44px] rounded-lg transition cursor-pointer border-0 ${
               isDismissing
                 ? 'bg-red-100 text-red-600'
                 : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
@@ -147,7 +147,7 @@ export const RecommendedCard = memo(function RecommendedCard({
         </div>
 
         {showRatingPopup && (
-          <div className="absolute right-4 top-full mt-1 z-10 bg-white border border-gray-200 rounded-xl shadow-lg p-3 flex gap-2">
+          <div className="absolute right-0 sm:right-4 top-full mt-1 z-10 bg-white border border-gray-200 rounded-xl shadow-lg p-3 flex gap-2 max-w-[calc(100vw-2rem)]">
             {[
               { rating: 5, emoji: '👍', label: 'Loved' },
               { rating: 3, emoji: '😐', label: 'Ok' },

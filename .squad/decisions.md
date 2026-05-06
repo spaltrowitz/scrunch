@@ -1630,3 +1630,68 @@ Most people see improvement in 2–4 weeks."
 **Date:** 2026-05-06
 **What:** Added PWA manifest.json, meta tags, PNG icons, and "Add to Home Screen" user instructions to the About page. Deliberately did NOT add a service worker - that would require decisions about caching strategy, offline support scope, and cache invalidation for Supabase data. The current setup gives users a home screen icon and standalone app feel without the complexity of offline caching.
 **Trade-off:** Without a service worker, Chrome's automatic "Install app" prompt won't fire. Users need the manual instructions on the About page. Adding a minimal service worker later would unlock the browser install prompt.
+# Decision: Mobile Audit Fixes - All 20 Issues Resolved
+
+**Author:** Frenchy
+**Date:** 2026-05-07
+**Status:** Implemented
+**Requested by:** Shari (based on Rizzo's mobile audit)
+
+## Summary
+
+Fixed all 6 blockers and all 14 should-fix issues from the mobile audit. Changes are Tailwind-only (no functionality changes). TypeScript passes clean.
+
+## Blockers Fixed (6)
+
+| ID | File | Fix |
+|----|------|-----|
+| B1 | Header.tsx | Sign Out button: `min-h-[44px]`, `py-2 px-4` |
+| B2 | Header.tsx | Sign In link: `min-h-[44px] inline-flex items-center` |
+| B3 | RecommendedCard.tsx | 3 action buttons: `min-h-[44px] py-2` |
+| B4 | RecommendedCard.tsx | Rating popup: `right-0 sm:right-4`, `max-w-[calc(100vw-2rem)]` |
+| B5 | QuickRateCard.tsx | 3 rating buttons: `py-2.5 min-h-[44px]` |
+| B6 | ProductDetail.tsx | Rating grid: `grid-cols-1 sm:grid-cols-2 md:grid-cols-4` |
+
+## Should-Fix Issues Fixed (14)
+
+| ID | File | Fix |
+|----|------|-----|
+| S1 | Login.tsx | Google button: `min-h-[44px]` |
+| S2 | SignUp.tsx | Google button: `min-h-[44px]` |
+| S3 | Profile.tsx | Quick Links grid: `grid-cols-1 sm:grid-cols-2` |
+| S4 | Dashboard.tsx | 2 CTA buttons: `min-h-[44px]` + `inline-flex items-center` |
+| S5 | CategoryPage.tsx | Filter pills: `min-h-[44px] inline-flex items-center` |
+| S6 | FeedbackButton.tsx | Modal form padding: `p-3 sm:p-4` |
+| S7 | FeedbackButton.tsx | Type buttons: `min-h-[44px]` |
+| S8 | FeedbackButton.tsx | Submit button: `min-h-[44px]` |
+| S9 | FeedbackButton.tsx | Email input: `min-h-[44px]` |
+| S10 | ProductCard.tsx | 2 action buttons: `min-h-[44px]` (was 36px) |
+| S11 | RatingGroup.tsx | Chip max-width: `max-w-[200px] sm:max-w-[260px]` |
+| S12 | Terms.tsx | Disclaimer padding: `p-3 sm:p-5` |
+| S13 | FilterPanel.tsx | Category buttons: `min-h-[44px]` (was 36px) |
+| S14 | Footer.tsx | Nav links: `py-2 min-h-[44px] inline-flex items-center` |
+
+## Files Modified (12)
+
+1. `src/components/layout/Header.tsx`
+2. `src/components/layout/Footer.tsx`
+3. `src/components/recommendations/RecommendedCard.tsx`
+4. `src/components/recommendations/RatingGroup.tsx`
+5. `src/components/products/QuickRateCard.tsx`
+6. `src/components/products/ProductCard.tsx`
+7. `src/components/products/FilterPanel.tsx`
+8. `src/components/FeedbackButton.tsx`
+9. `src/pages/ProductDetail.tsx`
+10. `src/pages/Login.tsx`
+11. `src/pages/SignUp.tsx`
+12. `src/pages/Profile.tsx`
+13. `src/pages/Dashboard.tsx`
+14. `src/pages/CategoryPage.tsx`
+15. `src/pages/Terms.tsx`
+
+## Validation
+
+- TypeScript: clean (0 errors)
+- No functionality changes - Tailwind class adjustments only
+- All touch targets now meet 44px minimum
+- Responsive breakpoints added where content was previously fixed-width

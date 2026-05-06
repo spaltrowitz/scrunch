@@ -108,3 +108,13 @@ Frenchy completed 13+ sessions: homepage redesign (discovery-first → Prose-ins
 - Added "Add to Home Screen" install instructions to About page
 - Deliberately deferred service worker (offline caching) to avoid complexity; documented trade-off
 - Key decision: PWA basics now, offline layer later
+
+## 2026-05-07: Mobile Audit Fixes (Rizzo's Audit - 20 Issues)
+
+- Fixed all 6 blockers and 14 should-fix items from Rizzo's mobile accessibility audit
+- All touch targets now meet 44px minimum height (buttons, links, inputs across 15 files)
+- Key patterns: `min-h-[44px]` on interactive elements, responsive grids (`grid-cols-1 sm:grid-cols-2`), responsive padding (`p-3 sm:p-5`), responsive max-width (`max-w-[200px] sm:max-w-[260px]`)
+- Rating popup overflow fix: `right-0 sm:right-4` + `max-w-[calc(100vw-2rem)]`
+- ProductCard/FilterPanel buttons upgraded from min-h-[36px] to min-h-[44px]
+- Footer links given touch target sizing with `py-2 min-h-[44px] inline-flex items-center`
+- TypeScript clean, no functionality changes

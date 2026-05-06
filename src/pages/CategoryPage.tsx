@@ -157,7 +157,7 @@ export function CategoryPage() {
             <Link
               key={cat}
               to={`/category/${categoryToSlug(cat)}`}
-              className={`text-sm px-3 py-1.5 rounded-full border transition-colors ${
+              className={`text-sm px-3 py-1.5 min-h-[44px] inline-flex items-center rounded-full border transition-colors ${
                 cat === category
                   ? 'bg-violet-100 border-violet-200 text-violet-700 font-medium'
                   : 'bg-white border-gray-200 text-gray-600 hover:border-violet-200 hover:text-violet-600'

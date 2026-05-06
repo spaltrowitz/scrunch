@@ -11,7 +11,7 @@ export function Terms() {
 
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mb-2">⚠️ Important Disclaimers</h2>
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 space-y-3">
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 sm:p-5 space-y-3">
             <p>
               <strong>Scrunch is not a medical or dermatological service.</strong> All product
               recommendations, ingredient analyses, and hair care suggestions on this platform

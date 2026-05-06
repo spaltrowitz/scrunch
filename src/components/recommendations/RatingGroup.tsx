@@ -27,7 +27,7 @@ const RatingChip = memo(function RatingChip({ review }: { review: ProductReview 
   return (
     <Link
       to={`/products/${review.product_id}`}
-      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-gray-200 hover:border-violet-300 transition no-underline text-sm text-gray-800 truncate max-w-[260px]"
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-gray-200 hover:border-violet-300 transition no-underline text-sm text-gray-800 truncate max-w-[200px] sm:max-w-[260px]"
     >
       <span className="shrink-0">{icon}</span>
       <span className="truncate">{review.products.brand} {review.products.name}</span>

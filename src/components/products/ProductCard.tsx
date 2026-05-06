@@ -99,7 +99,7 @@ export const ProductCard = memo(function ProductCard({
           <button
             onClick={onToggleTried}
             aria-label={hasTried ? 'Update rating' : 'Mark as tried'}
-            className={`text-xs px-3 py-2 min-h-[36px] rounded-full border cursor-pointer transition ${
+            className={`text-xs px-3 py-2 min-h-[44px] rounded-full border cursor-pointer transition ${
               hasTried
                 ? rating === 'loved' ? 'bg-green-100 border-green-300 text-green-700'
                   : rating === 'liked' ? 'bg-emerald-100 border-emerald-300 text-emerald-700'
@@ -118,7 +118,7 @@ export const ProductCard = memo(function ProductCard({
           <button
             onClick={onToggleBookmark}
             aria-label={hasBookmarked ? 'Remove from saved' : 'Save product'}
-            className={`text-xs px-3 py-2 min-h-[36px] rounded-full border cursor-pointer transition ${
+            className={`text-xs px-3 py-2 min-h-[44px] rounded-full border cursor-pointer transition ${
               hasBookmarked
                 ? 'bg-violet-100 border-violet-300 text-violet-700'
                 : 'border-gray-200 text-gray-500 hover:border-gray-300'

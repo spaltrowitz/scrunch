@@ -132,7 +132,7 @@ export function FeedbackButton({ inline }: { inline?: boolean }) {
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="p-6">
+              <form onSubmit={handleSubmit} className="p-3 sm:p-4">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-gray-900">Send Feedback</h3>
                   <button type="button" onClick={handleClose} className="text-gray-400 hover:text-gray-600 cursor-pointer text-lg">✕</button>
@@ -149,7 +149,7 @@ export function FeedbackButton({ inline }: { inline?: boolean }) {
                       key={value}
                       type="button"
                       onClick={() => { setType(value); setBody('') }}
-                      className={`text-xs px-3 py-1.5 rounded-full border cursor-pointer transition ${
+                      className={`text-xs px-3 py-1.5 min-h-[44px] rounded-full border cursor-pointer transition ${
                         type === value
                           ? 'bg-violet-100 border-violet-300 text-violet-700 font-medium'
                           : 'border-gray-200 text-gray-500 hover:border-gray-300'
@@ -175,7 +175,7 @@ export function FeedbackButton({ inline }: { inline?: boolean }) {
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       placeholder={type === 'bug' ? 'e.g., Sign-in button not working' : type === 'idea' ? 'e.g., Filter products by protein-free' : 'e.g., The ingredient checker is amazing!'}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                      className="w-full px-3 py-2 min-h-[44px] border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
                     />
                   </div>
                   <div>
@@ -192,7 +192,7 @@ export function FeedbackButton({ inline }: { inline?: boolean }) {
                 <button
                   type="submit"
                   disabled={submitting || !title.trim()}
-                  className="w-full mt-4 py-2.5 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 disabled:opacity-50 cursor-pointer"
+                  className="w-full mt-4 py-2.5 min-h-[44px] bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 disabled:opacity-50 cursor-pointer"
                 >
                   {submitting ? 'Submitting...' : 'Submit Feedback'}
                 </button>

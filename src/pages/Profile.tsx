@@ -168,7 +168,7 @@ export function ProfilePage() {
 
           <div className="mt-6 pt-6 border-t border-gray-200">
             <h2 className="font-semibold text-gray-900 mb-3">Quick Links</h2>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button onClick={() => navigate('/my-products')} className="p-3 bg-white rounded-lg border border-gray-200 hover:border-violet-300 text-left cursor-pointer transition">
                 <h3 className="font-medium text-gray-900 text-sm">📋 My Shelf</h3>
                 <p className="text-xs text-gray-500">Products you've tried and saved</p>

@@ -8,13 +8,13 @@ export function Footer() {
           Scrunch - Made by curly people, for curly people.
         </p>
         <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400">
-          <Link to="/about" className="hover:text-violet-600 no-underline">About</Link>
+          <Link to="/about" className="hover:text-violet-600 no-underline py-2 min-h-[44px] inline-flex items-center">About</Link>
           <span>·</span>
-          <Link to="/products" className="hover:text-violet-600 no-underline">Products</Link>
+          <Link to="/products" className="hover:text-violet-600 no-underline py-2 min-h-[44px] inline-flex items-center">Products</Link>
           <span>·</span>
-          <Link to="/community" className="hover:text-violet-600 no-underline">Community</Link>
+          <Link to="/community" className="hover:text-violet-600 no-underline py-2 min-h-[44px] inline-flex items-center">Community</Link>
           <span>·</span>
-          <Link to="/terms" className="hover:text-violet-600 no-underline">Terms</Link>
+          <Link to="/terms" className="hover:text-violet-600 no-underline py-2 min-h-[44px] inline-flex items-center">Terms</Link>
         </div>
       </div>
     </footer>
