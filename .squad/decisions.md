@@ -1220,3 +1220,24 @@ The quick wins above directly address these. Once messaging is clear, customer a
 Scrunch is **ready for adoption**, but adoption requires *communication* as much as product. A new user should understand within 10 seconds: "This app finds products for my specific hair type and lets me track what works." Once that clicks, the signup and onboarding flows will feel natural, not like a hurdle.
 
 The three quick wins are low-effort, high-impact changes to remove ambiguity and guide users toward the value Scrunch already delivers.
+# Homepage Enrichment Implementation
+
+**By:** Frenchy (Frontend Dev)
+**Date:** 2026-05-06
+**Implements:** Sandy's homepage enrichment plan (sections 1-4)
+
+## Decision
+
+Implemented sections 1-4 of Sandy's plan as static JSX in Home.tsx. No new components extracted - the sections are simple enough that inline JSX keeps Home.tsx readable (~190 lines total).
+
+## Key Choices
+
+1. **Anchor link with HashRouter:** Used `<a href="#how-it-works">` for the "See how it works" soft link. With HashRouter, this may not scroll smoothly in all cases - needs browser testing. If broken, we can switch to a `scrollIntoView()` onClick handler.
+
+2. **Section backgrounds alternate:** Hero (violet-50 gradient) -> How It Works (white) -> Why Scrunch? (gray-50) -> HairTok (gray-50). The two gray-50 sections back-to-back is acceptable since border-t separates them visually.
+
+3. **No component extraction:** All new sections are inline JSX. If we add more card-grid sections in the future, we should extract a `FeatureGrid` component.
+
+## What Changed
+
+- `src/pages/Home.tsx`: Enhanced hero sub-heading, "How It Works" section, "Why Scrunch?" section, HairTok repositioned after differentiation content.

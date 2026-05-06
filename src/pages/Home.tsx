@@ -33,8 +33,12 @@ export function Home() {
           Finally, one place for curly hair that actually works.
         </h1>
 
-        <p className="text-sm md:text-base text-gray-600 mb-6 max-w-xl leading-relaxed">
-          Find your perfect curly hair products and discover what actually works for your hair type.
+        <p className="text-sm md:text-base text-gray-600 mb-4 max-w-xl leading-relaxed">
+          Find products that actually work for your curls.
+        </p>
+
+        <p className="text-xs md:text-sm text-gray-500 mb-6 max-w-lg leading-relaxed">
+          Get personalized recommendations based on your hair type. No ads, no hype, just science.
         </p>
 
         <div className="flex flex-col items-center gap-3">
@@ -44,8 +48,78 @@ export function Home() {
           >
             Browse Products →
           </Link>
+          <a
+            href="#how-it-works"
+            className="text-xs text-gray-500 hover:text-violet-600 no-underline transition-colors min-h-[44px] flex items-center"
+          >
+            See how it works ↓
+          </a>
         </div>
 
+      </section>
+
+      {/* How It Works */}
+      <section id="how-it-works" className="py-16 px-4 bg-white border-t border-gray-200">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">
+            How Scrunch Works
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-6 rounded-lg border border-gray-200 bg-white text-center">
+              <p className="text-3xl mb-3">🔍</p>
+              <h3 className="text-base font-semibold text-gray-900 mb-2">Browse</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                Explore 400+ curly hair products by category, brand, or ingredients.
+              </p>
+            </div>
+            <div className="p-6 rounded-lg border border-gray-200 bg-white text-center">
+              <p className="text-3xl mb-3">⭐</p>
+              <h3 className="text-base font-semibold text-gray-900 mb-2">Rate</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                Rate products you've tried. We learn what works for your hair.
+              </p>
+            </div>
+            <div className="p-6 rounded-lg border border-gray-200 bg-white text-center">
+              <p className="text-3xl mb-3">✨</p>
+              <h3 className="text-base font-semibold text-gray-900 mb-2">Get Matched</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                See personalized picks based on your ratings and hair profile.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Scrunch */}
+      <section className="py-16 px-4 bg-gray-50 border-t border-gray-200">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">
+            Why Scrunch?
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-6 rounded-lg border border-gray-200 bg-white text-center">
+              <p className="text-3xl mb-3">🧪</p>
+              <h3 className="text-base font-semibold text-gray-900 mb-2">Ingredient-Checked</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                Every product reviewed for curly hair friendliness. Spot sulfates, silicones, and drying alcohols instantly.
+              </p>
+            </div>
+            <div className="p-6 rounded-lg border border-gray-200 bg-white text-center">
+              <p className="text-3xl mb-3">💚</p>
+              <h3 className="text-base font-semibold text-gray-900 mb-2">Ad-Free & Independent</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                No sponsored placements or affiliate links. Just honest, community-driven recommendations.
+              </p>
+            </div>
+            <div className="p-6 rounded-lg border border-gray-200 bg-white text-center">
+              <p className="text-3xl mb-3">💁‍♀️</p>
+              <h3 className="text-base font-semibold text-gray-900 mb-2">Built by Someone Like You</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                Created by a curly-haired person who was tired of guessing which products would work.
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Trending on #HairTok */}

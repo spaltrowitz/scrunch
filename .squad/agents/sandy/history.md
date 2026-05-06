@@ -62,6 +62,14 @@
 - **Store Scanner is ONLY persona via Google SEO** — product pages need SEO landing pages.
 - **Principles:** Scope discipline, "default is NO", complexity-is-cost, fastest aha moment = primary CTA.
 
+### Homepage Enrichment Strategy (2026-05-06)
+- **Mandate:** Close adoption gap ("What is this?" problem, lack of differentiation signal, unclear visitor flow)
+- **Approach:** 6-section homepage enrichment strategy with education-first positioning
+- **Key recommendations:** Enhanced hero sub-heading (answers value prop + positions differentiation), "How It Works" 3-step explainer, "Why Scrunch?" differentiation cards, HairTok repositioning, optional "Getting Started" section, "About Our Data" transparency section
+- **Rationale:** Visitor flow sequential messaging (What → Why → How). Hero sub-heading positions: personalization + ad-free + science-backed vs. TikTok/Reddit/CurlScan
+- **Implementation:** Frenchy (Frontend) implemented sections 1-4 directly in Home.tsx. TypeScript clean, build validated.
+- **Status:** Decision written to decisions.md, orchestration log created
+
 ## Session Archive Summary
 
-Sandy completed 8+ sessions: ship-readiness audit (14-page assessment), PR #13 full code review (65 files, APPROVED), PR merge batch (#9/#12/#15 with conflict resolution), TikTok legal analysis (safe practices defined, 3-phase roadmap), performance audit (static import optimization, auth loading gate), Supabase vs self-hosted analysis (phased recommendation), toast convention establishment, and product strategy integration from Kenickie. Key role: architectural gatekeeper ensuring React Query migration consistency across all PRs.
+Sandy completed 9+ sessions: ship-readiness audit (14-page assessment), PR #13 full code review (65 files, APPROVED), PR merge batch (#9/#12/#15 with conflict resolution), TikTok legal analysis (safe practices defined, 3-phase roadmap), performance audit (static import optimization, auth loading gate), Supabase vs self-hosted analysis (phased recommendation), toast convention establishment, product strategy integration from Kenickie, and homepage enrichment strategy (adoption-gap closure). Key role: architectural gatekeeper and strategic lead ensuring React Query migration consistency and product clarity across all PRs.

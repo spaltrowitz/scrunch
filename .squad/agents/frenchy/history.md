@@ -82,9 +82,18 @@
 - Always cross-reference structural changes with copy specs to avoid dead edits
 - Feedback form label changes touch 6 points: union, LABELS, PLACEHOLDERS, default, reset, conditional renders
 
+### Homepage Enrichment (2026-05-06 session)
+- **Added 3 new sections to Home.tsx:** "How It Works" (3-step education cards: Browse → Rate → Get Matches), "Why Scrunch?" (3 differentiation cards vs. competitors), and enhanced hero with sub-heading + soft anchor link ("See how it works").
+- **Section order:** Hero -> How It Works -> Why Scrunch? -> Trending on #HairTok (HairTok repositioned per Sandy's plan).
+- **Pattern:** New sections use consistent card styling (border border-gray-200, bg-white, rounded-lg, p-6) and grid pattern (grid-cols-1 md:grid-cols-3).
+- **Anchor linking:** "See how it works" in hero links to `#how-it-works` section ID. Note: HashRouter may interfere with anchor scroll - test in browser.
+- **Implementation:** No new components extracted - all JSX inline in Home.tsx for readability.
+- **Validation:** TypeScript clean, build succeeds, no lint errors.
+- **Implements:** Sandy's homepage enrichment plan (sections 1-4), addressing adoption gap and clarifying visitor flow.
+
 ## Session Archive Summary
 
-Frenchy completed 12+ sessions: homepage redesign (discovery-first → Prose-inspired), performance decomposition (Products.tsx 661→280 lines), ProductPlaceholder tooltip, toast notification system (7 mutations wired), Jan's UX recommendations (10/13 implemented), homepage declutter, HairTok section, community page polish, beta UX fixes (empty state, mobile CTAs), lint fixes (setState-in-effect, fast refresh, exhaustive-deps), and copy/visual polish passes. All sessions maintained 26/26 tests green.
+Frenchy completed 13+ sessions: homepage redesign (discovery-first → Prose-inspired), performance decomposition (Products.tsx 661→280 lines), ProductPlaceholder tooltip, toast notification system (7 mutations wired), Jan's UX recommendations (10/13 implemented), homepage declutter, HairTok section, community page polish, beta UX fixes (empty state, mobile CTAs), lint fixes (setState-in-effect, fast refresh, exhaustive-deps), SEO improvements (CategoryPage, dynamic titles, deep links), copy/visual polish passes, and homepage enrichment (How It Works + Why Scrunch sections). All sessions maintained 26/26 tests green.
 
 ## Learnings
 
@@ -95,3 +104,11 @@ Frenchy completed 12+ sessions: homepage redesign (discovery-first → Prose-ins
 - **Products page deep links:** Added `useSearchParams` to Products.tsx so `?category=curl_cream` pre-selects the filter. CategoryPage CTA links to this.
 - **`ProductImage` component signature:** Takes `{ brand, name, seedImageUrl, category, className }` — not a product object. `seedImageUrl` maps to product's `image_url` field.
 - **Vite base path:** `base: '/scrunch/'` in vite.config.ts — all absolute URLs in meta tags must include this prefix.
+
+### Homepage Enrichment (2026 session)
+- **Added 3 new sections to Home.tsx:** "How It Works" (3-step education cards), "Why Scrunch?" (3 differentiation cards), and enhanced hero with sub-heading + anchor link.
+- **Section order:** Hero -> How It Works -> Why Scrunch? -> Trending on #HairTok (HairTok moved down per Sandy's plan).
+- **Pattern:** New sections use same card styling (border border-gray-200, bg-white, rounded-lg, p-6) and grid pattern (grid-cols-1 md:grid-cols-3).
+- **Anchor linking:** "See how it works" in hero links to `#how-it-works` section ID. Note: HashRouter may interfere with anchor scroll - test in browser.
+- **No new components or dependencies added** - pure JSX additions to Home.tsx.
+- **No em dashes used** - hard rule across the app.
