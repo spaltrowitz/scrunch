@@ -74,17 +74,21 @@ export function useRatingMutation() {
         return
       }
 
-      const { error } = await supabase.from('product_reviews').upsert({
+      const payload = {
         user_id: user.id,
         product_id: input.productId,
         rating: RATING_MAP[input.rating],
         would_repurchase: REPURCHASE_MAP[input.rating],
         status: 'tried_once',
         results_notes: input.notes?.trim() || null,
-        photo_urls: [],
+        photo_urls: [] as string[],
         application_method: null,
         routine_context: null,
-      }, { onConflict: 'user_id,product_id' })
+      }
+      const { error } = await supabase.from('product_reviews').upsert(
+        payload as unknown as Parameters<typeof supabase.from<'product_reviews'>>[0],
+        { onConflict: 'user_id,product_id' }
+      )
       if (error) throw error
     },
     onSuccess: (_data, input) => {
