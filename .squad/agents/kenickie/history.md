@@ -54,3 +54,25 @@
 **Key insight:** Ingredient Checker is what only Scrunch does (Reddit can't do this). It should be unmissable, not a feature in a grid.
 
 **Metrics to track:** Hero CTA click rate vs. old baseline; new → account conversion; repositioned Recommendations engagement.
+
+### 2026-05-06: Adoption Analysis & Mission Clarity — Kenickie
+
+**Session:** 2026-05-06T19-24
+
+**What:** Analyzed Scrunch adoption barriers and messaging gaps. Ranked three critical concerns:
+1. **"What is this?" (CRITICAL)** — Homepage doesn't explain differentiator vs. Reddit/CurlScan/IsItCG. New users bounce without understanding value.
+2. **Undifferentiated value prop (HIGH)** — Unique strengths (personalization, all-in-one, ad-free, built by curly-haired founder) invisible on landing page.
+3. **Unclear first-visit flow (HIGH)** — New visitor sees 400+ products or trending #HairTok; no clear next action or signal that signup = personalized value.
+
+**Key Recommendations:**
+- **Mission:** "Give curly and wavy hair people the personalized product guidance and community wisdom they need to find products that actually work for *their* hair."
+- **Tagline:** "Get personalized product recommendations based on your hair, not just trends."
+- **3 Quick Wins:** (1) Add hero sub-heading (1h, high impact), (2) Reword CTA to "Create Your Hair Profile" (5m, high impact), (3) Add "How It Works" section (2h, high impact).
+
+**Competitive Analysis:**  
+Documented how Scrunch differs from CurlScan (ingredient checker), IsItCG (quick CG scoring), r/curlyhair (community recommendations), Yuka (health scoring). Scrunch's all-in-one + personalization is undermarketed.
+
+**Outcomes:**  
+Comprehensive adoption analysis with implementation roadmap (P0/P1/P2 priority matrix, effort estimates). Flagged three questions for owner: target persona (beginner vs. expert), primary differentiator priority, signup friction strategy.
+
+**Status:** Recommendation. Awaiting Shari review & clarification questions.
