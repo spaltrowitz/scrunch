@@ -191,7 +191,7 @@ export function buildIngredientTier(
       if (flexible.length > 0) {
         const { score, matchedIngredients } = scoreProductByIngredients(product, profile)
         if (score > 0 && matchedIngredients.length > 0) {
-          const reason = `Contains ${formatIngredientList(matchedIngredients)} — ingredients you've loved in other products`
+          const reason = `Contains ${formatIngredientList(matchedIngredients)}  -  ingredients you've loved in other products`
           const warning = `⚠️ Contains ${formatIngredientList(flexible)} (you prefer to avoid)`
           scored.push({ ...product, _score: score * 0.7, _reason: reason, _sensitivityWarning: warning })
         }
@@ -201,7 +201,7 @@ export function buildIngredientTier(
 
     const { score, matchedIngredients } = scoreProductByIngredients(product, profile)
     if (score > 0 && matchedIngredients.length > 0) {
-      const reason = `Contains ${formatIngredientList(matchedIngredients)} — ingredients you've loved in other products`
+      const reason = `Contains ${formatIngredientList(matchedIngredients)}  -  ingredients you've loved in other products`
       scored.push({ ...product, _score: score, _reason: reason })
     }
   }
@@ -219,8 +219,8 @@ export function tierHeader(tier: Tier, profile: Profile | null): { title: string
       return {
         title: 'Popular CG-Approved Products',
         subtitle: profile?.cgm_experience === 'just_starting'
-          ? 'Starting CGM? Your first step is a clarifying wash — we\'ve included one below'
-          : 'These are crowd favorites. Tell us about your hair and we\'ll match products to your curl pattern, porosity, and goals — no more guessing.',
+          ? 'Starting CGM? Your first step is a clarifying wash  -  we\'ve included one below'
+          : 'These are crowd favorites. Tell us about your hair and we\'ll match products to your curl pattern, porosity, and goals  -  no more guessing.',
       }
     case 2:
       return {

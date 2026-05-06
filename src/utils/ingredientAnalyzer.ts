@@ -22,7 +22,7 @@ interface IngredientRule {
 
 const NOT_APPROVED_RULES: IngredientRule[] = [
   // Silicones (non-water-soluble)
-  { pattern: /\bdimethicone\b(?!.*(?:peg|ppg|bis-))/i, reason: 'Non-water-soluble silicone — causes buildup without sulfates', category: 'silicone', status: 'not_approved' },
+  { pattern: /\bdimethicone\b(?!.*(?:peg|ppg|bis-))/i, reason: 'Non-water-soluble silicone  -  causes buildup without sulfates', category: 'silicone', status: 'not_approved' },
   { pattern: /\bcyclomethicone\b/i, reason: 'Non-water-soluble silicone', category: 'silicone', status: 'not_approved' },
   { pattern: /\bamodimethicone\b(?!.*(?:peg|ppg))/i, reason: 'Non-water-soluble silicone (some consider it okay as it doesn\'t build up as much)', category: 'silicone', status: 'not_approved' },
   { pattern: /\btrimethylsilylamodimethicone\b/i, reason: 'Non-water-soluble silicone', category: 'silicone', status: 'not_approved' },
@@ -32,41 +32,41 @@ const NOT_APPROVED_RULES: IngredientRule[] = [
   { pattern: /\bdimethiconol\b/i, reason: 'Non-water-soluble silicone', category: 'silicone', status: 'not_approved' },
   { pattern: /\btrimethicone\b/i, reason: 'Non-water-soluble silicone', category: 'silicone', status: 'not_approved' },
 
-  // Sulfates (harsh) — note: sodium coco-sulfate is intentionally excluded (it's gentle)
-  { pattern: /\bsodium lauryl sulfate\b/i, reason: 'Harsh sulfate — strips natural oils', category: 'sulfate', status: 'not_approved' },
-  { pattern: /\bsodium laureth sulfate\b/i, reason: 'Harsh sulfate — strips natural oils', category: 'sulfate', status: 'not_approved' },
+  // Sulfates (harsh)  -  note: sodium coco-sulfate is intentionally excluded (it's gentle)
+  { pattern: /\bsodium lauryl sulfate\b/i, reason: 'Harsh sulfate  -  strips natural oils', category: 'sulfate', status: 'not_approved' },
+  { pattern: /\bsodium laureth sulfate\b/i, reason: 'Harsh sulfate  -  strips natural oils', category: 'sulfate', status: 'not_approved' },
   { pattern: /\bammonium lauryl sulfate\b/i, reason: 'Harsh sulfate', category: 'sulfate', status: 'not_approved' },
   { pattern: /\bammonium laureth sulfate\b/i, reason: 'Harsh sulfate', category: 'sulfate', status: 'not_approved' },
   { pattern: /\bsodium c14-16 olefin sulfonate\b/i, reason: 'Harsh sulfonate surfactant', category: 'sulfate', status: 'not_approved' },
 
   // Drying alcohols (expanded per CG guide)
-  { pattern: /\bisopropyl alcohol\b/i, reason: 'Drying alcohol — strips moisture', category: 'drying_alcohol', status: 'not_approved' },
+  { pattern: /\bisopropyl alcohol\b/i, reason: 'Drying alcohol  -  strips moisture', category: 'drying_alcohol', status: 'not_approved' },
   { pattern: /\balcohol denat\b/i, reason: 'Drying/denatured alcohol', category: 'drying_alcohol', status: 'not_approved' },
   { pattern: /\bsd alcohol\b/i, reason: 'Drying alcohol', category: 'drying_alcohol', status: 'not_approved' },
   { pattern: /\bpropanol\b/i, reason: 'Drying alcohol', category: 'drying_alcohol', status: 'not_approved' },
   { pattern: /\bethanol\b(?!.*\bphenoxy)/i, reason: 'Drying alcohol', category: 'drying_alcohol', status: 'not_approved' },
-  { pattern: /\bbenzyl alcohol\b/i, reason: 'Drying alcohol — can be irritating at high concentrations', category: 'drying_alcohol', status: 'not_approved' },
+  { pattern: /\bbenzyl alcohol\b/i, reason: 'Drying alcohol  -  can be irritating at high concentrations', category: 'drying_alcohol', status: 'not_approved' },
 
   // Waxes / Mineral oils
   { pattern: /\bmineral oil\b/i, reason: 'Can cause buildup, blocks moisture', category: 'wax', status: 'not_approved' },
-  { pattern: /\bpetrolatum\b/i, reason: 'Petroleum-based — causes buildup', category: 'wax', status: 'not_approved' },
-  { pattern: /\bparaffinum liquidum\b/i, reason: 'Mineral oil (INCI name) — causes buildup', category: 'wax', status: 'not_approved' },
+  { pattern: /\bpetrolatum\b/i, reason: 'Petroleum-based  -  causes buildup', category: 'wax', status: 'not_approved' },
+  { pattern: /\bparaffinum liquidum\b/i, reason: 'Mineral oil (INCI name)  -  causes buildup', category: 'wax', status: 'not_approved' },
 ]
 
 const CAUTION_RULES: IngredientRule[] = [
   // Water-soluble silicones (some CGM followers avoid all silicones)
-  { pattern: /\bpeg-.*dimethicone\b/i, reason: 'Water-soluble silicone — generally considered okay for CGM', category: 'silicone_ws', status: 'caution' },
+  { pattern: /\bpeg-.*dimethicone\b/i, reason: 'Water-soluble silicone  -  generally considered okay for CGM', category: 'silicone_ws', status: 'caution' },
   { pattern: /\bppg-.*dimethicone\b/i, reason: 'Water-soluble silicone', category: 'silicone_ws', status: 'caution' },
   { pattern: /\bbis-peg.*dimethicone\b/i, reason: 'Water-soluble silicone', category: 'silicone_ws', status: 'caution' },
 
-  // Commonly confused — educate users
-  { pattern: /\bbehentrimonium methosulfate\b/i, reason: 'NOT a sulfate — this is a gentle conditioning agent and is CG-approved', category: 'safe', status: 'caution' },
+  // Commonly confused  -  educate users
+  { pattern: /\bbehentrimonium methosulfate\b/i, reason: 'NOT a sulfate  -  this is a gentle conditioning agent and is CG-approved', category: 'safe', status: 'caution' },
 
-  // Gentle sulfate — okay for clarifying
-  { pattern: /\bsodium coco[- ]?sulfate\b/i, reason: 'Gentle sulfate — milder than SLS. Acceptable for clarifying use', category: 'gentle_sulfate', status: 'caution' },
+  // Gentle sulfate  -  okay for clarifying
+  { pattern: /\bsodium coco[- ]?sulfate\b/i, reason: 'Gentle sulfate  -  milder than SLS. Acceptable for clarifying use', category: 'gentle_sulfate', status: 'caution' },
 ]
 
-// Humectants — beneficial ingredients the guide highlights
+// Humectants  -  beneficial ingredients the guide highlights
 const HUMECTANT_PATTERNS: RegExp[] = [
   /\bglycerin\b/i, /\bvegetable glycerin\b/i,
   /\bhoney\b/i,
@@ -79,7 +79,7 @@ const HUMECTANT_PATTERNS: RegExp[] = [
   /\bagave\b/i,
 ]
 
-// Film-forming humectants — great for low dew points
+// Film-forming humectants  -  great for low dew points
 const FILM_FORMING_PATTERNS: RegExp[] = [
   /\bflaxseed\b/i, /\blinum usitatissimum\b/i,
   /\bhydroxyethylcellulose\b/i,
@@ -91,7 +91,7 @@ const FILM_FORMING_PATTERNS: RegExp[] = [
   /\bokra\b/i,
 ]
 
-// Protein patterns — for protein-moisture balance tracking
+// Protein patterns  -  for protein-moisture balance tracking
 const PROTEIN_PATTERNS: { pattern: RegExp; type: string }[] = [
   { pattern: /\bhydrolyzed\b.*\bkeratin\b/i, type: 'keratin' },
   { pattern: /\bhydrolyzed\b.*\bsilk\b/i, type: 'silk' },

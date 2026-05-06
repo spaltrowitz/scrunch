@@ -13,22 +13,22 @@ export const CURL_PATTERNS: { value: CurlPattern; label: string; description: st
 ]
 
 export const POROSITY_OPTIONS: { value: Porosity; label: string; description: string; characteristics: string[] }[] = [
-  { value: 'low', label: 'Low', description: 'Hair resists absorbing moisture — products sit on top', characteristics: [
+  { value: 'low', label: 'Low', description: 'Hair resists absorbing moisture  -  products sit on top', characteristics: [
     'Water beads up on hair instead of absorbing',
     'Takes a long time to get fully wet and even longer to dry',
     'Products tend to build up quickly',
     'Shiny, smooth-feeling strands',
     'Resistant to chemical treatments (dye, relaxer)',
   ] },
-  { value: 'medium', label: 'Medium', description: 'Hair absorbs and retains moisture well — easy to work with', characteristics: [
+  { value: 'medium', label: 'Medium', description: 'Hair absorbs and retains moisture well  -  easy to work with', characteristics: [
     'Hair gets wet fairly quickly and dries in a few hours',
     'Holds styles well and responds to products predictably',
     'Takes color as expected',
     'Generally healthy-looking with some shine',
   ] },
-  { value: 'high', label: 'High', description: 'Hair absorbs fast but loses moisture quickly — needs sealing', characteristics: [
+  { value: 'high', label: 'High', description: 'Hair absorbs fast but loses moisture quickly  -  needs sealing', characteristics: [
     'Gets wet immediately and may dry very fast',
-    'Soaks in products quickly — may feel like nothing is "enough"',
+    'Soaks in products quickly  -  may feel like nothing is "enough"',
     'Tangles easily, feels rough or bumpy',
     'Can look dull or feel dry',
     'May be from damage (heat, bleach, chemical treatments) or genetics',
@@ -57,9 +57,9 @@ export const PRODUCT_CATEGORY_LABELS: Record<ProductCategory, string> = {
 
 export const PRODUCT_CATEGORY_DESCRIPTIONS: Record<ProductCategory, string> = {
   clarifying_shampoo: 'Contains sulfates to remove buildup. Use as your first wash when starting CG, then infrequently as needed.',
-  dry_shampoo: 'Powder or spray that absorbs oil between wash days. Extends time between washes. Check ingredients — many contain non-CG alcohols or silicones.',
+  dry_shampoo: 'Powder or spray that absorbs oil between wash days. Extends time between washes. Check ingredients  -  many contain non-CG alcohols or silicones.',
   low_poo: 'Gentle, sulfate-free shampoo. Good for low porosity, fine hair, and loose curls that need cleansing without stripping.',
-  co_wash: 'Conditioner-based cleansing — replaces shampoo in the CG method. Great for high porosity, coarse, and tight curls.',
+  co_wash: 'Conditioner-based cleansing  -  replaces shampoo in the CG method. Great for high porosity, coarse, and tight curls.',
   rinse_out_conditioner: 'Standard conditioner for detangling and moisture. Almost everyone benefits from these. Can double as co-wash or leave-in.',
   deep_conditioner: 'Intensive treatment applied for minutes to an hour. Best for high porosity, damaged, or dry-climate hair. May contain protein.',
   leave_in_conditioner: 'Applied after washing, not rinsed out. Adds lasting moisture without hold. Also called "milks" or "sprays."',
@@ -67,10 +67,10 @@ export const PRODUCT_CATEGORY_DESCRIPTIONS: Record<ProductCategory, string> = {
   gel: '#1 recommended styler! Provides hold, increases definition, and reduces frizz. Don\'t forget to scrunch out the crunch (SOTC).',
   mousse: 'Lightweight alternative to gel. Great for low porosity, fine, or low density hair. Softer look than gel.',
   custard: 'Jelly-like texture that provides hold similar to gel. Some work as "one and done" stylers. Curl enhancers promote tighter curls.',
-  oil_serum: 'Used to seal moisture (SOTC) or as a pre-poo. Look for pure, cold-pressed oils. Always check labels — many contain silicones.',
+  oil_serum: 'Used to seal moisture (SOTC) or as a pre-poo. Look for pure, cold-pressed oils. Always check labels  -  many contain silicones.',
   spray_refresher: 'Revives curls between wash days or provides flexible hold. Virtually weightless.',
   protein_treatment: 'Helps curls "bounce back." Best for high porosity, fine, or damaged hair. Use when curls feel mushy or lack elasticity.',
-  scalp_treatment: 'Products specifically targeting scalp health — dryness, flakiness, irritation, or buildup.',
+  scalp_treatment: 'Products specifically targeting scalp health  -  dryness, flakiness, irritation, or buildup.',
   scalp_care: 'Scalp treatments, oils, and serums that nourish and support a healthy scalp environment.',
   bond_repair: 'Bond-building treatments that repair broken disulfide bonds in hair damaged by heat, color, or chemical processing.',
 }
@@ -155,7 +155,7 @@ export const SENSITIVITIES = [
 
 export const SCALP_TYPE_OPTIONS: { value: ScalpType; label: string; description: string }[] = [
   { value: 'dry', label: 'Dry', description: 'Tight, flaky, or itchy scalp' },
-  { value: 'normal', label: 'Normal', description: 'Balanced — not too oily, not too dry' },
+  { value: 'normal', label: 'Normal', description: 'Balanced  -  not too oily, not too dry' },
   { value: 'oily', label: 'Oily', description: 'Gets greasy quickly, especially at the roots' },
 ]
 
@@ -193,13 +193,13 @@ export const WORKOUT_FREQUENCY_OPTIONS: { value: WorkoutFrequency; label: string
 ]
 
 export const FRAGRANCE_PREFERENCE_OPTIONS: { value: FragrancePreference; label: string }[] = [
-  { value: 'love_it', label: 'Love it — bring on the scents' },
+  { value: 'love_it', label: 'Love it  -  bring on the scents' },
   { value: 'no_preference', label: 'No preference' },
   { value: 'fragrance_free', label: 'Prefer fragrance-free' },
 ]
 
 export const WATER_TYPE_OPTIONS: { value: WaterType; label: string; description: string }[] = [
-  { value: 'hard', label: 'Hard water', description: 'Leaves mineral buildup — you may need chelating shampoo' },
+  { value: 'hard', label: 'Hard water', description: 'Leaves mineral buildup  -  you may need chelating shampoo' },
   { value: 'soft', label: 'Soft water', description: 'Low mineral content' },
   { value: 'unknown', label: 'Not sure', description: 'Check with your local water utility' },
 ]

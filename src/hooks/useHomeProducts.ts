@@ -4,7 +4,7 @@ import type { Product } from '../lib/database.types'
 import { SEED_PRODUCTS } from '../data/seedProducts'
 import { seedToProduct } from './useProducts'
 
-// Lightweight select — only columns needed for homepage product cards
+// Lightweight select  -  only columns needed for homepage product cards
 const HOME_PRODUCT_SELECT = 'id,brand,name,category,cg_status,image_url,cruelty_free'
 
 // Pre-computed placeholder from bundled seed data (renders instantly, no async)

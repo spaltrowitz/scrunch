@@ -19,7 +19,7 @@ export interface IngredientScore {
 /** Map of normalized ingredient → rarity weight (≥1.0; higher = rarer) */
 export type IngredientRarityMap = Map<string, number>
 
-// Filler ingredients that appear in almost every product — ignore for matching
+// Filler ingredients that appear in almost every product  -  ignore for matching
 // Note: glycerin, aloe, and panthenol are intentionally NOT in this list
 // because they are beneficial humectants that differentiate product quality
 const FILLER_INGREDIENTS = new Set([

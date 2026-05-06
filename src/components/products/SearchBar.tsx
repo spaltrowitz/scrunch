@@ -24,6 +24,7 @@ export function SearchBar({ search, onSearchChange, suggestions }: SearchBarProp
     <div ref={searchRef} className="relative mb-4">
       <input
         type="text"
+        aria-label="Search products"
         placeholder="Search by brand or product name..."
         value={search}
         onChange={(e) => { onSearchChange(e.target.value); setShowSuggestions(true) }}

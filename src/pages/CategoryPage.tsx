@@ -20,7 +20,7 @@ function categoryToSlug(cat: ProductCategory): string {
 export function CategoryPage() {
   const { slug } = useParams<{ slug: string }>()
   const category = slug ? SLUG_TO_CATEGORY[slug] : undefined
-  const { data } = useCatalogProducts()
+  const { data, isLoading, isError } = useCatalogProducts()
   const products = useMemo(() => data?.products ?? [], [data])
 
   const categoryProducts = useMemo(
@@ -43,6 +43,38 @@ export function CategoryPage() {
       <div className="max-w-3xl mx-auto px-4 py-16 text-center">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">Category not found</h1>
         <p className="text-gray-600 mb-6">We couldn't find that product category.</p>
+        <Link to="/products" className="text-violet-600 hover:text-violet-700 font-medium">
+          Browse all products →
+        </Link>
+      </div>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <div className="max-w-5xl mx-auto px-4 py-16 text-center">
+        <p className="text-gray-500">Loading products...</p>
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-16 text-center">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Something went wrong</h1>
+        <p className="text-gray-600 mb-6">We couldn't load products right now. Please try again later.</p>
+        <Link to="/products" className="text-violet-600 hover:text-violet-700 font-medium">
+          Browse all products →
+        </Link>
+      </div>
+    )
+  }
+
+  if (categoryProducts.length === 0) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-16 text-center">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">No {label} products yet</h1>
+        <p className="text-gray-600 mb-6">We haven't added any products in this category yet. Check back soon!</p>
         <Link to="/products" className="text-violet-600 hover:text-violet-700 font-medium">
           Browse all products →
         </Link>

@@ -59,7 +59,7 @@ export function Home() {
               Paste a product label and instantly find out if it's curl-safe - no guesswork, no Googling.
             </p>
             <Link
-              to="/ingredients"
+              to="/ingredient-checker"
               className="inline-flex items-center justify-center w-full md:w-auto text-sm md:text-xs px-4 md:px-3 py-3 md:py-2 min-h-[44px] md:min-h-0 rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors mt-auto"
             >
               Try Ingredient Checker →
