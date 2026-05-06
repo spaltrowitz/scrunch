@@ -42,8 +42,9 @@ export function useProductRating(productId: string | null) {
 
       if (error?.code === 'PGRST116') return null
       if (error) throw error
-      if (!data || data.rating == null) return null
-      return { rating: numericToTried(data.rating), notes: data.results_notes }
+      const row = data as { rating: number; results_notes: string | null } | null
+      if (!row || row.rating == null) return null
+      return { rating: numericToTried(row.rating), notes: row.results_notes }
     },
     staleTime: 5 * 60 * 1000,
   })
