@@ -2,54 +2,34 @@
 
 ## Key Patterns & Corrections
 
-### Homepage Evolution
-- **Discovery-first redesign:** Rewrote Home.tsx from hero-centric marketing to product browser with category grid, sticky filter bar, product cards.
-- **Prose-inspired redesign:** Full rewrite to full-viewport hero, 3 narrative feature sections (alternating layout), 6-product teaser grid. Removed: sticky filter bar, category grid, persona pills, old feature cards, 12-product grid, all filter state. Page: ~2.5 scroll heights (was ~5-6).
-- **Homepage declutter:** Top 6 categories (by popularity) with "Show all" toggle, 12 products (was 40), persona pills moved below categories with toned-down styling.
-- **HairTok section:** "Trending on #HairTok" between products and closer. Filters by `notes` field, fallback to hardcoded names. Featured creators as text-only cards (legal: no embeds/images).
-- **`useHomeProducts()`** is homepage-specific hook (7 columns, 20 rows, placeholderData) — never use `useProducts()` on homepage.
+### Homepage & Component Evolution (pattern summary)
+- **Homepage progression:** Discovery-first → Prose-inspired → Progressive disclosure (declutter) → Education-first enrichment (How It Works, Why Scrunch)
+- **Pattern:** Full page rewrites maintain Home.tsx ~150-200 lines by using inline JSX for sections, leveraging existing pattern library (cards, grids, gradients)
+- **Latest enrichment (2026-05-06):** Enhanced hero sub-heading, 3-step "How It Works" explainer, 3-card "Why Scrunch?" differentiation section, HairTok repositioned after education (section order: Hero → How It Works → Why Scrunch? → HairTok)
+- **Related:** `useHomeProducts()` homepage-specific hook (7 cols, 20 rows, placeholderData). Never use `useProducts()` on homepage.
 
-### Component Architecture
-- **Performance decomposition:** Extracted `SearchBar`, `FilterPanel`, `ProductCard` from Products.tsx (661→~280 lines). `ProductCard` wrapped in `React.memo`.
-- **"Show More" pagination:** `useState(PRODUCTS_PER_PAGE)` + `.slice(0, visibleCount)` — reset when filters change.
-- **Module-level constants:** `EMPTY_SET` avoids per-render allocations for default props.
-- **`useProducts()` returns `{ products, isFallback }`** — all consumers updated. Fallback banner when Supabase down.
+### Component Architecture & Performance (pattern summary)
+- **Performance decomposition:** Extract from monolithic files (Products.tsx 661→280 lines example), wrap extracted components in `React.memo` for isolated re-renders
+- **Pagination:** `useState(PRODUCTS_PER_PAGE)` + `.slice(0, visibleCount)`, reset on filter change
+- **Module-level constants:** `EMPTY_SET` avoids per-render allocations. `PRODUCT_CATEGORY_LABELS` in `lib/constants.ts` is canonical
+- **Fallback handling:** `useProducts()` returns `{ products, isFallback }`. Fallback banner when Supabase down. `SEED_PRODUCTS` as fallback data
 
-### React Patterns
-- **setState-in-effect fix:** Render-time sync (track previous value, compare during render). Idiomatic replacement for "sync external data" effects.
-- **Fast refresh:** Provider in `.tsx`, hook in `.utils.ts` — separate files.
-- **Dependency array instability:** `data?.y ?? []` creates new arrays every render — `useMemo`.
-- **React Query `placeholderData`:** Function using `queryClient.getQueryData()` to search all caches for instant navigation.
-- **Auth loading gate:** Never return null from route wrapper — `animate-pulse bg-gray-50` placeholder.
+### React Patterns & UX Standards (pattern summary)
+- **setState-in-effect fix:** Render-time sync (track previous value, compare during render)
+- **Dependency array instability:** `data?.y ?? []` creates new arrays — use `useMemo`
+- **React Query `placeholderData`:** Function using `queryClient.getQueryData()` for instant navigation
+- **Auth loading gate:** Never return null — use `animate-pulse bg-gray-50` placeholder
+- **Toast system:** Context + hook, success/error/info, auto-dismiss 4s, bottom-right desktop / bottom-center mobile
+- **UX pattern:** 44px touch targets, `grid-cols-1 md:grid-cols-3` responsive grids, text wrapping (`break-words` / `truncate` / `line-clamp-N`), mobile-first padding (`px-4`)
+- **Copy convention:** No CGM jargon ("Curl Safety" not "CG status"), no em dashes, friendly empty states with icons, soft CTA language
 
-### Toast Notification System
-- Created `useToast.tsx` (context + hook) and `ToastContainer.tsx`. Types: success/error/info, auto-dismiss 4s. Bottom-right desktop, bottom-center mobile.
-- Wired to all 7 `useMutation` calls across ProductDetail, Products, Recommendations, OnboardingWizard.
-- **Convention:** All future mutations must include success/error toast.
+### Toast Convention & Mobile Polish (standards)
+- All `useMutation` calls require success/error toast
+- Mobile CTAs: full-width with 44px min-height. Desktop: compact inline
+- Category cards sorted by popularity. Persona pills toned down
+- ProductPlaceholder: "No image" (don't promise timeline)
+- Community: collapsible textarea, fadeIn animation, ↗ external-link icons
 
-### UX Polish
-- **Hero copy:** Removed CGM jargon ("CG status" → "Curl Safety"). CG badges: "CG ✓" → "Curl Safe ✓".
-- **Categories sorted by popularity** (product count descending).
-- **Persona quick-start pills:** Newbie → ingredient checker, Scanner → curl-safe products, Optimizer → browse all.
-- **ProductPlaceholder:** "Image coming soon" → "No image" (don't promise timeline).
-- **Community page:** Collapsible textarea after search, `fadeIn` animation for results, ↗ icon for external links.
-- **Products empty state:** 🔍 icon, friendlier copy, violet "Clear all filters" button.
-- **Mobile CTAs:** Full-width with 44px min-height on mobile, compact inline on desktop.
-
-### Mobile & Responsive
-- **44px touch targets** on all interactive elements (`min-h-[44px]`, `py-2.5` on inputs).
-- **Rating buttons:** `grid grid-cols-2 sm:grid-cols-4 gap-2` for wrapping on narrow screens.
-- **Footer links:** `flex-wrap` for 320px screens.
-- **Stack pattern:** `flex-col sm:flex-row` for layouts that overflow on mobile.
-- **ProductCard actions:** Removed `pl-20` indent on mobile (`pl-0 sm:pl-20`).
-
-### Codebase Knowledge
-- `SEED_PRODUCTS` as fallback when Supabase empty — both paths handled.
-- `ProductImage` handles brand-color placeholders — reuse everywhere.
-- `PRODUCT_CATEGORY_LABELS` in `lib/constants.ts` is canonical source.
-- Sticky filter bar: `top-16` accounts for 64px header.
-- `useProductImage` has `enabled` flag + IntersectionObserver — images fetch only when visible.
-- localStorage persistence: `scrunch_profile`, `scrunch_ratings`, `scrunch_actions`, `scrunch_notes`.
 
 ## Cross-Project Frontend Knowledge (injected 2026-05-02)
 
