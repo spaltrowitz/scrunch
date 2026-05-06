@@ -85,3 +85,13 @@
 ## Session Archive Summary
 
 Frenchy completed 12+ sessions: homepage redesign (discovery-first → Prose-inspired), performance decomposition (Products.tsx 661→280 lines), ProductPlaceholder tooltip, toast notification system (7 mutations wired), Jan's UX recommendations (10/13 implemented), homepage declutter, HairTok section, community page polish, beta UX fixes (empty state, mobile CTAs), lint fixes (setState-in-effect, fast refresh, exhaustive-deps), and copy/visual polish passes. All sessions maintained 26/26 tests green.
+
+## Learnings
+
+### SEO & Landing Pages (2026 session)
+- **SPA SEO limitations:** HashRouter means Google won't deeply index hash-fragment routes. JSON-LD structured data in `index.html` helps surface the app in search results as a WebApplication + FAQPage.
+- **Category landing pages:** Created `CategoryPage.tsx` with route `/category/:slug`. Slugs are auto-derived from `ProductCategory` keys (underscores → hyphens). Reuses `useCatalogProducts()` hook.
+- **Dynamic page titles:** `usePageTitle` hook in `src/hooks/usePageTitle.ts` — route-based title map with override support. Wired globally via `PageTitleUpdater` component inside `AppRoutes`. ProductDetail and CategoryPage use override for dynamic titles.
+- **Products page deep links:** Added `useSearchParams` to Products.tsx so `?category=curl_cream` pre-selects the filter. CategoryPage CTA links to this.
+- **`ProductImage` component signature:** Takes `{ brand, name, seedImageUrl, category, className }` — not a product object. `seedImageUrl` maps to product's `image_url` field.
+- **Vite base path:** `base: '/scrunch/'` in vite.config.ts — all absolute URLs in meta tags must include this prefix.

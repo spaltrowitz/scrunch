@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useSearchParams } from 'react-router-dom'
 import type { ProductCategory, Product, ProductReview } from '../lib/database.types'
 import { RequestProductForm } from '../components/products/RequestProductForm'
 import { SearchBar } from '../components/products/SearchBar'
@@ -68,7 +69,11 @@ export function Products() {
   const loading = !data
   const userId = user?.id
   const [search, setSearch] = useState('')
-  const [selectedCategories, setSelectedCategories] = useState<Set<ProductCategory>>(new Set())
+  const [searchParams] = useSearchParams()
+  const initialCategory = searchParams.get('category') as ProductCategory | null
+  const [selectedCategories, setSelectedCategories] = useState<Set<ProductCategory>>(
+    () => initialCategory ? new Set([initialCategory]) : new Set()
+  )
   const [showApprovedOnly, setShowApprovedOnly] = useState(false)
   const [showGoodPlus, setShowGoodPlus] = useState(false)
   const [brandFilter, setBrandFilter] = useState('')

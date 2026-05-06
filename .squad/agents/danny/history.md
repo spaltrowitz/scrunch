@@ -60,3 +60,26 @@
 ## Session Archive Summary
 
 Danny completed 10+ sessions: product image sourcing across 3 phases (28→52→64 URLs applied, reaching ~98% coverage), backend performance fixes (count queries, O(n) dedup, Reddit parallelization), Supabase fallback diagnosis (status_conflict column), community search relevance redesign (domain-aware extraction, multi-query strategy, honest labeling, fallback UI), instant render optimization (placeholderData + staleTime across all hooks, removed loading gates), HairTok product catalog expansion (2 batches, 10 new products, 2 new categories), and product categorization audit (7 recategorized, 1 duplicate removed).
+
+## Learnings
+
+### Community Search v2 Improvements
+- **Stem-based scoring:** `simpleStem()` strips common suffixes (ing/ed/s/tion/etc). Scoring now uses exact word matches (×100), stem matches (×50), and snippet stem matches (×10). "protein" now matches "proteins", "proteining", etc.
+- **Highlight matching terms:** `HighlightedText` component wraps stem-matched words in `<mark>` tags in result titles and snippets. Uses `useMemo` to avoid re-computing on every render.
+- **Debounced auto-search:** 1.2s debounce on textarea input (only triggers at ≥10 chars). Long delay avoids Reddit rate limits while still feeling responsive. `clearTimeout` on submit and unmount.
+- **Browse categories:** 10 topic pills (Products, Techniques, Ingredients, Haircuts, Curl Types, Porosity, Routine, Weather, Transitioning, Scalp Care) with pre-baked search terms.
+- **Trending topics:** 6 curated trending queries shown in gradient cards before first search.
+- **No results recovery:** Now shows the original query text, plus 5 quick-browse category pills alongside existing subreddit links.
+- **Result count:** Total result count shown in page header after searches.
+- **Pattern:** `runSearch` extracted as `useCallback` so categories/trending/debounce all share one code path.
+
+## Learnings
+
+### Auth Rating Persistence (2026-05-03)
+- **Existing state:** Products.tsx and Recommendations.tsx already had inline Supabase mutations for logged-in users + localStorage fallback. ProductDetail.tsx was auth-only (no guest rating).
+- **Created `src/hooks/useProductRatings.ts`:** Three centralized hooks — `useProductRating(productId)`, `useRatingMutation()`, `useDeleteRating()`. Each checks auth state: Supabase if logged in, localStorage if not. Cache invalidation covers `product-rating`, `product-reviews`, `reviews`, and `review-count` query keys.
+- **Created `src/hooks/useMigrateLocalRatings.ts`:** Runs once on first login via `useEffect`. Reads `scrunch_ratings` from localStorage, filters for valid UUIDs (skips brand::name keys from seed products), bulk-upserts with `ignoreDuplicates: true` (server wins on conflict). Clears localStorage after success. Shows toast with count. Uses `scrunch_ratings_migrated` localStorage flag to prevent re-runs.
+- **Wired migration in `App.tsx`:** `MigrationRunner` component sits inside AuthProvider + ToastProvider, runs automatically.
+- **Updated `ProductDetail.tsx`:** Rating section now visible for both guests and logged-in users. Guest ratings save to localStorage. Shows "Create an account" nudge for guests. `submitRating` branches on auth state.
+- **Key pattern:** `ignoreDuplicates: true` on Supabase upsert = server wins (existing reviews preserved). Different from `onConflict` + update which would overwrite.
+- **Lesson:** The `product_reviews` insert type requires `photo_urls: []` to be passed explicitly (not optional in the generated types), even though the DB has a default.

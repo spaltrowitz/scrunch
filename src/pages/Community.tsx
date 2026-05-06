@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 
 interface RedditResult {
   title: string
@@ -165,6 +165,68 @@ function stripMarkdown(text: string): string {
     .trim()
 }
 
+const BROWSE_CATEGORIES = [
+  { label: '🧴 Products', terms: 'best product recommendations' },
+  { label: '💆 Techniques', terms: 'styling technique method' },
+  { label: '🧬 Ingredients', terms: 'protein moisture ingredients' },
+  { label: '✂️ Haircuts', terms: 'haircut layers deva cut rezo' },
+  { label: '🌀 Curl Types', terms: 'curl pattern type 2a 2b 3a 3b 3c' },
+  { label: '💧 Porosity', terms: 'low porosity high porosity' },
+  { label: '🔄 Routine', terms: 'wash day routine refresh' },
+  { label: '🌡️ Weather', terms: 'humidity frizz weather' },
+  { label: '🆕 Transitioning', terms: 'transitioning natural curly girl method beginner' },
+  { label: '🩺 Scalp Care', terms: 'scalp dandruff buildup clarifying' },
+] as const
+
+const TRENDING_TOPICS = [
+  'rice water rinse results',
+  'bond repair vs protein treatment',
+  'best diffuser technique for volume',
+  'low porosity deep conditioning tips',
+  'CGM for wavy hair — modified routine',
+  'flaxseed gel DIY recipe',
+] as const
+
+function simpleStem(word: string): string {
+  if (word.length <= 3) return word
+  return word
+    .replace(/(?:ing|tion|ness|ment|able|ible|ful|less|ous|ive|ize|ise|ify|ated?|er|est|ly|ed|es|s)$/, '')
+    || word
+}
+
+function highlightTerms(text: string, terms: string[]): Array<string | { highlighted: string }> {
+  if (!terms.length) return [text]
+  const stems = terms.map(t => simpleStem(t.toLowerCase())).filter(s => s.length >= 2)
+  if (!stems.length) return [text]
+
+  const pattern = stems.map(s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')
+  const regex = new RegExp(`(\\b(?:${pattern})\\w*)`, 'gi')
+  const parts: Array<string | { highlighted: string }> = []
+  let lastIndex = 0
+
+  for (const match of text.matchAll(regex)) {
+    const idx = match.index ?? 0
+    if (idx > lastIndex) parts.push(text.slice(lastIndex, idx))
+    parts.push({ highlighted: match[0] })
+    lastIndex = idx + match[0].length
+  }
+  if (lastIndex < text.length) parts.push(text.slice(lastIndex))
+  return parts
+}
+
+function HighlightedText({ text, terms }: { text: string; terms: string[] }) {
+  const parts = useMemo(() => highlightTerms(text, terms), [text, terms])
+  return (
+    <>
+      {parts.map((part, i) =>
+        typeof part === 'string'
+          ? <span key={i}>{part}</span>
+          : <mark key={i} className="bg-violet-100 text-violet-900 rounded-sm px-0.5">{part.highlighted}</mark>
+      )}
+    </>
+  )
+}
+
 async function searchReddit(query: string): Promise<SearchResponse> {
   const { primary, fallback } = extractSearchTerms(query)
   const subreddits = ['curlyhair', 'curlygirl', 'wavyhair']
@@ -216,12 +278,23 @@ async function searchReddit(query: string): Promise<SearchResponse> {
   const withComments = deduped.filter(r => r.num_comments > 0)
   const pool = withComments.length >= 3 ? withComments : deduped
 
-  // Score and rank results
+  // Score and rank results — stem-aware partial matching
   const searchWords = primary.toLowerCase().split(/\s+/)
+  const searchStems = searchWords.map(w => simpleStem(w)).filter(s => s.length >= 2)
   const scored = pool.map(r => {
     const titleLower = r.title.toLowerCase()
-    const titleMatches = searchWords.filter(w => titleLower.includes(w)).length
-    const boost = titleMatches * 100
+    const titleWords = titleLower.split(/\s+/)
+    const titleStems = titleWords.map(w => simpleStem(w))
+
+    // Exact word matches in title (strongest signal)
+    const exactMatches = searchWords.filter(w => titleLower.includes(w)).length
+    // Stem matches (catches "protein" → "proteins", "curl" → "curling")
+    const stemMatches = searchStems.filter(s => titleStems.some(ts => ts === s || ts.startsWith(s))).length
+    // Snippet stem matches (weaker signal)
+    const snippetStems = r.snippet.toLowerCase().split(/\s+/).map(w => simpleStem(w))
+    const snippetMatches = searchStems.filter(s => snippetStems.some(ss => ss === s || ss.startsWith(s))).length
+
+    const boost = exactMatches * 100 + stemMatches * 50 + snippetMatches * 10
     const commentScore = Math.min(r.num_comments, 50) * 2
     return { result: r, rank: boost + commentScore }
   })
@@ -298,13 +371,11 @@ export function Community() {
   const [loading, setLoading] = useState(false)
   const [history, setHistory] = useState<CommunityQuestion[]>([])
   const [showSearchBox, setShowSearchBox] = useState(true)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const handleAsk = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!question.trim()) return
-
+  const runSearch = useCallback(async (q: string) => {
+    if (!q.trim()) return
     setLoading(true)
-    const q = question.trim()
     setQuestion('')
 
     const { results: redditResults, status, searchTerms } = await searchReddit(q)
@@ -312,7 +383,7 @@ export function Community() {
 
     const newQ: CommunityQuestion = {
       id: Date.now().toString(),
-      question: q,
+      question: q.trim(),
       aiAnswer,
       redditResults,
       searchStatus: status,
@@ -323,11 +394,39 @@ export function Community() {
     setHistory(prev => [newQ, ...prev])
     setLoading(false)
     setShowSearchBox(false)
+  }, [])
+
+  const handleAsk = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    runSearch(question)
   }
+
+  // Debounced auto-search: fire after 1.2s of inactivity (long enough to avoid mid-typing hits)
+  const handleInputChange = useCallback((value: string) => {
+    setQuestion(value)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    if (value.trim().length >= 10) {
+      debounceRef.current = setTimeout(() => runSearch(value), 1200)
+    }
+  }, [runSearch])
+
+  useEffect(() => {
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
+  }, [])
+
+  const totalResults = history.reduce((sum, h) => sum + h.redditResults.length, 0)
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">Community</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-2">
+        Community
+        {totalResults > 0 && (
+          <span className="ml-2 text-sm font-normal text-gray-400">
+            {totalResults} result{totalResults !== 1 ? 's' : ''} found
+          </span>
+        )}
+      </h1>
       <p className="text-gray-600 mb-8">
         Ask anything about curly or wavy hair. We'll search the top Reddit communities for real answers.
       </p>
@@ -339,7 +438,7 @@ export function Community() {
             <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
               <textarea
                 value={question}
-                onChange={(e) => setQuestion(e.target.value)}
+                onChange={(e) => handleInputChange(e.target.value)}
                 placeholder="Ask a question... e.g., 'Best gel for 3B low porosity hair?' or 'How often should I deep condition?'"
                 className="w-full h-24 border-0 resize-none text-sm focus:outline-none placeholder-gray-400"
               />
@@ -358,29 +457,64 @@ export function Community() {
             </div>
           </form>
 
-          {/* Suggested questions — only before first search */}
+          {/* Default browsing state — categories, trending, popular questions */}
           {history.length === 0 && !loading && (
-            <div className="mb-8">
-              <h3 className="text-sm font-medium text-gray-700 mb-3">Popular questions</h3>
-              <div className="grid gap-2">
-                {[
-                  'Best gel for fine curly hair?',
-                  'How to fix protein overload?',
-                  'Curly girl method for beginners — where to start?',
-                  'Low porosity hair — what products actually work?',
-                  'How to refresh day 2 curls?',
-                  'Sulfate-free shampoo recommendations?',
-                ].map((q, i) => (
-                  <button
-                    key={i}
-                    onClick={() => { setQuestion(q); }}
-                    className="text-left text-sm px-4 py-3 min-h-[44px] bg-white rounded-lg border border-gray-200 hover:border-violet-300 text-gray-700 cursor-pointer transition"
-                  >
-                    {q}
-                  </button>
-                ))}
+            <>
+              {/* Browse by category */}
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-gray-700 mb-3">Browse by topic</h3>
+                <div className="flex flex-wrap gap-2">
+                  {BROWSE_CATEGORIES.map((cat, i) => (
+                    <button
+                      key={i}
+                      onClick={() => runSearch(cat.terms)}
+                      className="text-sm px-3 py-2 min-h-[44px] bg-white rounded-full border border-gray-200 hover:border-violet-300 hover:bg-violet-50 text-gray-700 cursor-pointer transition"
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+
+              {/* Trending topics */}
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-gray-700 mb-3">🔥 Trending topics</h3>
+                <div className="grid gap-2">
+                  {TRENDING_TOPICS.map((topic, i) => (
+                    <button
+                      key={i}
+                      onClick={() => { setQuestion(topic); runSearch(topic); }}
+                      className="text-left text-sm px-4 py-3 min-h-[44px] bg-gradient-to-r from-violet-50 to-pink-50 rounded-lg border border-violet-100 hover:border-violet-300 text-gray-700 cursor-pointer transition"
+                    >
+                      🔥 {topic}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Popular questions */}
+              <div className="mb-8">
+                <h3 className="text-sm font-medium text-gray-700 mb-3">Popular questions</h3>
+                <div className="grid gap-2">
+                  {[
+                    'Best gel for fine curly hair?',
+                    'How to fix protein overload?',
+                    'Curly girl method for beginners — where to start?',
+                    'Low porosity hair — what products actually work?',
+                    'How to refresh day 2 curls?',
+                    'Sulfate-free shampoo recommendations?',
+                  ].map((q, i) => (
+                    <button
+                      key={i}
+                      onClick={() => { setQuestion(q); }}
+                      className="text-left text-sm px-4 py-3 min-h-[44px] bg-white rounded-lg border border-gray-200 hover:border-violet-300 text-gray-700 cursor-pointer transition"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
           )}
         </>
       ) : (
@@ -434,13 +568,27 @@ export function Community() {
             {item.searchStatus === 'no_results' && (
               <div className="px-6 py-6">
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
-                  <p className="text-sm font-medium text-amber-800 mb-1">🔍 No results found</p>
+                  <p className="text-sm font-medium text-amber-800 mb-1">🔍 No results found for "{item.question}"</p>
                   <p className="text-sm text-amber-700 mb-2">We searched across all three curly hair communities but didn't find matching discussions.</p>
                   <ul className="text-sm text-amber-700 list-disc list-inside space-y-0.5">
                     <li>Try different keywords (e.g., "frizz" instead of "frizzy hair problems")</li>
                     <li>Check spelling of product or ingredient names</li>
                     <li>Use shorter, more specific terms</li>
                   </ul>
+                </div>
+                <div className="mb-4">
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Try a related topic</p>
+                  <div className="flex flex-wrap gap-2">
+                    {BROWSE_CATEGORIES.slice(0, 5).map((cat, i) => (
+                      <button
+                        key={i}
+                        onClick={() => runSearch(cat.terms)}
+                        className="text-xs px-3 py-2 min-h-[44px] rounded-full bg-violet-50 text-violet-700 border border-violet-200 hover:bg-violet-100 cursor-pointer transition"
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 <SubredditLinks searchTerms={item.searchTerms} />
                 <AskCommunityPrompt />
@@ -478,11 +626,13 @@ export function Community() {
                         </div>
                         <div className="min-w-0">
                           <p className="text-sm font-medium text-gray-900 leading-tight">
-                            {result.title} <span className="text-gray-400 text-xs" aria-label="opens on Reddit">↗</span>
+                            <HighlightedText text={result.title} terms={item.searchTerms.split(/\s+/)} /> <span className="text-gray-400 text-xs" aria-label="opens on Reddit">↗</span>
                           </p>
                           <p className="text-xs text-violet-500 mt-0.5">{result.subreddit}</p>
                           {result.snippet && (
-                            <p className="text-xs text-gray-500 mt-1 line-clamp-2">{result.snippet}</p>
+                            <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                              <HighlightedText text={result.snippet} terms={item.searchTerms.split(/\s+/)} />
+                            </p>
                           )}
                         </div>
                       </div>

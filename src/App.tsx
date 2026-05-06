@@ -7,6 +7,8 @@ import { Header } from './components/layout/Header'
 import { Footer } from './components/layout/Footer'
 import { ToastProvider } from './hooks/useToast'
 import { ToastContainer } from './components/ui/ToastContainer'
+import { usePageTitle } from './hooks/usePageTitle'
+import { useMigrateLocalRatings } from './hooks/useMigrateLocalRatings'
 
 const PAGE_PLACEHOLDER = <div className="flex-1 animate-pulse bg-gray-50" />
 
@@ -24,6 +26,7 @@ const Community = lazy(() => import('./pages/Community').then(m => ({ default: m
 const About = lazy(() => import('./pages/About').then(m => ({ default: m.About })))
 const Terms = lazy(() => import('./pages/Terms').then(m => ({ default: m.Terms })))
 const Recommendations = lazy(() => import('./pages/Recommendations').then(m => ({ default: m.Recommendations })))
+const CategoryPage = lazy(() => import('./pages/CategoryPage').then(m => ({ default: m.CategoryPage })))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,11 +37,23 @@ const queryClient = new QueryClient({
   },
 })
 
+function PageTitleUpdater() {
+  usePageTitle()
+  return null
+}
+
+function MigrationRunner() {
+  useMigrateLocalRatings()
+  return null
+}
+
 function AppRoutes() {
   const { loading } = useAuth()
   if (loading) return PAGE_PLACEHOLDER
   return (
     <Suspense fallback={<div className="flex items-center justify-center py-20 text-gray-400">Loading…</div>}>
+      <PageTitleUpdater />
+      <MigrationRunner />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -54,6 +69,7 @@ function AppRoutes() {
         <Route path="/community" element={<Community />} />
         <Route path="/about" element={<About />} />
         <Route path="/terms" element={<Terms />} />
+        <Route path="/category/:slug" element={<CategoryPage />} />
       </Routes>
     </Suspense>
   )

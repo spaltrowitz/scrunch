@@ -8,6 +8,8 @@ import { ProductImage } from '../hooks/useProductImage'
 import type { ProductReview, Profile } from '../lib/database.types'
 import { useProduct } from '../hooks/useProducts'
 import { useToast } from '../hooks/useToast.utils'
+import { usePageTitle } from '../hooks/usePageTitle'
+import { getLocalRatings } from '../lib/localProfile'
 
 type TriedRating = 'loved' | 'liked' | 'ok' | 'disliked'
 
@@ -43,6 +45,8 @@ export function ProductDetail() {
   const queryClient = useQueryClient()
   const { addToast } = useToast()
   const { data: product, isLoading: productLoading, error: productError } = useProduct(id)
+
+  usePageTitle(product ? `${product.brand} ${product.name} — Scrunch` : undefined)
   const { data: reviewsData = [], isLoading: reviewsLoading, error: reviewsError } = useQuery({
     queryKey: ['product-reviews', id],
     enabled: !!id,
@@ -67,6 +71,13 @@ export function ProductDetail() {
     const mine = allReviews.find(r => r.user_id === userId) ?? null
     return { reviews: allReviews.filter(r => r.user_id !== userId), myReview: mine }
   }, [reviewsData, userId])
+
+  // Local rating for logged-out users
+  const localRating = useMemo(() => {
+    if (user || !id) return null
+    const local = getLocalRatings()
+    return local[id] ?? null
+  }, [user, id])
 
   // Rating form state
   const [ratingPopup, setRatingPopup] = useState(false)
@@ -123,11 +134,18 @@ export function ProductDetail() {
   })
 
   const submitRating = async (rating: TriedRating) => {
-    if (!userId || !product) return
     setSelectedRating(rating)
     setSubmitting(true)
     try {
-      await submitRatingMutation.mutateAsync({ rating, note: personalNote })
+      if (userId && product) {
+        await submitRatingMutation.mutateAsync({ rating, note: personalNote })
+      } else if (product) {
+        // Logged-out: save to localStorage
+        const local = getLocalRatings()
+        local[product.id] = rating
+        localStorage.setItem('scrunch_ratings', JSON.stringify(local))
+        addToast('Rating saved locally!', 'success')
+      }
     } finally {
       setSubmitting(false)
       setRatingPopup(false)
@@ -225,38 +243,42 @@ export function ProductDetail() {
       )}
 
       {/* Your Rating */}
-      {user && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-          <h2 className="font-semibold text-gray-900 mb-3">Your Rating</h2>
-          {myReview?.rating != null ? (
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-sm font-medium text-gray-700">
-                  {RATING_OPTIONS.find(o => o.value === numericToTriedRating(myReview.rating!))?.icon}{' '}
-                  {triedRatingLabel(numericToTriedRating(myReview.rating!))}
-                </span>
-                <button
-                  onClick={() => { setSelectedRating(numericToTriedRating(myReview.rating!)); setRatingPopup(true) }}
-                  className="text-xs text-violet-600 hover:underline cursor-pointer"
-                >
-                  Change
-                </button>
-              </div>
-              {myReview.results_notes && (
-                <p className="text-sm text-gray-600 bg-gray-50 rounded-lg px-3 py-2">📝 {myReview.results_notes}</p>
-              )}
-            </div>
-          ) : (
-            <div>
-              <p className="text-sm text-gray-500 mb-3">Tried it? Rate this product for your hair.</p>
+      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+        <h2 className="font-semibold text-gray-900 mb-3">Your Rating</h2>
+        {(myReview?.rating != null || localRating) ? (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-sm font-medium text-gray-700">
+                {RATING_OPTIONS.find(o => o.value === (myReview?.rating != null ? numericToTriedRating(myReview.rating!) : localRating!))?.icon}{' '}
+                {triedRatingLabel(myReview?.rating != null ? numericToTriedRating(myReview.rating!) : localRating!)}
+              </span>
               <button
-                onClick={() => setRatingPopup(true)}
-                className="text-sm px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 cursor-pointer"
+                onClick={() => { setSelectedRating(myReview?.rating != null ? numericToTriedRating(myReview.rating!) : localRating!); setRatingPopup(true) }}
+                className="text-xs text-violet-600 hover:underline cursor-pointer"
               >
-                Rate this product
+                Change
               </button>
             </div>
-          )}
+            {myReview?.results_notes && (
+              <p className="text-sm text-gray-600 bg-gray-50 rounded-lg px-3 py-2">📝 {myReview.results_notes}</p>
+            )}
+            {!user && (
+              <p className="text-xs text-gray-400 mt-2">
+                <Link to="/signup" className="text-violet-600 hover:underline">Create an account</Link> to sync ratings across devices
+              </p>
+            )}
+          </div>
+        ) : (
+          <div>
+            <p className="text-sm text-gray-500 mb-3">Tried it? Rate this product for your hair.</p>
+            <button
+              onClick={() => setRatingPopup(true)}
+              className="text-sm px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 cursor-pointer"
+            >
+              Rate this product
+            </button>
+          </div>
+        )}
 
           {/* Rating popup */}
           {ratingPopup && (
@@ -298,7 +320,6 @@ export function ProductDetail() {
             </div>
           )}
         </div>
-      )}
 
       {/* Community Ratings */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
