@@ -22,27 +22,15 @@ const CATEGORY_ICONS: Record<string, string> = {
   bond_repair: '🔗',
 }
 
-const RatingRow = memo(function RatingRow({ review }: { review: ProductReview & { products: Product } }) {
+const RatingChip = memo(function RatingChip({ review }: { review: ProductReview & { products: Product } }) {
   const icon = CATEGORY_ICONS[review.products.category] || '🧴'
   return (
     <Link
       to={`/products/${review.product_id}`}
-      className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-violet-300 transition no-underline"
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-gray-200 hover:border-violet-300 transition no-underline text-sm text-gray-800 truncate max-w-[260px]"
     >
-      <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-xl shrink-0">
-        {icon}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-xs text-gray-500">{review.products.brand}</p>
-        <p className="text-sm font-semibold text-gray-900 truncate">
-          {review.products.name}
-        </p>
-      </div>
-      {review.results_notes && (
-        <p className="text-xs text-gray-400 truncate max-w-[150px]">
-          {review.results_notes}
-        </p>
-      )}
+      <span className="shrink-0">{icon}</span>
+      <span className="truncate">{review.products.brand} {review.products.name}</span>
     </Link>
   )
 })
@@ -59,13 +47,13 @@ export const RatingGroup = memo(function RatingGroup({
   reviews: (ProductReview & { products: Product })[]
 }) {
   return (
-    <div className="mb-6">
+    <div className="mb-4">
       <h3 className={`text-sm font-medium ${colorClass} mb-2`}>
         {label} ({count})
       </h3>
-      <div className="space-y-2">
+      <div className="flex flex-wrap gap-2">
         {reviews.map(review => (
-          <RatingRow key={review.id} review={review} />
+          <RatingChip key={review.id} review={review} />
         ))}
       </div>
     </div>

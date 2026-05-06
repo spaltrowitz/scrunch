@@ -2,6 +2,7 @@ import { memo } from 'react'
 import { Link } from 'react-router-dom'
 import type { Product } from '../../lib/database.types'
 import { ProductImage } from '../../hooks/useProductImage'
+import { SEED_PRODUCTS } from '../../data/seedProducts'
 
 interface SavedProductsProps {
   products: Product[]
@@ -31,16 +32,19 @@ export const SavedProducts = memo(function SavedProducts({ products }: SavedProd
       <div className="space-y-2">
         {bookmarkedKeys.map(key => {
           const product = products.find(p => p.id === key)
-          const brand = product?.brand || (key.includes('::') ? key.split('::')[0] : null)
-          const name = product?.name || (key.includes('::') ? key.split('::')[1] : null)
+          const seedProduct = !product && key.startsWith('seed-')
+            ? SEED_PRODUCTS[parseInt(key.replace('seed-', ''), 10)] ?? null
+            : null
+          const brand = product?.brand || seedProduct?.brand || (key.includes('::') ? key.split('::')[0] : null)
+          const name = product?.name || seedProduct?.name || (key.includes('::') ? key.split('::')[1] : null)
           if (!brand || !name) return null
           return (
             <Link
               key={key}
-              to={product ? `/products/${product.id}` : '/products'}
+              to={product ? `/products/${product.id}` : `/products/${key}`}
               className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-violet-300 transition no-underline"
             >
-              <ProductImage brand={brand} name={name} seedImageUrl={product?.image_url} category={product?.category} className="w-10 h-10" />
+              <ProductImage brand={brand} name={name} seedImageUrl={product?.image_url ?? seedProduct?.image_url} category={product?.category ?? seedProduct?.category} className="w-10 h-10" />
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-gray-500">{brand}</p>
                 <p className="text-sm font-semibold text-gray-900 truncate">{name}</p>

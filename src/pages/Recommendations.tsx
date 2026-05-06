@@ -386,7 +386,7 @@ export function Recommendations() {
 
       <hr className="border-gray-200 mb-12" />
 
-      <SavedProducts products={popularProducts} />
+      <SavedProducts products={products} />
 
       {userReviews.length > 0 && <hr className="border-gray-200 mb-12" />}
 
