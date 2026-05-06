@@ -256,3 +256,101 @@ Applied to Scrunch: Do NOT put a journey question before the product browse. Eit
 **Enforcement:** Code review checklist for any count operation, array dedup, or parallel fetch decision.
 
 ---
+### 2026-05-01T22:27: User directive
+**By:** Shari Paltrowitz (via Copilot)
+**What:** New visitors to curly hair don't want to check ingredients first — they want to learn basics about maintaining their hair and understand how this website will help them. The ingredient checker is a power-user feature, not a first-visit hook. The homepage should lead with education/discovery, not tools.
+**Why:** User request — captured for team memory. Critical for homepage CTA prioritization.
+
+---
+
+### 2026-05-01T22:30: User directive
+**By:** Shari Paltrowitz (via Copilot)
+**What:** Community Q&A is NOT a primary product feature — it's currently the weakest part of the app. The Reddit search engine needs significant optimization before it should be prominently featured. Demote it on the homepage; don't lead with it as a main selling point.
+**Why:** User assessment of current feature quality. The search results are not good enough to be a top-level CTA. Product catalog browsing and personalized recommendations are stronger value props right now.
+
+---
+
+### 2026-05-01: Mobile-First Design Standards
+**By:** Jan (Product Designer)
+**What:** Established mobile-first design standards for the team:
+1. **Touch Target Minimum:** All interactive elements must have 44×44px minimum (use `min-h-[44px]`, `py-3` for inputs)
+2. **Explicit Grid Columns:** Always specify mobile-first grid columns explicitly (`grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3`)
+3. **Text Wrapping:** Use `break-words` for long content, `truncate` for known-short, `line-clamp-N` for multi-line
+4. **Mobile Padding:** Use `px-4` for horizontal padding on page containers
+5. **Responsive Typography:** H1 `text-xl md:text-2xl lg:text-3xl`, H2 `text-lg md:text-xl lg:text-2xl`, H3 `text-base md:text-lg`, Body `text-sm md:text-base`
+6. **Form Input Height:** 44px minimum for all inputs and buttons
+
+**Implementation Priority:**
+- High: ProductDetail ingredient wrapping, auth form input heights, Community button touch targets
+- Medium: Audit all buttons, add explicit grid-cols-1, update ProductDetail rating layout
+- Low: Component library docs, automated touch target testing
+
+**Why:** Mobile responsiveness audit findings. Touch accuracy and readability on small screens are critical.
+
+---
+
+### 2026-05-01: Homepage CTA Priority & Structure
+**By:** Kenickie (Product Manager), approved per Shari Paltrowitz
+**What:** Restructured homepage to prioritize the Ingredient Checker as primary CTA and remove overlapping calls-to-action. 
+
+**Changes:**
+1. **Hero CTA:** "Check Ingredients Now →" (was "Explore Products") with subheading: "Paste any ingredient list — Scrunch tells you if it's curl-safe in seconds"
+2. **Feature Grid (2 boxes):** Browse Products + Community Q&A (removed Ingredient Checker duplicate and Recommendations)
+3. **Products Teaser:** Keep grid, remove "See All Products" CTA, add inline text: "Click any product to check ingredients or read reviews"
+4. **New section after #HairTok:** "Ready to get personalized?" with "Create Profile & Get Recommendations" link (outline style, lower priority)
+5. **Delete:** "New to curly hair?" section (duplicate Ingredient Checker messaging)
+
+**Priority Hierarchy:**
+- **PRIMARY:** Check Ingredients (fastest aha moment, zero friction, proves value)
+- **Secondary:** Browse Products (discovery next step)
+- **Tertiary:** Get Recommendations (future engagement, lower friction)
+- **Support:** Community Q&A (social proof)
+
+**Why:** Resolves Shari's concern about overwhelming first-time visitors. Ingredient Checker is the unique value prop (what only Scrunch does) and requires zero friction/account. Aligns with invisible onboarding philosophy.
+
+---
+
+### 2026-05-01: Supabase vs Self-Hosted Database — Phased Approach Decision
+**By:** Sandy (Lead Engineer), approved by Shari Paltrowitz
+**What:** Recommends phased approach: Phase 1 (static MVP with offline-first) → Phase 2 (Supabase backend if validation positive). Current architecture uses Supabase free tier (cold starts 1-3s on first request after inactivity).
+
+**Options Evaluated & Verdict:**
+- A: **Stay on Supabase (Free)** ✅ Default choice — zero code changes, managed auth, RLS, sustainable for MVP
+- B: **Self-hosted Postgres** ❌ Too complex for MVP — requires 2-3 days, custom auth backend, ISP reliability risk
+- C: **Supabase self-hosted (Docker)** 🤔 Good fallback later — solves cold starts but adds ops overhead
+- D: **Railway/Render + Node Backend** ⚠️ Viable but costly ($12-15/mo) and complex
+- E: **Static MVP (seed-only, offline-first)** 🎯 Recommended Phase 1
+
+**Phased Roadmap:**
+- **Phase 1:** Keep seed products as primary data source, remove auth requirement from browsing, localStorage for guest ratings, measure retention/pain points
+- **Phase 2 (if validation positive):** Upgrade to Supabase Pro ($25/mo) or Railway ($12-15/mo), add persistent auth flow
+
+**Key Finding:** App already has workarounds (placeholderData from seed products, Supabase fallback, RLS). Scaling: free tier covers ~100 active users.
+
+**Why:** Lowest risk, validates market before infrastructure investment, avoids premature optimization.
+
+---
+
+### 2026-05-01: Performance Audit Decision Record
+**By:** Sandy (Lead Engineer)
+**Status:** Confidence 7/10 — performance is good, 3 issues worth fixing
+
+**Current State (Good):**
+- All 14 routes lazy-loaded, 27 chunks, 298ms build time
+- Instant render from seed data via placeholderData
+- Lightweight query variants (7-9 cols vs 22) reduce payload
+- Image lazy-loading via IntersectionObserver + localStorage
+- staleTime 5min + gcTime 10min = minimal refetches
+- CSS purged (49KB raw, 9KB gzip)
+- Bundle: 816KB raw, ~143KB gzip — reasonable
+
+**Issues & Fixes:**
+1. **Static SEED_PRODUCTS import (HIGH impact, MEDIUM fix):** Defeats lazy loading but enables instant render. **Decision: keep as intentional trade-off** — document that 15KB gzip cost buys instant paint on every product page.
+2. **Auth blank screen on cold start (MEDIUM impact, EASY fix):** Supabase free-tier `getSession()` takes 1-3s, user sees blank white screen. **Fix:** Show app shell (Header + Footer + skeleton) during loading instead of `return null`.
+3. **ProductDetail has no PlaceholderData (LOW-MEDIUM impact, EASY fix):** Pages show "Loading..." even though product might be in `['products']` cache. **Fix:** Use `queryClient.getQueryData(['products'])` to populate placeholderData.
+
+**Decision:** Fix #2 (auth blank screen) — most user-visible and easiest. Fix #3 if time allows. Not worth fixing: Supabase-js SDK size, OpenBeautyFacts caching, component memoization, offline support (PWA).
+
+**Why:** Determines performance optimization priorities without over-engineering diminishing returns.
+
+---
