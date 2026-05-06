@@ -187,8 +187,14 @@ const TRENDING_TOPICS = [
   'flaxseed gel DIY recipe',
 ] as const
 
+const STEM_PROTECTED = new Set([
+  'curly', 'oily', 'daily', 'frizzy', 'early', 'only', 'apply', 'supply',
+  'jelly', 'belly', 'lovely', 'wavy',
+])
+
 function simpleStem(word: string): string {
   if (word.length <= 3) return word
+  if (STEM_PROTECTED.has(word)) return word
   return word
     .replace(/(?:ing|tion|ness|ment|able|ible|ful|less|ous|ive|ize|ise|ify|ated?|er|est|ly|ed|es|s)$/, '')
     || word
@@ -371,6 +377,7 @@ export function Community() {
   const [loading, setLoading] = useState(false)
   const [history, setHistory] = useState<CommunityQuestion[]>([])
   const [showSearchBox, setShowSearchBox] = useState(true)
+  const [thankedIds, setThankedIds] = useState<Set<string>>(new Set())
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const runSearch = useCallback(async (q: string) => {
@@ -506,7 +513,7 @@ export function Community() {
                   ].map((q, i) => (
                     <button
                       key={i}
-                      onClick={() => { setQuestion(q); }}
+                      onClick={() => { setQuestion(q); runSearch(q); }}
                       className="text-left text-sm px-4 py-3 min-h-[44px] bg-white rounded-lg border border-gray-200 hover:border-violet-300 text-gray-700 cursor-pointer transition"
                     >
                       {q}
@@ -644,9 +651,16 @@ export function Community() {
 
             {/* Did this help? feedback */}
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+              {thankedIds.has(item.id) ? (
+                <p className="text-sm text-green-700">Thanks for the feedback!</p>
+              ) : (
+              <>
               <p className="text-sm text-gray-700 mb-2">Did this answer your question?</p>
               <div className="flex flex-wrap items-center gap-2">
-                <button className="text-xs px-3 py-2 min-h-[44px] rounded-full bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 cursor-pointer transition">
+                <button
+                  onClick={() => setThankedIds(prev => new Set(prev).add(item.id))}
+                  className="text-xs px-3 py-2 min-h-[44px] rounded-full bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 cursor-pointer transition"
+                >
                   👍 Yes, thanks!
                 </button>
                 <button
@@ -656,6 +670,8 @@ export function Community() {
                   🔄 Refine my search
                 </button>
               </div>
+              </>
+              )}
             </div>
           </div>
         ))}
