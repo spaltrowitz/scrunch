@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth.utils'
 import { PRODUCT_CATEGORY_LABELS, PRODUCT_CATEGORY_DESCRIPTIONS } from '../lib/constants'
@@ -9,9 +9,8 @@ import type { ProductReview, Profile } from '../lib/database.types'
 import { useProduct } from '../hooks/useProducts'
 import { useToast } from '../hooks/useToast.utils'
 import { usePageTitle } from '../hooks/usePageTitle'
-import { getLocalRatings } from '../lib/localProfile'
-
-type TriedRating = 'loved' | 'liked' | 'ok' | 'disliked'
+import { useProductRating, useRatingMutation } from '../hooks/useProductRatings'
+import type { TriedRating } from '../hooks/useProductRatings'
 
 type ReviewWithProfile = ProductReview & {
   profile?: Pick<Profile, 'display_name' | 'curl_pattern' | 'porosity'> | null
@@ -42,11 +41,14 @@ function formatDate(iso: string): string {
 export function ProductDetail() {
   const { id } = useParams<{ id: string }>()
   const { user } = useAuth()
-  const queryClient = useQueryClient()
   const { addToast } = useToast()
   const { data: product, isLoading: productLoading, error: productError } = useProduct(id)
 
   usePageTitle(product ? `${product.brand} ${product.name} — Scrunch` : undefined)
+
+  const { data: myRatingData } = useProductRating(id ?? null)
+  const ratingMutation = useRatingMutation()
+
   const { data: reviewsData = [], isLoading: reviewsLoading, error: reviewsError } = useQuery({
     queryKey: ['product-reviews', id],
     enabled: !!id,
@@ -72,84 +74,34 @@ export function ProductDetail() {
     return { reviews: allReviews.filter(r => r.user_id !== userId), myReview: mine }
   }, [reviewsData, userId])
 
-  // Local rating for logged-out users
-  const localRating = useMemo(() => {
-    if (user || !id) return null
-    const local = getLocalRatings()
-    return local[id] ?? null
-  }, [user, id])
+  const currentRating = myRatingData?.rating ?? null
+  const currentNotes = myRatingData?.notes ?? ''
 
   // Rating form state
   const [ratingPopup, setRatingPopup] = useState(false)
-  const initialRating = myReview?.rating != null ? numericToTriedRating(myReview.rating) : null
-  const initialNote = myReview?.results_notes ?? ''
-  const [selectedRating, setSelectedRating] = useState<TriedRating | null>(initialRating)
-  const [personalNote, setPersonalNote] = useState(initialNote)
-  const [submitting, setSubmitting] = useState(false)
+  const [selectedRating, setSelectedRating] = useState<TriedRating | null>(currentRating)
+  const [personalNote, setPersonalNote] = useState(currentNotes)
 
-  // Sync form state when review data changes (render-time sync pattern)
-  const [prevRating, setPrevRating] = useState(myReview?.rating)
-  const [prevNotes, setPrevNotes] = useState(myReview?.results_notes)
-  if (myReview?.rating !== prevRating || myReview?.results_notes !== prevNotes) {
-    setPrevRating(myReview?.rating)
-    setPrevNotes(myReview?.results_notes)
-    if (myReview?.rating != null) {
-      setSelectedRating(numericToTriedRating(myReview.rating))
-      setPersonalNote(myReview.results_notes ?? '')
-    } else {
-      setSelectedRating(null)
-      setPersonalNote('')
-    }
+  // Sync form state when hook data changes
+  const [prevRating, setPrevRating] = useState(currentRating)
+  const [prevNotes, setPrevNotes] = useState(currentNotes)
+  if (currentRating !== prevRating || currentNotes !== prevNotes) {
+    setPrevRating(currentRating)
+    setPrevNotes(currentNotes)
+    setSelectedRating(currentRating)
+    setPersonalNote(currentNotes)
   }
 
-  const submitRatingMutation = useMutation({
-    mutationFn: async ({ rating, note }: { rating: TriedRating; note: string }) => {
-      if (!userId || !product) return
-      const ratingMap: Record<TriedRating, number> = { loved: 5, liked: 4, ok: 3, disliked: 1 }
-      const repurchaseMap: Record<TriedRating, string> = { loved: 'yes', liked: 'yes', ok: 'maybe', disliked: 'no' }
-      const { error } = await supabase.from('product_reviews').upsert({
-        user_id: userId,
-        product_id: product.id,
-        status: 'tried_once',
-        rating: ratingMap[rating],
-        would_repurchase: repurchaseMap[rating],
-        results_notes: note.trim() || null,
-      } as never, { onConflict: 'user_id,product_id' })
-      if (error) throw error
-    },
-    onError: (error) => {
-      console.error('Review upsert failed:', error)
-      addToast('Failed to save your review. Please try again.', 'error')
-    },
-    onSuccess: () => {
-      addToast('Review saved!', 'success')
-      if (id) {
-        queryClient.invalidateQueries({ queryKey: ['product', id] })
-        queryClient.invalidateQueries({ queryKey: ['product-reviews', id] })
-      }
-      if (userId) {
-        queryClient.invalidateQueries({ queryKey: ['reviews', userId] })
-      }
-    },
-  })
-
   const submitRating = async (rating: TriedRating) => {
+    if (!product) return
     setSelectedRating(rating)
-    setSubmitting(true)
     try {
-      if (userId && product) {
-        await submitRatingMutation.mutateAsync({ rating, note: personalNote })
-      } else if (product) {
-        // Logged-out: save to localStorage
-        const local = getLocalRatings()
-        local[product.id] = rating
-        localStorage.setItem('scrunch_ratings', JSON.stringify(local))
-        addToast('Rating saved locally!', 'success')
-      }
-    } finally {
-      setSubmitting(false)
-      setRatingPopup(false)
+      await ratingMutation.mutateAsync({ productId: product.id, rating, notes: personalNote })
+      addToast(user ? 'Review saved!' : 'Rating saved locally!', 'success')
+    } catch {
+      addToast('Failed to save your review. Please try again.', 'error')
     }
+    setRatingPopup(false)
   }
 
   if (loading) return <div className="text-center py-12 text-gray-500">Loading…</div>
@@ -245,22 +197,22 @@ export function ProductDetail() {
       {/* Your Rating */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
         <h2 className="font-semibold text-gray-900 mb-3">Your Rating</h2>
-        {(myReview?.rating != null || localRating) ? (
+        {currentRating ? (
           <div>
             <div className="flex items-center gap-2 mb-3">
               <span className="text-sm font-medium text-gray-700">
-                {RATING_OPTIONS.find(o => o.value === (myReview?.rating != null ? numericToTriedRating(myReview.rating!) : localRating!))?.icon}{' '}
-                {triedRatingLabel(myReview?.rating != null ? numericToTriedRating(myReview.rating!) : localRating!)}
+                {RATING_OPTIONS.find(o => o.value === currentRating)?.icon}{' '}
+                {triedRatingLabel(currentRating)}
               </span>
               <button
-                onClick={() => { setSelectedRating(myReview?.rating != null ? numericToTriedRating(myReview.rating!) : localRating!); setRatingPopup(true) }}
+                onClick={() => { setSelectedRating(currentRating); setRatingPopup(true) }}
                 className="text-xs text-violet-600 hover:underline cursor-pointer"
               >
                 Change
               </button>
             </div>
-            {myReview?.results_notes && (
-              <p className="text-sm text-gray-600 bg-gray-50 rounded-lg px-3 py-2">📝 {myReview.results_notes}</p>
+            {currentNotes && (
+              <p className="text-sm text-gray-600 bg-gray-50 rounded-lg px-3 py-2">📝 {currentNotes}</p>
             )}
             {!user && (
               <p className="text-xs text-gray-400 mt-2">
@@ -310,10 +262,10 @@ export function ProductDetail() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => selectedRating && submitRating(selectedRating)}
-                  disabled={!selectedRating || submitting}
+                  disabled={!selectedRating || ratingMutation.isPending}
                   className="px-4 py-2 bg-violet-600 text-white text-sm rounded-lg hover:bg-violet-700 disabled:opacity-50 cursor-pointer"
                 >
-                  {submitting ? 'Saving…' : 'Save'}
+                  {ratingMutation.isPending ? 'Saving…' : 'Save'}
                 </button>
                 <button onClick={() => setRatingPopup(false)} className="text-sm text-gray-400 hover:text-gray-600 cursor-pointer">Cancel</button>
               </div>

@@ -2,11 +2,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../lib/auth.utils'
 import { supabase } from '../lib/supabase'
 import { getLocalRatings } from '../lib/localProfile'
+import type { RepurchaseIntent } from '../lib/database.types'
 
-type TriedRating = 'loved' | 'liked' | 'ok' | 'disliked'
+export type TriedRating = 'loved' | 'liked' | 'ok' | 'disliked'
 
 const RATING_MAP: Record<TriedRating, number> = { loved: 5, liked: 4, ok: 3, disliked: 1 }
-const REPURCHASE_MAP: Record<TriedRating, string> = { loved: 'yes', liked: 'yes', ok: 'maybe', disliked: 'no' }
+const REPURCHASE_MAP: Record<TriedRating, RepurchaseIntent> = { loved: 'yes', liked: 'yes', ok: 'maybe', disliked: 'no' }
 
 function numericToTried(n: number): TriedRating {
   if (n >= 5) return 'loved'
@@ -81,7 +82,9 @@ export function useRatingMutation() {
         status: 'tried_once',
         results_notes: input.notes?.trim() || null,
         photo_urls: [],
-      } as never, { onConflict: 'user_id,product_id' })
+        application_method: null,
+        routine_context: null,
+      }, { onConflict: 'user_id,product_id' })
       if (error) throw error
     },
     onSuccess: (_data, input) => {

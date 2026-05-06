@@ -21,10 +21,12 @@ export function usePageTitle(override?: string) {
   const { pathname } = useLocation()
 
   useEffect(() => {
+    const defaultTitle = 'Scrunch — Curly Hair Product Discovery'
     if (override) {
       document.title = override
-      return
+    } else {
+      document.title = ROUTE_TITLES[pathname] ?? defaultTitle
     }
-    document.title = ROUTE_TITLES[pathname] ?? 'Scrunch — Curly Hair Product Discovery'
+    return () => { document.title = defaultTitle }
   }, [pathname, override])
 }

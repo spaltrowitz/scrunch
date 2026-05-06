@@ -8,6 +8,15 @@
 
 ## Learnings
 
+### 2026-05-03: Full Test Pass — Post-Feature Verification
+- **Build & types clean:** `tsc --noEmit` zero errors, `npm run build` succeeds with no warnings.
+- **useProductRatings.ts is dead code:** All three hooks (`useProductRating`, `useRatingMutation`, `useDeleteRating`) are defined but never imported anywhere. ProductDetail.tsx has its own inline rating logic. These hooks should either replace the inline code or be removed.
+- **`as never` cast in useProductRatings.ts line 84:** Used to bypass Supabase's strict generated types on upsert. Works but hides type mismatches — if schema changes, this won't catch it.
+- **useMigrateLocalRatings.ts has solid guards:** `attempted.current` ref + `MIGRATION_KEY` localStorage flag = double protection against re-runs. `ignoreDuplicates: true` = server wins on conflict. Empty localStorage handled gracefully.
+- **Community.tsx debounce is correct:** Cleanup on unmount via useEffect return. Auto-search only fires at ≥10 chars after 1.2s inactivity. Regex special chars in highlight terms are escaped (line 202).
+- **usePageTitle.ts has no cleanup:** Sets `document.title` but never resets on unmount. Acceptable in SPA since every route sets its own title via the `PageTitleUpdater` component.
+- **Sitemap categories match constants 1:1:** All 17 categories present with correct slug ↔ underscore mapping.
+
 
 ## Cross-Project Tester Knowledge (injected 2026-05-02)
 
