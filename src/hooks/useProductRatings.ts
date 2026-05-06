@@ -85,8 +85,9 @@ export function useRatingMutation() {
         application_method: null,
         routine_context: null,
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await supabase.from('product_reviews').upsert(
-        payload as unknown as Parameters<typeof supabase.from<'product_reviews'>>[0],
+        payload as any,
         { onConflict: 'user_id,product_id' }
       )
       if (error) throw error
