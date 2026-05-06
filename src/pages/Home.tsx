@@ -34,7 +34,7 @@ export function Home() {
         </h1>
 
         <p className="text-sm md:text-base text-gray-600 mb-6 max-w-xl leading-relaxed">
-          Find your perfect products, check any ingredient list in seconds, and discover what actually works - backed by 400K+ community members.
+          Find your perfect curly hair products and discover what actually works for your hair type.
         </p>
 
         <div className="flex flex-col items-center gap-3">
@@ -46,26 +46,6 @@ export function Home() {
           </Link>
         </div>
 
-      </section>
-
-      {/* Features */}
-      <section className="py-10 px-4 border-b border-gray-200">
-        <div className="max-w-lg mx-auto">
-          <div className="p-5 rounded-xl border border-gray-200 hover:border-violet-200 transition flex flex-col">
-            <h2 className="text-sm font-semibold text-gray-900 mb-1.5">
-              Check any ingredient list
-            </h2>
-            <p className="text-xs text-gray-600 mb-3 leading-relaxed flex-1">
-              Paste a product label and instantly find out if it's curl-safe - no guesswork, no Googling.
-            </p>
-            <Link
-              to="/ingredient-checker"
-              className="inline-flex items-center justify-center w-full md:w-auto text-sm md:text-xs px-4 md:px-3 py-3 md:py-2 min-h-[44px] md:min-h-0 rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors mt-auto"
-            >
-              Try Ingredient Checker →
-            </Link>
-          </div>
-        </div>
       </section>
 
       {/* Trending on #HairTok */}

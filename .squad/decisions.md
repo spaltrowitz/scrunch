@@ -8,26 +8,9 @@
 
 ---
 
-### 2026-05-01T16:25:00Z: PR Merge Batch — Conflict Resolution Policy
-**By:** Sandy (Lead Engineer)
-**What:** Merged PRs #9, #12, #15 to main. All three had merge conflicts due to the React Query migration (PR #13) that landed after they were branched. Resolution policy applied:
-
-1. **Architecture wins over feature code.** When incoming PRs use old patterns (useState/useEffect for data fetching), resolve conflicts by adapting to the current architecture (React Query hooks + useMemo), not by reverting the migration.
-2. **Drop features that can't cleanly adapt.** PR #9's `requestedProducts` matching in Recommendations.tsx used the old useCallback/useState loading pattern. Rather than create a hybrid, the feature was dropped from the merge and should be re-implemented as a `useProductRequests()` React Query hook.
-3. **Image sourcing policy preserved.** PR #9's seed data used Target/Ulta image URLs. These were kept for now but conflict with HEAD's image sourcing policy (brand sites + Open Beauty Facts only). These should be migrated in a follow-up.
-
-**Follow-up items:**
-- Re-implement requestedProducts matching using React Query hook pattern
-- Audit merged seed product image URLs against image sourcing policy
-- PR #15's custom brand fields (`custom_brand`, `custom_hero_ingredients`) need corresponding Supabase migration
-
-**Why:** Establishes precedent for how to handle PR conflicts when architectural migrations land between branch creation and merge.
-
 ---
 
----
-
-### 2026-05-01T16:25:00Z: Recommendations.tsx Decomposition
+### ### 2026-05-01T16:25:00Z: Recommendations.tsx Decomposition
 **By:** Cha-Cha (⚡ Performance Optimizer)
 **What:** Decomposed `Recommendations.tsx` from 1173 lines into 7 files following the same pattern as the Products.tsx decomposition (PR #13).
 
@@ -62,7 +45,7 @@ src/components/recommendations/
 
 ---
 
-### 2026-05-01T18:21:41Z: Homepage progressive disclosure
+### ### 2026-05-01T18:21:41Z: Homepage progressive disclosure
 **By:** Frenchy (Frontend Dev)
 **What:** Homepage now uses progressive disclosure: top 6 categories shown by default (expandable to 14), 12 products shown initially (scroll for more, was 40 always-visible), persona pills moved below categories as secondary navigation.
 **Why:** Shari flagged homepage as overwhelming. Hick's Law — too many choices paralyzes users on first load. Progressive disclosure lets users see most-popular content immediately and drill deeper if interested. No functionality removed — all categories and products remain accessible.
@@ -72,7 +55,7 @@ src/components/recommendations/
 
 ---
 
-### 2026-05-01T18:21:41Z: About page consolidation
+### ### 2026-05-01T18:21:41Z: About page consolidation
 **By:** Frenchy (Frontend Dev)
 **What:** About.tsx refactored from 219 lines to 121 lines (45% reduction). Merged redundant sections, removed roadmap (out of scope), made credits collapsible accordion.
 **Why:** Focus and clarity — page was repetitive. Roadmap content belonged in a product roadmap doc, not a shipped app. Collapsible credits preserve transparency without page bloat.
@@ -82,7 +65,7 @@ src/components/recommendations/
 
 ---
 
-### 2026-05-01T18:21:41Z: Remove phantom status_conflict column
+### ### 2026-05-01T18:21:41Z: Remove phantom status_conflict column
 **By:** Danny (Backend Dev)
 **What:** Removed `status_conflict` from Product TypeScript interface, all Supabase queries, and seed mapper. Column was defined in types but never created in database, causing PostgREST errors on product fetches → silent fallback on GitHub Pages.
 **Why:** Type/schema misalignment. The `as unknown as` cast in useProducts hid this TypeScript error. PostgREST returned a hard error when selecting non-existent columns.
@@ -92,7 +75,7 @@ src/components/recommendations/
 
 ---
 
-### 2026-05-01T18:21:41Z: Add r/wavyhair community
+### ### 2026-05-01T18:21:41Z: Add r/wavyhair community
 **By:** Danny (Backend Dev)
 **What:** Added r/wavyhair subreddit to Community.tsx (subreddits array, search links, badge text) and to Credits.tsx.
 **Why:** Community expansion — wavy hair users now included in community resources.
@@ -100,177 +83,14 @@ src/components/recommendations/
 
 ---
 
-### 2026-04-30T12:59:00-04:00: User directive
-**By:** Shari Paltrowitz (via Copilot)
-**What:** Use premium models for squad agents: Claude Opus 4.6 as the default preference, or GPT-5.5 when it's better suited for the specific skill/persona. Choose whichever premium model is strongest for the task at hand.
-**Why:** User request — applies to all spaltrowitz squads, not just this repo
-
----
-
----
-
-### 2026-04-30T13:41:00-04:00: User persona finalization
-**By:** Shari Paltrowitz + Kenickie (PM)
-**What:** Final 4 user personas for Scrunch: (1) The Newbie (P0) — CGM beginner, needs safe products with clear badges; (2) The Store Scanner (P0) — in-aisle checker, instant pass/fail + alternatives; (3) The Budget Builder (P1) — cost-conscious, drugstore-first, price filters; (4) The Optimizer (P1) — experienced, filters by ingredients, experiments with new products (merged from Ingredient Detective + Routine Refiner).
-**Key decisions:** Scrunch is discovery-first with checking built in. Homepage leads with browsing/categories, not a search bar. Filters are the killer feature. Age is NOT a differentiating axis — it correlates with persona (younger → Newbie/Budget) but doesn't change app behavior or UX.
-**Why:** Product strategy — these personas drive feature prioritization and UX decisions
-
----
-
----
-
-### 2026-04-30T13:44:00-04:00: Onboarding philosophy — invisible onboarding
-**By:** Shari Paltrowitz (via Copilot)
-**What:** Onboarding should be invisible per these reference articles:
-1. "Your Onboarding Should Become Invisible" (Growthmates) — don't gate value behind questions. Let users act immediately. Collect profiling data WHILE they're getting value, not before. Best AI products start working with you immediately.
-2. "AI Product Development" (Atomic Object) — validate core loop first, scope small, product thinking > speed. Don't add features just because you can.
-
-Applied to Scrunch: Do NOT put a journey question before the product browse. Either defer it (ask after they've explored), infer it (watch behavior), or embed it inline. The homepage should show products immediately — zero friction before first value.
-**Why:** User research — Shari's product direction based on industry best practices
-
----
-
----
-
-### 2026-04-30T16:17:00Z: User directive — Hosting migration plan
-**By:** Shari Paltrowitz (via Copilot)
-**What:** GitHub Pages is fine while Scrunch is static. When auth becomes a requirement, migrate to Firebase (like My Daily Win) — Firebase Auth + Firestore on the free tier. Deploy to scrunch.web.app or custom domain. The move is straightforward — redeploy and update portfolio link.
-**Why:** User request — captured for team memory. Auth requires server-side session handling which static hosting can't provide.
-
----
-
----
-
-### 2026-04-30T16:21:00Z: User directive — Hosting + Auth clarification (supersedes earlier directive)
-**By:** Shari Paltrowitz (via Copilot)
-**What:** Scrunch CAN stay on GitHub Pages even with auth. Client-side auth (Firebase Auth) runs entirely in the browser — GitHub Pages just serves the static files. No migration needed. Pattern: GitHub Pages serves HTML/JS/CSS, Firebase Auth handles login, Firestore stores user data if needed. The hosting and auth are separate services.
-**Why:** Corrects earlier directive that said auth requires leaving GitHub Pages. That was too simplistic — client-side auth works fine with static hosting.
-
----
-
----
-
-### 2026-04-30T16:24:00Z: User directive — Hosting & scaling limits reference
-**By:** Shari Paltrowitz (via Copilot)
-**What:** GitHub Pages limits: 100GB bandwidth/month (~200K page loads), 1GB repo, 10 builds/hr — more than enough even for hundreds of users. The real bottleneck is Firebase free tier: 50K Firestore reads/day, 20K writes/day, 10K auth verifications/month. Free tier covers up to ~100 active users. Past that, move to Firebase Blaze plan ($0.06/100K reads). Recommendation: keep GitHub Pages for hosting indefinitely, watch Firebase usage past 100 active users.
-**Why:** User request — captured for team memory. Important scaling reference for Alpha → Beta → Launch progression.
-
----
-
----
-
-### 2026-04-30T19:40:00-04:00: Column-specific select() patterns per page
-**By:** Cha-Cha (⚡ Performance Optimizer)  
-**What:** Every Supabase `.select()` call now lists explicit columns instead of `'*'`. Each page fetches only fields it renders/filters/sorts on.
-**Key mappings:**
-- Home: id, brand, name, category, cg_status, cruelty_free, notes, image_url
-- Products: + country_availability; reviews: product_id, status, rating, results_notes
-- ProductDetail: + ingredients, flagged_ingredients, avg_rating, review_count; reviews: id, user_id, rating, created_at
-- MyProducts: reviews (5 cols) + products join (4 cols)
-- Recommendations: scoring (10 cols with ingredients), collab display (8 cols, no ingredients)
-- Profile: display fields minus id, avatar_url, country, zip_code, wash_frequency, timestamps
-
-**Why:** Products have large `ingredients[]` arrays (30-50 items each). With 200+ products, `select('*')` was 60% over-fetching.  
-**Scope:** All new Supabase queries must use explicit columns, not `select('*')`.
-
----
-
----
-
-### 2026-04-30T19:40:00-04:00: React Query patterns — products/profile/reviews
-**By:** Cha-Cha (⚡ Performance Optimizer)  
-**What:** Canonical React Query query key conventions and shared hook patterns for data fetching.
-**Query keys:**
-- Products list: `['products']`
-- Product detail: `['product', id]`
-- User reviews: `['reviews', userId]`
-- User profile: `['profile', userId]`
-- Product reviews (detail): `['product-reviews', id]`
-- Collaborative recs: `['collab-recs', userId, curlPattern, porosity, ratedIds, dislikedCategories]`
-
-**Shared hooks:**
-- `useProducts()` — owns seed fallback via dynamic import
-- `useProduct(id)` — single product detail
-- `useUserReviews(userId)` — user reviews with product join
-- `useUserProfile(userId)` — user profile data
-
-**Mutations:** All Supabase writes use `useMutation` with query invalidation. Example: rate product → invalidate `['reviews', userId]`.  
-**Why:** Centralize caching, deduplication, stale-while-revalidate behavior. Prevent N+1 requests.
-
----
-
----
-
-### 2026-04-30T19:34:00-04:00: Performance Standards — Team Adoption
-**By:** Cha-Cha (⚡ Performance Optimizer, via Scribe)
-**What:** 6 mandatory performance patterns for all team members:
-1. **Always use React Query for Supabase fetches** — Wrap every `supabase.from().select()` call in `useQuery`. No raw `useEffect` + `useState` for data fetching.
-2. **Never `select('*')` — always list columns** — Specify only columns each page/component uses to avoid 60% over-fetching (products have large `ingredients[]` arrays).
-3. **Route-level code splitting is mandatory** — Use `React.lazy()` + `<Suspense>` for all page components in `App.tsx`. Currently all 14 pages in initial bundle.
-4. **No static imports for fallback/seed data** — `seedProducts.ts` (80KB) and large data files must use dynamic `import()`, not static `import`.
-5. **Components > 300 lines should be decomposed** — Split monolithic pages (e.g., Products.tsx 661 lines, Recommendations.tsx 1145 lines) into smaller sub-components for maintainability and optimization.
-6. **Use count queries for counts, not fetching IDs** — When counting, use `select('id', { count: 'exact', head: true })` instead of fetching all rows and calling `.length`.
-
-**Why:** Performance audit (2026-04-30) found 26 issues: React Query unused (13KB dead weight), N+1 image API calls, monolithic components, duplicate fetches, bundle bloat. Standards prevent recurrence and establish team baseline.
-**Scope:** All team members writing Supabase queries, React components, or page logic.
-**Enforcement:** Code review checklist during PR review.
-
----
-
----
-
-### 2026-04-30T20:00:00-04:00: Component decomposition — Products.tsx structure
-**By:** Frenchy (Frontend Dev)
-**What:** Products.tsx decomposed into reusable sub-components with memo boundaries and smart pagination:
-- `src/components/products/SearchBar.tsx` — search input with autocomplete dropdown
-- `src/components/products/FilterPanel.tsx` — category chips, brand/region selects, toggle filters
-- `src/components/products/ProductCard.tsx` — individual product card (wrapped in React.memo)
-- Products.tsx orchestrates state and renders at 280 lines (down from 661)
-
-**Pagination Pattern:** Show More (20 items per load) instead of rendering 200+ products immediately. State reset on filter change.
-
-**Key Benefits:** Memo boundaries eliminate sibling re-renders on state changes. Decomposed structure improves testability and maintainability.
-
-**Why:** Performance Round 2 deliverable. Monolithic components defeat React optimization and reduce code clarity.
-
----
-
----
-
-### 2026-04-30T20:00:00-04:00: Query optimization patterns — count, dedup, parallelization
-**By:** Danny (Backend Dev)
-**What:** Three core patterns for efficient backend operations:
-
-1. **Count-Only Queries:** Use `select('id', { count: 'exact', head: true })` instead of fetching rows and calling `.length`. Transfers zero rows — count lives in metadata.
-
-2. **Deduplication:** Replace O(n²) `filter + findIndex` with Map-based O(n):
-   ```ts
-   const seen = new Map()
-   return products.filter(p => !seen.has(key) && seen.set(key, true))
-   ```
-
-3. **Parallel Independent Fetches:** Use `Promise.all([fetchA(), fetchB()])` for independent API calls instead of sequential awaits.
-
-**Why:** Performance Round 2 audit found these patterns drive measurable speedup on counting, dedup, and API parallelization operations.
-
-**Enforcement:** Code review checklist for any count operation, array dedup, or parallel fetch decision.
-
----
-### 2026-05-01T22:27: User directive
-**By:** Shari Paltrowitz (via Copilot)
-**What:** New visitors to curly hair don't want to check ingredients first — they want to learn basics about maintaining their hair and understand how this website will help them. The ingredient checker is a power-user feature, not a first-visit hook. The homepage should lead with education/discovery, not tools.
-**Why:** User request — captured for team memory. Critical for homepage CTA prioritization.
-
----
-
-### 2026-05-01T22:30: User directive
+### ### 2026-05-01T22:30: User directive
 **By:** Shari Paltrowitz (via Copilot)
 **What:** Community Q&A is NOT a primary product feature — it's currently the weakest part of the app. The Reddit search engine needs significant optimization before it should be prominently featured. Demote it on the homepage; don't lead with it as a main selling point.
 **Why:** User assessment of current feature quality. The search results are not good enough to be a top-level CTA. Product catalog browsing and personalized recommendations are stronger value props right now.
 
 ---
 
-### 2026-05-01: Mobile-First Design Standards
+### ### 2026-05-01: Mobile-First Design Standards
 **By:** Jan (Product Designer)
 **What:** Established mobile-first design standards for the team:
 1. **Touch Target Minimum:** All interactive elements must have 44×44px minimum (use `min-h-[44px]`, `py-3` for inputs)
@@ -289,7 +109,7 @@ Applied to Scrunch: Do NOT put a journey question before the product browse. Eit
 
 ---
 
-### 2026-05-01: Homepage CTA Priority & Structure
+### ### 2026-05-01: Homepage CTA Priority & Structure
 **By:** Kenickie (Product Manager), approved per Shari Paltrowitz
 **What:** Restructured homepage to prioritize the Ingredient Checker as primary CTA and remove overlapping calls-to-action. 
 
@@ -310,7 +130,7 @@ Applied to Scrunch: Do NOT put a journey question before the product browse. Eit
 
 ---
 
-### 2026-05-01: Supabase vs Self-Hosted Database — Phased Approach Decision
+### ### 2026-05-01: Supabase vs Self-Hosted Database — Phased Approach Decision
 **By:** Sandy (Lead Engineer), approved by Shari Paltrowitz
 **What:** Recommends phased approach: Phase 1 (static MVP with offline-first) → Phase 2 (Supabase backend if validation positive). Current architecture uses Supabase free tier (cold starts 1-3s on first request after inactivity).
 
@@ -331,7 +151,7 @@ Applied to Scrunch: Do NOT put a journey question before the product browse. Eit
 
 ---
 
-### 2026-05-01: Performance Audit Decision Record
+### ### 2026-05-01: Performance Audit Decision Record
 **By:** Sandy (Lead Engineer)
 **Status:** Confidence 7/10 — performance is good, 3 issues worth fixing
 
@@ -354,3 +174,514 @@ Applied to Scrunch: Do NOT put a journey question before the product browse. Eit
 **Why:** Determines performance optimization priorities without over-engineering diminishing returns.
 
 ---
+# Auth Architecture Decision: Persistent Ratings Across Devices
+
+**Author:** Sandy (Lead Engineer)  
+**Date:** 2026-05-03  
+**Status:** Draft Decision  
+**Scope:** Add user accounts to persist ratings across devices (currently localStorage-only)
+
+---
+
+## Executive Summary
+
+**What exists:** Supabase Auth is **fully configured and functional**. Email/password + Google OAuth are wired end-to-end. Profiles table auto-creates on signup. Product reviews table exists with RLS policies. The app just doesn't yet save ratings to the server.
+
+**What's missing:** A migration path for localStorage ratings → Supabase, and a unified ratings hook that handles both authenticated users (save to server) and guests (stay on localStorage).
+
+**Path forward:** Add 4 new React Query hooks (useProductRatings, useMigrateLocalRatings, useRatingMutation, useDeleteRating) + run one-time migration on first auth. No schema changes needed. The data layer is already production-ready.
+
+---
+
+## Current Auth Setup Analysis
+
+### ✅ What's Already Built
+
+**Auth Provider (src/lib/auth.tsx)**
+- Email/password signup & signin: `signUp()`, `signIn()` ✓
+- Google OAuth: `signInWithGoogle()` ✓
+- Logout: `signOut()` ✓
+- Session state: `user`, `session`, `loading` ✓
+- Context + hook: `useAuth()` ✓
+- **Status:** **Fully functional**, tested with real Supabase project (rqmplfyuonkikdmqngrj)
+
+**Auth UI (src/pages/Login.tsx, src/pages/SignUp.tsx)**
+- Email/password forms with validation ✓
+- Google button ✓
+- Error handling ✓
+- **Status:** **Fully functional**
+
+**Database Schema (supabase/schema.sql)**
+- `profiles` table with auto-create trigger on auth signup ✓
+- `product_reviews` table with RLS policies (public read, auth users can insert/update own) ✓
+- Foreign keys: `profiles.id → auth.users.id`, `product_reviews.user_id → auth.users.id` ✓
+- Unique constraint: `(user_id, product_id)` on reviews (1 review per user per product) ✓
+- **Status:** **Deployed to Supabase**, RLS enabled
+
+**Supabase Config (src/lib/supabase.ts)**
+- Client initialized with real URL + anon key ✓
+- Database types generated via `supabase gen types` ✓
+- **Status:** **Production-ready**
+
+### ⚠️ What's Missing
+
+**Ratings → Server Sync:**
+- Ratings in `src/pages/Products.tsx` save to `localStorage.setItem('scrunch_ratings', ...)` only
+- Ratings in `src/pages/Recommendations.tsx` same pattern
+- **No code path** to save ratings to `product_reviews` table
+- Migration for existing localStorage ratings: **not implemented**
+
+**Query Hooks:**
+- No `useProductRatings(productId)` hook to fetch user's rating from server
+- No `useMigrateLocalRatings()` hook to bulk-insert localStorage into Supabase on first auth
+- No `useRatingMutation()` to handle both authenticated + guest paths
+
+**Recommendations Integration:**
+- `src/pages/Recommendations.tsx` calls `getLocalReviewsForRecs()` to build recommendations from localStorage
+- After auth, needs to also fetch server ratings via React Query
+
+---
+
+## Key Questions → Answers
+
+### 1. How much auth is already built?
+**80% complete.** Authentication (email, Google, logout) is fully wired and tested. Profiles auto-create. The missing piece is connecting ratings to Supabase—not auth itself.
+
+### 2. What's the simplest path to persistent ratings?
+**Add React Query hooks for ratings + migration trigger.** The Supabase schema is correct. We only need:
+- Hook to fetch user's ratings from `product_reviews` table
+- Hook to migrate localStorage → Supabase on first auth
+- Mutations to save/delete ratings on authenticated pages
+
+This is simpler than building auth from scratch, and avoids new tables or RLS policies.
+
+### 3. What providers should we support?
+**Priority 1 (Q2):** Google + Email/Password  
+**Priority 2 (Q3):** Magic link (email sign-in without password)  
+**Priority 3 (Q4):** Apple Sign-In (iOS companion app)  
+
+Current setup supports Priority 1 fully. Magic link is config-only in Supabase. Apple Sign-In requires additional Supabase config.
+
+### 4. What needs to change in the data layer?
+**Nothing.** Schema is ready:
+- `product_reviews` table exists with correct schema
+- RLS policies allow public read + authenticated insert/update
+- Unique constraint prevents duplicate reviews
+- Trigger auto-creates `profiles` on signup
+
+Optional future improvements (out of scope):
+- Denormalized `avg_rating` + `review_count` on `products` table (currently computed, not cached)
+- Partial index on `product_reviews(user_id, created_at)` for user profile pages
+
+### 5. How do we merge localStorage ratings with server-side?
+**One-time migration on first login:**
+
+```
+User logs in → AuthProvider sets loading=false → 
+  App triggers useMigrateLocalRatings() →
+    Read localStorage ratings →
+    Bulk-insert to product_reviews (ignoring conflicts) →
+    Clear localStorage →
+    Show toast "Synced X ratings"
+```
+
+This is safe because:
+- Supabase unique constraint prevents duplicates
+- If user rated on mobile + desktop (both to localStorage), one of them will be the "latest"
+- We can use `on_conflict('user_id, product_id') do update` to preserve the most recent
+
+---
+
+## Recommended Implementation Plan
+
+### Phase 1: React Query Hooks for Ratings (1-2 hours)
+
+New file: `src/hooks/useProductRatings.ts`
+
+```typescript
+// Fetch authenticated user's rating for a specific product
+export function useProductRating(productId: string | null) {
+  const { user } = useAuth()
+  return useQuery({
+    queryKey: ['product-rating', productId, user?.id],
+    enabled: !!user && !!productId,
+    queryFn: async () => {
+      if (!productId || !user) return null
+      const { data, error } = await supabase
+        .from('product_reviews')
+        .select('id,rating,would_repurchase,results_notes')
+        .eq('user_id', user.id)
+        .eq('product_id', productId)
+        .single()
+      if (error?.code === 'PGRST116') return null // Not found
+      if (error) throw error
+      return data ?? null
+    }
+  })
+}
+
+// Save/update rating (authenticated users only)
+export function useRatingMutation() {
+  const { user } = useAuth()
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (input: { productId: string; rating: number; would_repurchase: string; notes?: string }) => {
+      if (!user) throw new Error('Not authenticated')
+      const { error } = await supabase.from('product_reviews').upsert({
+        user_id: user.id,
+        product_id: input.productId,
+        rating: input.rating,
+        would_repurchase: input.would_repurchase,
+        results_notes: input.notes,
+      })
+      if (error) throw error
+    },
+    onSuccess: (_data, { productId }) => {
+      queryClient.invalidateQueries({ queryKey: ['product-rating', productId] })
+      queryClient.invalidateQueries({ queryKey: ['product-reviews', productId] })
+    }
+  })
+}
+
+// Delete rating
+export function useDeleteRating() {
+  const { user } = useAuth()
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (productId: string) => {
+      if (!user) throw new Error('Not authenticated')
+      const { error } = await supabase
+        .from('product_reviews')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('product_id', productId)
+      if (error) throw error
+    },
+    onSuccess: (_data, productId) => {
+      queryClient.invalidateQueries({ queryKey: ['product-rating', productId] })
+    }
+  })
+}
+```
+
+### Phase 2: Migration Hook (30 mins)
+
+New file: `src/hooks/useMigrateLocalRatings.ts`
+
+```typescript
+import { useEffect } from 'react'
+import { useMutation } from '@tanstack/react-query'
+import { useAuth } from '../lib/auth.utils'
+import { getLocalRatings } from '../lib/localProfile'
+import { supabase } from '../lib/supabase'
+
+export function useMigrateLocalRatings() {
+  const { user, loading } = useAuth()
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async () => {
+      if (!user) return
+      const localRatings = getLocalRatings()
+      if (Object.keys(localRatings).length === 0) return
+
+      // Convert localStorage format: { 'product-id': 'loved' } → { rating: 5, would_repurchase: 'yes', ... }
+      const ratingMap: Record<string, number> = { loved: 5, liked: 4, ok: 3, disliked: 1 }
+      const repurchaseMap: Record<string, string> = { loved: 'yes', liked: 'yes', ok: 'maybe', disliked: 'no' }
+      
+      const reviews = Object.entries(localRatings).map(([productId, triedRating]) => ({
+        user_id: user.id,
+        product_id: productId,
+        rating: ratingMap[triedRating as never],
+        would_repurchase: repurchaseMap[triedRating as never],
+        status: 'tried_once' as const,
+      }))
+
+      // Upsert with conflict handling (preserves existing if any)
+      const { error } = await supabase
+        .from('product_reviews')
+        .upsert(reviews, { onConflict: 'user_id,product_id' })
+      
+      if (error) throw error
+      
+      // Only clear localStorage after successful sync
+      localStorage.removeItem('scrunch_ratings')
+      localStorage.removeItem('scrunch_profile')
+      
+      return Object.keys(localRatings).length
+    },
+  })
+
+  useEffect(() => {
+    if (!loading && user && !isPending) {
+      mutateAsync() // Fire and forget, errors are logged via QueryClient
+    }
+  }, [loading, user?.id, isPending, mutateAsync])
+}
+```
+
+**How it's used:** In `App.tsx` after AuthProvider:
+
+```typescript
+export function App() {
+  return (
+    <AuthProvider>
+      <MigrationWrapper />
+    </AuthProvider>
+  )
+}
+
+function MigrationWrapper() {
+  useMigrateLocalRatings() // Runs automatically on first auth
+  return <Router />
+}
+```
+
+### Phase 3: Update Rating Components (1 hour)
+
+**Update src/pages/Products.tsx:**
+
+```typescript
+// Instead of:
+const [ratings, setRatings] = useState(() => JSON.parse(localStorage.getItem('scrunch_ratings') || '{}'))
+
+// Use:
+const { user } = useAuth()
+const { data: serverRating } = useProductRating(ratingPopup) // When product is selected
+const localRatings = !user ? JSON.parse(localStorage.getItem('scrunch_ratings') || '{}') : {}
+const { mutate: saveRating } = useRatingMutation()
+
+// In submit handler:
+if (user) {
+  saveRating({ productId: id, rating: 5, would_repurchase: 'yes' })
+} else {
+  setRatings(prev => ({ ...prev, [id]: 'loved' }))
+  localStorage.setItem('scrunch_ratings', JSON.stringify(ratings))
+}
+```
+
+**Update src/pages/Recommendations.tsx:**
+
+```typescript
+// For authenticated users, also fetch server ratings
+const { data: serverReviews } = useQuery({
+  queryKey: ['user-reviews', user?.id],
+  enabled: !!user,
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from('product_reviews')
+      .select('product_id,rating,would_repurchase')
+      .eq('user_id', user.id)
+    if (error) throw error
+    return data ?? []
+  }
+})
+
+// Combine for recommendations:
+const allReviews = user 
+  ? [...localReviews, ...serverReviews.map(r => toReviewFormat(r))]
+  : localReviews
+```
+
+### Phase 4: Update Recommendations Engine (optional, 30 mins)
+
+Currently in `src/components/recommendations/Recommendations.tsx`, make sure we're using both localStorage + server ratings:
+
+```typescript
+const localReviews = useMemo(() => {
+  if (user || products.length === 0) return [] // Don't use local if authenticated
+  return getLocalReviewsForRecs(products)
+}, [user, products])
+
+// Fetch server reviews for authenticated users
+const { data: serverReviews = [] } = useQuery({
+  queryKey: ['my-reviews', user?.id],
+  enabled: !!user,
+  queryFn: async () => { /* ... */ }
+})
+
+// Both sources feed recommendations
+const allReviews = [...localReviews, ...serverReviews]
+```
+
+---
+
+## Data Layer Summary
+
+### Tables (No Changes Needed)
+
+| Table | Status | Notes |
+|-------|--------|-------|
+| `auth.users` | ✅ Built | Supabase managed |
+| `profiles` | ✅ Built | Auto-creates on signup |
+| `product_reviews` | ✅ Built | RLS: public read, auth insert/update |
+| `products` | ✅ Built | Existing inventory |
+
+### RLS Policies (Already Correct)
+
+```sql
+-- Existing, no changes:
+create policy "Reviews are public" on product_reviews for select using (true);
+create policy "Auth users can insert reviews" on product_reviews for insert
+  with check (auth.uid() = user_id);
+create policy "Users can update own reviews" on product_reviews for update
+  with check (auth.uid() = user_id);
+create policy "Users can delete own reviews" on product_reviews for delete
+  with check (auth.uid() = user_id);
+```
+
+### Future Optimization (Q3, not in scope)
+
+- Add `avg_rating` + `review_count` computed columns on `products` table + materialized view
+- Partial index on `product_reviews(user_id, created_at)` for profile pages
+- Caching layer in React Query for expensive aggregations
+
+---
+
+## Migration Strategy for localStorage → Supabase
+
+### Step 1: One-Time Sync on First Login
+
+When user authenticates:
+1. `useMigrateLocalRatings` hook fires
+2. Reads localStorage `scrunch_ratings` + `scrunch_profile`
+3. Bulk-inserts to Supabase using `upsert` with conflict strategy
+4. Clears localStorage after success
+5. Shows toast: "✓ Synced X ratings"
+
+### Step 2: Conflict Handling
+
+If user rated product on two devices before syncing:
+
+```
+Device 1 localStorage: { 'prod-1': 'loved' }
+Device 2 localStorage: { 'prod-1': 'liked' }
+Server: empty
+
+After sync:
+  Upsert with on_conflict='user_id,product_id' do update
+  → Last write wins (Supabase auto-updates updated_at)
+```
+
+This is acceptable because:
+- Ratings are low-stakes (not financial)
+- User sees both devices' history in "My Reviews" later
+- UI can prompt user to re-rate if needed
+
+### Step 3: Post-Migration Behavior
+
+**For authenticated users:**
+- Ratings save to `product_reviews` immediately (via React Query mutation)
+- localStorage is ignored
+- Can sync across devices at login
+
+**For guests:**
+- Ratings stay in localStorage
+- Can be synced later if they create an account
+
+---
+
+## File Changes Summary
+
+| File | Change | Complexity |
+|------|--------|------------|
+| `src/hooks/useProductRatings.ts` | **NEW** — fetch/save/delete rating hooks | 🟢 Low |
+| `src/hooks/useMigrateLocalRatings.ts` | **NEW** — migration on first auth | 🟢 Low |
+| `src/pages/Products.tsx` | Use hooks instead of useState + localStorage | 🟡 Medium |
+| `src/pages/Recommendations.tsx` | Fetch server ratings for authenticated users | 🟡 Medium |
+| `src/components/recommendations/Recommendations.tsx` | Include server reviews in scoring | 🟡 Medium |
+| `src/App.tsx` | Add MigrationWrapper for useMigrateLocalRatings() | 🟢 Low |
+| `supabase/schema.sql` | **No changes** — already correct | ✅ Done |
+| `src/lib/auth.tsx` | **No changes** — already complete | ✅ Done |
+| `src/lib/supabase.ts` | **No changes** — already configured | ✅ Done |
+
+---
+
+## Provider Priority & Roadmap
+
+### Phase 1: Q2 (This Sprint)
+- ✅ Email/Password (already built)
+- ✅ Google OAuth (already built)
+- Task: Connect to ratings storage
+
+### Phase 2: Q3
+- Magic link (email sign-in, no password)
+- Apple Sign-In config (iOS companion app prep)
+- Analytics: track auth conversion funnel
+
+### Phase 3: Q4+
+- OAuth provider expansion (GitHub, Microsoft) if needed
+- SAML for enterprise
+- Passwordless WebAuthn
+
+---
+
+## Complexity & Effort Estimate
+
+| Item | Complexity | Effort | Risk |
+|------|------------|--------|------|
+| Add rating hooks | 🟢 Low | 2 hours | Minimal — isolated hooks |
+| Add migration hook | 🟢 Low | 1 hour | Low — upsert handles conflicts |
+| Update Products.tsx | 🟡 Medium | 1 hour | Medium — interacts with state management |
+| Update Recommendations | 🟡 Medium | 1 hour | Low — additive query, no logic change |
+| Testing & verification | 🟡 Medium | 2 hours | Low — mostly manual E2E |
+| **Total** | | **7 hours** | **Low** |
+
+---
+
+## Rollout Strategy
+
+### Week 1: Build + Test
+1. Implement hooks in isolation ✓
+2. Unit test useMigrateLocalRatings (with mocked supabase) ✓
+3. Manual E2E: Create account → Rate product → Logout/login → Ratings persist ✓
+
+### Week 2: Staged Rollout
+1. Merge to `main` (feature complete)
+2. Deploy to GitHub Pages (GitHub Actions CI/CD)
+3. Monitor: localStorage → Supabase sync success rate
+4. Alert: If >10% migration failures, rollback
+
+### Monitoring Queries
+
+```sql
+-- Verify migration success
+SELECT COUNT(*), COUNT(DISTINCT user_id) FROM product_reviews;
+-- Should match number of localStorage keys × 0.8 (some dupes expected)
+
+-- Track auth conversion
+SELECT 
+  DATE(created_at) as date,
+  COUNT(DISTINCT id) as new_users,
+  COUNT(DISTINCT CASE WHEN onboarding_completed THEN id END) as completed_onboarding
+FROM profiles
+GROUP BY DATE(created_at);
+```
+
+---
+
+## Post-Implementation Follow-Up
+
+### Immediate (Week 3-4)
+- [ ] Analytics: Review auth funnel (signup → onboarding → first rating)
+- [ ] Survey: Ask users if sync worked smoothly
+- [ ] Fix any edge cases (bad auth state, network errors during migration)
+
+### Q3
+- [ ] Magic link auth (config-only in Supabase)
+- [ ] Denormalize avg_rating on products table
+- [ ] User profile page to show all reviews
+
+### Q4+
+- [ ] Apple Sign-In for iOS companion app
+- [ ] Social sharing of reviews
+- [ ] Reputation system (most helpful reviews)
+
+---
+
+## Decision Summary
+
+**We proceed with Phase 1 (add hooks + migration).** The auth infrastructure is already production-ready; we're just connecting ratings storage to it. This is a safe, low-risk addition with high user value (persistent cross-device ratings).
+
+**Start:** Next sprint  
+**Duration:** 1 sprint (7 hours active work)  
+**Owner:** Sandy (Lead) + one frontend dev  
+**Approval:** Pending stakeholder sign-off
