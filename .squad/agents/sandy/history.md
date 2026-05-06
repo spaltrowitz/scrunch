@@ -73,3 +73,10 @@
 ## Session Archive Summary
 
 Sandy completed 9+ sessions: ship-readiness audit (14-page assessment), PR #13 full code review (65 files, APPROVED), PR merge batch (#9/#12/#15 with conflict resolution), TikTok legal analysis (safe practices defined, 3-phase roadmap), performance audit (static import optimization, auth loading gate), Supabase vs self-hosted analysis (phased recommendation), toast convention establishment, product strategy integration from Kenickie, and homepage enrichment strategy (adoption-gap closure). Key role: architectural gatekeeper and strategic lead ensuring React Query migration consistency and product clarity across all PRs.
+
+## 2026-05-06: Homepage UX Analysis (3 Personas)
+
+- Analyzed Reddit r/curlyhair lurker, TikTok scroller, and frustrated beginner personas against current homepage
+- Identified 3 conversion blockers: (1) Hero copy lacks trust signals, (2) Ingredient checker hidden, (3) No beginner guidance
+- Recommended prioritized changes: hero reframe (copy), beginner collection (high-value, low-effort), ingredient teaser (deferred to sprint 2)
+- Key insight: Homepage answers "what is Scrunch?" but not "why should I use it right now?"

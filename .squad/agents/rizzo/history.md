@@ -71,3 +71,11 @@ The following learnings come from Tester agents across Shari's other personal pr
 
 ### From HealthStitch (Zoe — Tester)
 - No testing learnings recorded yet (project in early stage). Stack: Node.js/Express backend, React/Vite frontend, Swift/SwiftUI iOS, SQLite.
+
+## 2026-05-06: Mobile Responsive Audit (Full)
+
+- Audited all 16 pages and 12 key components per WCAG 2.5.5 + Apple HIG standards
+- Found 6 blockers (touch targets on primary CTAs), 14 should-fix issues, 10 nice-to-have improvements
+- Documented all findings with file paths and specific fixes (30 total issues)
+- Priority framework: blockers first (6), then should-fix (14), then nice-to-have (10)
+- Already good: header nav, container patterns, grid collapse, text overflow handling

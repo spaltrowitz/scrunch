@@ -235,3 +235,77 @@ Danny expanded the community features to include the wavy hair subreddit:
 
 **Build Status:** ✅ Build passes.
 
+
+## Agent: Sandy (Lead)
+
+**Task:** User POV homepage analysis from 3 curly hair personas  
+**Outcome:** Completed. Found 3 conversion gaps (Reddit lurker, TikTok scroller, frustrated beginner). Proposed top 2-3 copy/UX changes for highest conversion lift.
+
+### Summary
+Sandy conducted deep persona analysis on the existing homepage against three key user segments:
+- **Reddit r/curlyhair Lurker:** Seeking trust signals and low-friction product discovery. Hero doesn't answer "why should I trust this?"
+- **TikTok #CurlyHairTok Scroller:** Skeptical of paid recommendations. Ingredient transparency invisible on homepage.
+- **Frustrated Beginner:** No "where to start?" guidance. 400 products create paralysis, not discovery.
+
+**Conversion Blockers Identified:**
+1. Hero copy "Find products that actually work for your curls" is circular; lacks trust signals for skeptics
+2. Ingredient checker (differentiation) is hidden below the fold and in product pages only
+3. No beginner collection or guided path for search-traffic users (high-intent, SEO-friendly)
+
+**Recommended Changes (Priority):**
+- Change #1: Reframe hero sub-heading to emphasize community + no ads + ingredient checking (addresses all 3 personas)
+- Change #2: Add ingredient checker teaser below trending section with visual example (TikTok scroller hook)
+- Change #3: Add "Beginner's First Steps" micro-section with 3-product starter set ($15–$25) for search traffic
+
+**Implementation Notes:** #1 is copy-only; #2 requires moderate lifting (filter state); #3 is low-effort, high-conversion (product collection tag + section).
+
+---
+
+## Agent: Frenchy (Frontend)
+
+**Task:** PWA manifest + install instructions  
+**Outcome:** Completed. Created manifest.json, generated icons, added "Add to Home Screen" guide to About page.
+
+### Summary
+Frenchy added PWA baseline capabilities without a service worker (avoiding offline caching complexity):
+
+**What Shipped:**
+- `manifest.json` with app name, theme color, icon references
+- PNG icons (192x192, 512x512) generated from SVG favicon
+- "Add to Home Screen" user instructions added to About page
+- PWA meta tags in index.html
+
+**Trade-off (Documented):** Without a service worker, Chrome's automatic install prompt won't fire. Users need manual instructions. Adding a minimal service worker later would unlock browser-driven install UX.
+
+**Key Decision:** PWA basics without offline complexity. Keeps surface area small; ready for caching layer iteration in future.
+
+**Files Added/Modified:** manifest.json, public/icons/, About.tsx, index.html meta tags
+
+---
+
+## Agent: Rizzo (Tester)
+
+**Task:** Full mobile responsive audit  
+**Outcome:** Completed. Audited all 16 pages + 12 components. Found 6 blockers (touch targets), 14 should-fix issues, 10 nice-to-have improvements. Documented all with file paths and fixes.
+
+### Summary
+Rizzo conducted comprehensive mobile audit per WCAG 2.5.5 and Apple HIG standards:
+
+**Blockers (6):** Touch target compliance on primary CTAs
+- Header Sign Out/In (too small)
+- RecommendedCard action buttons (Save/Rate/Dismiss)
+- QuickRateCard rating buttons
+- ProductDetail rating grid (2-column on mobile instead of 1)
+- RecommendedCard rating popup overflow on narrow screens
+
+**Should-Fix (14):** Page-level and component-level touch targets + grid/spacing responsive gaps
+- Login/SignUp buttons, Profile Quick Links grid, Dashboard CTAs, Category filter pills, FeedbackButton modal, ProductCard buttons, Footer nav links, etc.
+
+**Nice-to-Have (10):** Polish improvements (responsive image heights, padding scaling, textarea heights, container heights)
+
+**Already Good:** Header mobile nav (correct 44px), Footer wrapping, container max-w pattern, grid collapse, text overflow, FilterPanel mobile overlay, image constraints, Community buttons.
+
+**Priority:** Blockers first (6 items), then should-fix (14 items), then nice-to-have (10 items).
+
+---
+

@@ -43,6 +43,31 @@ export function About() {
           </p>
         </section>
 
+        <section className="bg-white border border-gray-200 rounded-lg p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">📱 Add Scrunch to Your Home Screen</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Use Scrunch like a real app - no app store needed.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">iPhone / iPad</h3>
+              <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
+                <li>Open Scrunch in <span className="font-medium">Safari</span></li>
+                <li>Tap the <span className="font-medium">Share</span> button (↑)</li>
+                <li>Scroll down and tap <span className="font-medium">"Add to Home Screen"</span></li>
+              </ol>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Android</h3>
+              <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
+                <li>Open Scrunch in <span className="font-medium">Chrome</span></li>
+                <li>Tap the <span className="font-medium">menu</span> (⋮)</li>
+                <li>Tap <span className="font-medium">"Add to Home Screen"</span></li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
         <details className="border-t border-gray-200 pt-6" id="credits">
           <summary className="text-sm font-semibold text-gray-900 cursor-pointer hover:text-violet-700 transition">
             Sources & Credits

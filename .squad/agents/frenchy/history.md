@@ -92,3 +92,19 @@ Frenchy completed 13+ sessions: homepage redesign (discovery-first → Prose-ins
 - **Anchor linking:** "See how it works" in hero links to `#how-it-works` section ID. Note: HashRouter may interfere with anchor scroll - test in browser.
 - **No new components or dependencies added** - pure JSX additions to Home.tsx.
 - **No em dashes used** - hard rule across the app.
+
+### PWA Support (2026 session)
+- **Created `public/manifest.json`** with app name, theme color (#7c3aed violet), standalone display mode, and icons (SVG + PNG 192/512 + maskable variants).
+- **Updated `index.html`** with manifest link, apple-touch-icon, theme-color meta, apple-mobile-web-app-capable/title metas.
+- **Generated PNG icons** from favicon.svg using sharp-cli (192px and 512px, plus maskable copies).
+- **Added "Add to Home Screen" instructions** to About.tsx - a card section above the credits with iPhone/iPad and Android steps in a 2-column grid.
+- **No service worker added** - that's a bigger task. Current setup enables basic PWA metadata and "Add to Home Screen" prompts on Android Chrome. iOS Safari will use the apple-mobile-web-app-* metas.
+- **Base path:** All manifest/icon paths use `/scrunch/` prefix matching vite.config.ts `base`.
+
+## 2026-05-06: PWA Implementation (Baseline)
+
+- Added manifest.json with app metadata (name, theme color, icons)
+- Generated PNG icons (192x192, 512x512) from SVG favicon
+- Added "Add to Home Screen" install instructions to About page
+- Deliberately deferred service worker (offline caching) to avoid complexity; documented trade-off
+- Key decision: PWA basics now, offline layer later
