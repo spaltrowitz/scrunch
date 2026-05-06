@@ -39,10 +39,10 @@ export function Home() {
 
         <div className="flex flex-col items-center gap-3">
           <Link
-            to="/recommendations"
+            to="/products"
             className="px-6 py-3 min-h-[44px] flex items-center rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium text-sm transition-colors"
           >
-            Take the Hair Quiz →
+            Browse Products →
           </Link>
         </div>
 
