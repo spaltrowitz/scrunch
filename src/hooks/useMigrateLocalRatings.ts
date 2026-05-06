@@ -61,7 +61,7 @@ export function useMigrateLocalRatings() {
     },
     onError: (error) => {
       console.error('Rating migration failed:', error)
-      addToast('Some ratings could not be synced. They'll stay saved locally.', 'error')
+      addToast('Some ratings could not be synced. They will stay saved locally.', 'error')
     },
   })
 
