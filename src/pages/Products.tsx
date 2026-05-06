@@ -369,7 +369,7 @@ export function Products() {
               Rate {ratingsNeeded} more product{ratingsNeeded !== 1 ? 's' : ''} to unlock personalized suggestions ✨
             </p>
             <p className="text-xs text-violet-600 mt-0.5">
-              {userRatingCount}/10 rated — click "Tried it?" on products you've used
+              {userRatingCount}/10 rated - click "Tried it?" on products you've used
             </p>
           </div>
           <div className="w-full sm:w-24 h-2 bg-violet-200 rounded-full shrink-0">

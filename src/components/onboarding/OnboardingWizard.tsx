@@ -196,7 +196,7 @@ export function OnboardingWizard() {
       <div className="w-full max-w-lg">
         {/* Header */}
         {isEditing && step === 1 && (
-          <p className="text-sm text-violet-600 mb-4">✏️ Editing your hair profile — your current selections are pre-loaded</p>
+          <p className="text-sm text-violet-600 mb-4">✏️ Editing your hair profile - your current selections are pre-loaded</p>
         )}
         {/* Progress */}
         <div className="mb-8">
@@ -241,7 +241,7 @@ export function OnboardingWizard() {
                     <li><strong>Soaks in immediately</strong> → High porosity</li>
                   </ul>
                 </div>
-                <p className="text-gray-500 italic">⚠️ The "float test" (hair in water) is unreliable — fine hair floats regardless of porosity, and product residue skews results. The spray test and characteristics above are more accurate.</p>
+                <p className="text-gray-500 italic">⚠️ The "float test" (hair in water) is unreliable - fine hair floats regardless of porosity, and product residue skews results. The spray test and characteristics above are more accurate.</p>
               </div>
             </details>
 
@@ -257,7 +257,7 @@ export function OnboardingWizard() {
                 onClick={() => { update('porosity', null as unknown as Porosity); setStep(s => s + 1) }}
                 className="w-full px-4 py-3 rounded-lg border border-dashed border-gray-300 text-sm text-gray-400 hover:text-gray-600 hover:border-gray-400 cursor-pointer transition text-left"
               >
-                🧪 Not sure yet — I'll figure it out later
+                🧪 Not sure yet - I'll figure it out later
               </button>
             </div>
           </div>
@@ -271,7 +271,7 @@ export function OnboardingWizard() {
 
             <div className="mb-6">
               <h3 className="text-sm font-semibold text-gray-800 mb-1">Density</h3>
-              <p className="text-xs text-gray-500 mb-3">Part your hair and check the mirror — the more scalp you see, the less dense.</p>
+              <p className="text-xs text-gray-500 mb-3">Part your hair and check the mirror - the more scalp you see, the less dense.</p>
               <div className="grid grid-cols-3 gap-3">
                 {(['thin', 'medium', 'thick'] as const).map(v => (
                   <OptionButton key={v} selected={data.hair_density === v} onClick={() => update('hair_density', v)}>
@@ -283,7 +283,7 @@ export function OnboardingWizard() {
 
             <div>
               <h3 className="text-sm font-semibold text-gray-800 mb-1">Strand Width (Texture)</h3>
-              <p className="text-xs text-gray-500 mb-3">Roll a single strand between your fingers. Compare to sewing thread — fine is thinner, coarse is thicker.</p>
+              <p className="text-xs text-gray-500 mb-3">Roll a single strand between your fingers. Compare to sewing thread - fine is thinner, coarse is thicker.</p>
               <div className="grid grid-cols-3 gap-3">
                 {(['fine', 'medium', 'coarse'] as const).map(v => (
                   <OptionButton key={v} selected={data.hair_width === v} onClick={() => update('hair_width', v)}>
@@ -480,8 +480,8 @@ export function OnboardingWizard() {
               })}
             </div>
             <p className="text-xs text-gray-400 mt-4">
-              <strong>Prefer to avoid</strong> — we'll warn you but still show the product.
-              <strong> Must avoid</strong> — we'll hide it from recommendations.
+              <strong>Prefer to avoid</strong> - we'll warn you but still show the product.
+              <strong> Must avoid</strong> - we'll hide it from recommendations.
             </p>
 
             <div className="mt-6">
@@ -515,7 +515,7 @@ export function OnboardingWizard() {
                 onClick={() => { update('custom_brand', null); update('custom_hero_ingredients', []); setStep(s => s + 1) }}
                 className="w-full px-4 py-3 rounded-lg border border-dashed border-gray-300 text-sm text-gray-400 hover:text-gray-600 hover:border-gray-400 cursor-pointer transition text-left"
               >
-                I don't use a custom brand — skip this
+                I don't use a custom brand - skip this
               </button>
             </div>
 
@@ -557,7 +557,7 @@ export function OnboardingWizard() {
                 {data.custom_hero_ingredients.length > 0 && (
                   <div className="mt-4 p-3 bg-violet-50 border border-violet-200 rounded-lg">
                     <p className="text-xs text-violet-700">
-                      ✨ Selected {data.custom_hero_ingredients.length} ingredient{data.custom_hero_ingredients.length !== 1 ? 's' : ''} — we'll find cheaper products with these same ingredients
+                      ✨ Selected {data.custom_hero_ingredients.length} ingredient{data.custom_hero_ingredients.length !== 1 ? 's' : ''} - we'll find cheaper products with these same ingredients
                     </p>
                   </div>
                 )}
@@ -566,14 +566,14 @@ export function OnboardingWizard() {
           </div>
         )}
 
-        {/* ── Step 8: Curl Pattern (OPTIONAL — last, because porosity+texture matter more) ── */}
+        {/* ── Step 8: Curl Pattern (OPTIONAL - last, because porosity+texture matter more) ── */}
         {step === 8 && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">What's your curl pattern? <span className="text-sm font-normal text-gray-400">(optional)</span></h2>
-            <p className="text-sm text-gray-500 mb-1">Curl type can change over time and varies across your head — that's normal!</p>
+            <p className="text-sm text-gray-500 mb-1">Curl type can change over time and varies across your head - that's normal!</p>
             <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg mb-4">
               <p className="text-xs text-amber-800">
-                💡 <strong>Porosity and texture matter more than curl type for choosing products.</strong> This is optional — your porosity and strand width (already captured) are what drive our recommendations.
+                💡 <strong>Porosity and texture matter more than curl type for choosing products.</strong> This is optional - your porosity and strand width (already captured) are what drive our recommendations.
               </p>
             </div>
             <a

@@ -35,7 +35,7 @@ export function Terms() {
               <strong>Check your allergens.</strong> Always review the full ingredient list on
               the product packaging before use. Product formulations can change without notice.
               If you have known allergies or sensitivities, verify ingredients directly on the
-              product — do not rely solely on Scrunch's ingredient analysis.
+              product - do not rely solely on Scrunch's ingredient analysis.
             </p>
           </div>
         </section>
@@ -49,19 +49,19 @@ export function Terms() {
             hair type. We are:
           </p>
           <ul className="list-disc pl-5 mt-2 space-y-1">
-            <li>A <strong>product information aggregator</strong> — we curate and organize data from public sources</li>
-            <li>A <strong>community review platform</strong> — users share their experiences with products</li>
-            <li>An <strong>educational resource</strong> — we explain ingredients and hair science concepts</li>
+            <li>A <strong>product information aggregator</strong> - we curate and organize data from public sources</li>
+            <li>A <strong>community review platform</strong> - users share their experiences with products</li>
+            <li>An <strong>educational resource</strong> - we explain ingredients and hair science concepts</li>
           </ul>
         </section>
 
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mb-2">What Scrunch Is Not</h2>
           <ul className="list-disc pl-5 space-y-1">
-            <li>We are <strong>not a retailer</strong> — we do not sell, manufacture, or distribute any products</li>
-            <li>We are <strong>not medical professionals</strong> — our content is not medical advice</li>
-            <li>We are <strong>not affiliated with any brands</strong> — we accept no paid sponsorships or advertising</li>
-            <li>We do <strong>not guarantee product safety</strong> — ingredient analysis is educational, not a safety certification</li>
+            <li>We are <strong>not a retailer</strong> - we do not sell, manufacture, or distribute any products</li>
+            <li>We are <strong>not medical professionals</strong> - our content is not medical advice</li>
+            <li>We are <strong>not affiliated with any brands</strong> - we accept no paid sponsorships or advertising</li>
+            <li>We do <strong>not guarantee product safety</strong> - ingredient analysis is educational, not a safety certification</li>
           </ul>
         </section>
 
@@ -70,7 +70,7 @@ export function Terms() {
           <p>
             Our ingredient checker and Scrunch Score are based on publicly available information
             about the Curly Girl Method and general ingredient science. They indicate whether a
-            product's ingredients align with CGM guidelines — <strong>they do not indicate
+            product's ingredients align with CGM guidelines - <strong>they do not indicate
             product safety, efficacy, or suitability for any individual</strong>.
           </p>
           <p className="mt-2">

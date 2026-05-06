@@ -34,7 +34,7 @@ export function Home() {
         </h1>
 
         <p className="text-sm md:text-base text-gray-600 mb-6 max-w-xl leading-relaxed">
-          Find your perfect products, check any ingredient list in seconds, and discover what actually works — backed by 400K+ community members.
+          Find your perfect products, check any ingredient list in seconds, and discover what actually works - backed by 400K+ community members.
         </p>
 
         <div className="flex flex-col items-center gap-3">
@@ -44,45 +44,25 @@ export function Home() {
           >
             Take the Hair Quiz →
           </Link>
-          <Link
-            to="/products"
-            className="text-sm text-violet-600 hover:text-violet-800 no-underline font-medium"
-          >
-            Browse Products →
-          </Link>
         </div>
 
       </section>
 
-      {/* Features — 2 columns */}
+      {/* Features */}
       <section className="py-10 px-4 border-b border-gray-200">
-        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="max-w-lg mx-auto">
           <div className="p-5 rounded-xl border border-gray-200 hover:border-violet-200 transition flex flex-col">
             <h2 className="text-sm font-semibold text-gray-900 mb-1.5">
               Check any ingredient list
             </h2>
             <p className="text-xs text-gray-600 mb-3 leading-relaxed flex-1">
-              Paste a product label and instantly find out if it's curl-safe — no guesswork, no Googling.
+              Paste a product label and instantly find out if it's curl-safe - no guesswork, no Googling.
             </p>
             <Link
               to="/ingredients"
               className="inline-flex items-center justify-center w-full md:w-auto text-sm md:text-xs px-4 md:px-3 py-3 md:py-2 min-h-[44px] md:min-h-0 rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors mt-auto"
             >
               Try Ingredient Checker →
-            </Link>
-          </div>
-          <div className="p-5 rounded-xl border border-gray-200 hover:border-violet-200 transition flex flex-col">
-            <h2 className="text-sm font-semibold text-gray-900 mb-1.5">
-              Your hair goals, your perfect routine
-            </h2>
-            <p className="text-xs text-gray-600 mb-3 leading-relaxed flex-1">
-              Tell us about your hair and goals — Scrunch matches products to your curl pattern, porosity, and what you're looking for.
-            </p>
-            <Link
-              to="/recommendations"
-              className="inline-flex items-center justify-center w-full md:w-auto text-sm md:text-xs px-4 md:px-3 py-3 md:py-2 min-h-[44px] md:min-h-0 rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium transition-colors mt-auto"
-            >
-              Get Personalized Picks →
             </Link>
           </div>
         </div>
@@ -97,7 +77,7 @@ export function Home() {
                 🎵 Trending on #HairTok
               </h2>
               <p className="text-gray-600">
-                Popular products from #CurlyHairTikTok — ingredient-checked by Scrunch.
+                Popular products from #CurlyHairTikTok - ingredient-checked by Scrunch.
               </p>
             </div>
 

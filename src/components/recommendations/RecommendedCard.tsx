@@ -10,7 +10,7 @@ const DISMISS_REASONS = [
   'Wrong for my porosity',
   'Too expensive',
   'Not available near me',
-  'Already tried — didn\'t work',
+  'Already tried - didn\'t work',
   'Not interested',
 ]
 

@@ -28,7 +28,7 @@ export function Dashboard() {
           <div className="p-6 bg-violet-50 border border-violet-200 rounded-xl">
             <h2 className="font-semibold text-gray-900 mb-2">First, let's set up your hair profile</h2>
             <p className="text-sm text-gray-600 mb-4">
-              Tell us about your curl pattern, porosity, and goals — takes about 2 minutes.
+              Tell us about your curl pattern, porosity, and goals - takes about 2 minutes.
               This lets us recommend products that work for people with hair like yours.
             </p>
             <Link
@@ -50,7 +50,7 @@ export function Dashboard() {
               <h2 className="font-semibold text-gray-900 mb-2">🧴 Starting CGM? Your first step is a clarifying wash</h2>
               <p className="text-sm text-gray-600 mb-3">
                 Before beginning the Curly Girl Method, you need to remove all product buildup with a clarifying shampoo
-                (one that contains sulfates but NO silicones). This is a one-time reset — after this, you'll switch to gentler cleansers.
+                (one that contains sulfates but NO silicones). This is a one-time reset - after this, you'll switch to gentler cleansers.
               </p>
               <Link
                 to="/products?category=clarifying_shampoo"
@@ -81,7 +81,7 @@ export function Dashboard() {
         <p className="text-gray-600 mb-6">Here's what's new for you.</p>
       )}
 
-      {/* Main actions — always show but adapt */}
+      {/* Main actions - always show but adapt */}
       <div className="grid md:grid-cols-2 gap-4">
         <Link to="/products" className="block p-5 bg-white rounded-xl border border-gray-200 hover:border-violet-300 hover:shadow-sm transition no-underline">
           <h3 className="font-semibold text-gray-900 mb-1">🔍 Browse Products</h3>

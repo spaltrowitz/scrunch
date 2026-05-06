@@ -53,7 +53,7 @@ export function RequestProductForm({ onClose }: { onClose: () => void }) {
     ].filter(Boolean).join('\n\n')
 
     const params = new URLSearchParams({
-      title: `[Product Request] ${request.brand} — ${request.name}`,
+      title: `[Product Request] ${request.brand} - ${request.name}`,
       body: issueBody,
       labels: 'product-request,from-app',
     })

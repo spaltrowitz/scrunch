@@ -45,7 +45,7 @@ export function ProfilePage() {
             <h2 className="font-semibold text-gray-900 mb-4">Hair Profile</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
               {[
-                { label: 'Curl Pattern', value: profile!.curl_pattern ? `${profile!.curl_pattern} — ${CURL_PATTERNS.find(c => c.value === profile!.curl_pattern)?.description}` : null },
+                { label: 'Curl Pattern', value: profile!.curl_pattern ? `${profile!.curl_pattern} - ${CURL_PATTERNS.find(c => c.value === profile!.curl_pattern)?.description}` : null },
                 { label: 'Porosity', value: profile!.porosity ? POROSITY_OPTIONS.find(p => p.value === profile!.porosity)?.label : null },
                 { label: 'Hair Density', value: profile!.hair_density },
                 { label: 'Hair Width', value: profile!.hair_width },

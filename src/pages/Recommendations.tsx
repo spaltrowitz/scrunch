@@ -133,7 +133,7 @@ export function Recommendations() {
     },
   })
   // Only block rendering if we have zero products (no placeholder either).
-  // Profile/reviews load in the background — the tier upgrades reactively.
+  // Profile/reviews load in the background - the tier upgrades reactively.
   const loading = !productsData
 
   const {
@@ -359,7 +359,7 @@ export function Recommendations() {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-gray-400">No recommendations yet — keep rating!</p>
+          <p className="text-sm text-gray-400">No recommendations yet - keep rating!</p>
         )}
       </section>
 

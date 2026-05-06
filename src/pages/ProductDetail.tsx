@@ -44,7 +44,7 @@ export function ProductDetail() {
   const { addToast } = useToast()
   const { data: product, isLoading: productLoading, error: productError } = useProduct(id)
 
-  usePageTitle(product ? `${product.brand} ${product.name} — Scrunch` : undefined)
+  usePageTitle(product ? `${product.brand} ${product.name} - Scrunch` : undefined)
 
   const { data: myRatingData } = useProductRating(id ?? null)
   const ratingMutation = useRatingMutation()
@@ -185,7 +185,7 @@ export function ProductDetail() {
                   <span className="mt-0.5 shrink-0">{flagged ? (flagged.severity === 'bad' ? '🔴' : '🟡') : '🟢'}</span>
                   <span className={`break-words ${flagged ? 'text-gray-900 font-medium' : 'text-gray-600'}`}>
                     {ing}
-                    {flagged && <span className="text-gray-500 font-normal"> — {flagged.reason}</span>}
+                    {flagged && <span className="text-gray-500 font-normal"> - {flagged.reason}</span>}
                   </span>
                 </div>
               )
@@ -282,7 +282,7 @@ export function ProductDetail() {
         ) : (
           <>
             <p className="text-sm text-gray-700 mb-4">
-              {allRatings.length} {allRatings.length === 1 ? 'person' : 'people'} rated this — {lovedPct}% loved it
+              {allRatings.length} {allRatings.length === 1 ? 'person' : 'people'} rated this - {lovedPct}% loved it
             </p>
 
             {/* Hair type breakdown */}

@@ -4,7 +4,7 @@ export function Credits() {
       <h1 className="text-2xl font-bold text-gray-900 mb-2">Credits & Sources</h1>
       <p className="text-gray-600 mb-8">
         Scrunch is built on the shoulders of an incredible curly hair community.
-        We believe in transparency — here are the sources that power this app.
+        We believe in transparency - here are the sources that power this app.
       </p>
 
       {/* Product Data Sources */}
@@ -73,7 +73,7 @@ export function Credits() {
           <SourceCard
             name="r/curlyhair"
             url="https://www.reddit.com/r/curlyhair/"
-            description="339K weekly visitors. The largest curly hair community on Reddit — holy grail product threads, routine megathreads, and technique discussions."
+            description="339K weekly visitors. The largest curly hair community on Reddit - holy grail product threads, routine megathreads, and technique discussions."
           />
           <SourceCard
             name="r/curlygirl"
@@ -83,7 +83,7 @@ export function Credits() {
           <SourceCard
             name="r/wavyhair"
             url="https://www.reddit.com/r/wavyhair/"
-            description="Wavy hair community on Reddit — techniques, product recommendations, and support for 2A-2C hair types."
+            description="Wavy hair community on Reddit - techniques, product recommendations, and support for 2A-2C hair types."
           />
         </div>
       </section>
@@ -112,7 +112,7 @@ export function Credits() {
           <li>🚫 <strong>No paid advertising.</strong> We will never run ads.</li>
           <li>🤝 <strong>Community-driven.</strong> Recommendations come from real people, not brands.</li>
           <li>🔍 <strong>Unbiased data.</strong> We cross-reference multiple sources, never relying on one authority.</li>
-          <li>🔗 <strong>Transparent sources.</strong> We always link back to original content — we curate, not copy.</li>
+          <li>🔗 <strong>Transparent sources.</strong> We always link back to original content - we curate, not copy.</li>
           <li>🐰 <strong>No sponsored content.</strong> YouTube and Reddit content is filtered for genuine reviews only.</li>
         </ul>
       </div>

@@ -93,7 +93,7 @@ function extractSearchTerms(query: string): { primary: string; fallback: string 
   const normalized = lower.replace(/[^\w\s'-]/g, ' ')
   const words = normalized.split(/\s+/).filter(Boolean)
 
-  // Drop celebrity/pop culture names — they won't match hair posts
+  // Drop celebrity/pop culture names - they won't match hair posts
   const NOISE_WORDS = new Set([
     'taylor', 'swift', 'beyonce', 'rihanna', 'zendaya', 'ariana', 'grande',
     'kardashian', 'jenner', 'folklore', 'era', 'eras', 'tour', 'album',
@@ -183,7 +183,7 @@ const TRENDING_TOPICS = [
   'bond repair vs protein treatment',
   'best diffuser technique for volume',
   'low porosity deep conditioning tips',
-  'CGM for wavy hair — modified routine',
+  'CGM for wavy hair - modified routine',
   'flaxseed gel DIY recipe',
 ] as const
 
@@ -278,7 +278,7 @@ async function searchReddit(query: string): Promise<SearchResponse> {
   const withComments = deduped.filter(r => r.num_comments > 0)
   const pool = withComments.length >= 3 ? withComments : deduped
 
-  // Score and rank results — stem-aware partial matching
+  // Score and rank results - stem-aware partial matching
   const searchWords = primary.toLowerCase().split(/\s+/)
   const searchStems = searchWords.map(w => simpleStem(w)).filter(s => s.length >= 2)
   const scored = pool.map(r => {
@@ -431,7 +431,7 @@ export function Community() {
         Ask anything about curly or wavy hair. We'll search the top Reddit communities for real answers.
       </p>
 
-      {/* Ask a question — collapses after first submission */}
+      {/* Ask a question - collapses after first submission */}
       {showSearchBox ? (
         <>
           <form onSubmit={handleAsk} className="mb-8">
@@ -457,7 +457,7 @@ export function Community() {
             </div>
           </form>
 
-          {/* Default browsing state — categories, trending, popular questions */}
+          {/* Default browsing state - categories, trending, popular questions */}
           {history.length === 0 && !loading && (
             <>
               {/* Browse by category */}
@@ -499,8 +499,8 @@ export function Community() {
                   {[
                     'Best gel for fine curly hair?',
                     'How to fix protein overload?',
-                    'Curly girl method for beginners — where to start?',
-                    'Low porosity hair — what products actually work?',
+                    'Curly girl method for beginners - where to start?',
+                    'Low porosity hair - what products actually work?',
                     'How to refresh day 2 curls?',
                     'Sulfate-free shampoo recommendations?',
                   ].map((q, i) => (
@@ -551,7 +551,7 @@ export function Community() {
               <div className="px-6 py-6">
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
                   <p className="text-sm font-medium text-red-800 mb-1">😕 Couldn't reach Reddit right now</p>
-                  <p className="text-sm text-red-700">The search didn't go through — Reddit may be temporarily unavailable. You can try again or browse the communities directly.</p>
+                  <p className="text-sm text-red-700">The search didn't go through - Reddit may be temporarily unavailable. You can try again or browse the communities directly.</p>
                 </div>
                 <button
                   onClick={() => { setQuestion(item.question); setShowSearchBox(true); }}
@@ -595,7 +595,7 @@ export function Community() {
               </div>
             )}
 
-            {/* Success state — Summary */}
+            {/* Success state - Summary */}
             {item.searchStatus === 'ok' && item.aiAnswer && (
               <div className="px-6 py-4 border-b border-gray-100">
                 <div className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
@@ -604,7 +604,7 @@ export function Community() {
               </div>
             )}
 
-            {/* Success state — Reddit Results */}
+            {/* Success state - Reddit Results */}
             {item.searchStatus === 'ok' && item.redditResults.length > 0 && (
               <div className="px-6 py-4">
                 <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">

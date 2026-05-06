@@ -28,7 +28,7 @@ const CATEGORY_CONFIG: Record<string, { icon: string; accent: string }> = {
 const DEFAULT_CONFIG = { icon: '🌀', accent: 'from-violet-100 to-violet-50' }
 
 const TOOLTIP_TEXT =
-  '📸 No product image yet — we only use photos from approved sources to respect copyright.'
+  '📸 No product image yet - we only use photos from approved sources to respect copyright.'
 
 export function ProductPlaceholder({ brand, name, category, className = 'w-16 h-16' }: ProductPlaceholderProps) {
   const [showMobileTooltip, setShowMobileTooltip] = useState(false)

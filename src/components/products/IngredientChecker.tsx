@@ -76,7 +76,7 @@ export function IngredientChecker() {
                 <div>
                   <span className="text-gray-900">{ing.name}</span>
                   {ing.reason && (
-                    <span className="text-gray-500 ml-2">— {ing.reason}</span>
+                    <span className="text-gray-500 ml-2">- {ing.reason}</span>
                   )}
                 </div>
               </div>

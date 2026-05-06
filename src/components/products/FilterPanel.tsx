@@ -71,7 +71,7 @@ export function FilterPanel({
         </div>
       </div>
 
-      {/* Filter content — always visible on desktop, toggled on mobile */}
+      {/* Filter content - always visible on desktop, toggled on mobile */}
       <div className={`${filtersOpen ? 'block' : 'hidden'} md:block`}>
         {/* Category chips */}
         <div className="mb-4">
@@ -161,7 +161,7 @@ export function FilterPanel({
         </div>
       </div>
 
-      {/* Count + actions row — always visible on desktop */}
+      {/* Count + actions row - always visible on desktop */}
       <div className="hidden md:flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <p className="text-xs text-gray-400">{filteredCount} products</p>
@@ -179,7 +179,7 @@ export function FilterPanel({
         </button>
       </div>
 
-      {/* Request product — mobile */}
+      {/* Request product - mobile */}
       <div className="md:hidden mb-4">
         <button
           onClick={onRequestProduct}
