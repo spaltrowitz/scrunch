@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://spaltrowitz.github.io/scrunch/sitemap.xml

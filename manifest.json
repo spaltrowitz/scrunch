@@ -1,0 +1,44 @@
+{
+  "name": "Scrunch - Curly Hair Product Discovery",
+  "short_name": "Scrunch",
+  "description": "Discover curly hair products, check ingredients, and find what works for your curl pattern.",
+  "start_url": "/scrunch/",
+  "scope": "/scrunch/",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#7c3aed",
+  "orientation": "portrait-primary",
+  "categories": ["lifestyle", "beauty"],
+  "icons": [
+    {
+      "src": "/scrunch/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/scrunch/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/scrunch/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/scrunch/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/scrunch/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
