@@ -1,0 +1,88 @@
+PRIVACY POLICY
+Scrunch
+Last Updated: May 7, 2026
+
+1. INTRODUCTION
+Scrunch ("we," "us," or "our") respects your privacy. This Privacy Policy explains how we collect, use, disclose, and protect your personal information when you use the Scrunch web application at spaltrowitz.github.io/scrunch.
+
+2. INFORMATION WE COLLECT
+
+Account Information (when you create an account):
+• Email address
+• Display name
+• Google account profile (if using Google Sign-In)
+
+Profile Information (provided during onboarding):
+• Curl pattern and hair type attributes
+• Hair care preferences
+
+User-Generated Content:
+• Product ratings and reviews (1-5 stars, repurchase intent, notes, application methods)
+• Product requests and feedback submissions
+• Saved/favorited products
+
+Automatically Collected:
+• Browser localStorage data (anonymous ratings cache, saved products, onboarding state)
+
+3. HOW WE USE YOUR INFORMATION
+We use your personal information solely for the following purposes:
+• Providing personalized product recommendations based on your hair profile
+• Storing and displaying your product ratings and reviews
+• Processing product requests you submit
+• Sending transactional emails (product request receipts, product-added notifications)
+• Migrating anonymous ratings to your account upon sign-in
+• Improving the product database based on user feedback
+
+4. INFORMATION SHARING AND DISCLOSURE
+We do not sell, rent, or trade your personal information. We may share your information only in the following limited circumstances:
+• Supabase: Database hosting provider (stores your profile and ratings data with row-level security)
+• Resend: Email service provider (receives your email address to deliver transactional emails only)
+• GitHub: Product request submissions are posted as GitHub Issues on our public repository — these contain the product/brand name you requested and your email address for notification purposes
+• Google: If you use Google Sign-In, Google processes your authentication; we receive only your email and display name
+• Legal Requirements: When required by law, regulation, or legal process
+
+Product requests submitted via the app are posted to a public GitHub repository. Your email address is included in the issue for notification purposes and is visible on the public issue.
+
+5. DATA SECURITY
+We implement reasonable technical safeguards to protect your personal information:
+• Supabase Row-Level Security (RLS) ensures users can only access their own profile and review data
+• Authentication tokens are managed by Supabase Auth
+• API keys with elevated privileges are stored as GitHub Actions secrets, never exposed to the client
+• All data is transmitted over HTTPS
+
+6. DATA STORAGE AND RETENTION
+• Account data and ratings are stored in Supabase (PostgreSQL) in the cloud
+• Anonymous ratings are stored in your browser's localStorage until you create an account, at which point they are migrated to the cloud and removed locally
+• We retain your data for as long as your account is active
+• You may request deletion of your account and associated data at any time
+
+7. YOUR RIGHTS AND CHOICES
+You have the following rights regarding your personal information:
+• Access: You may request access to the personal information we have about you
+• Correction: You may request correction of inaccurate information
+• Deletion: You may request deletion of your account and all associated data
+• Opt-Out: You may use the app without creating an account; anonymous ratings are stored only in your browser's localStorage
+• Data Portability: You may request a copy of your data
+
+8. COOKIES AND LOCAL STORAGE
+Scrunch does not use cookies for tracking. We use browser localStorage to store:
+• Saved products and anonymous ratings (scrunch_actions, scrunch_ratings)
+• Onboarding progress (onboarding_state)
+This data never leaves your browser unless you create an account, at which point it is synced to our database.
+
+9. THIRD-PARTY SERVICES
+Our application integrates with the following third-party services, each governed by their own privacy policies:
+• Supabase (database and authentication): https://supabase.com/privacy
+• Google (OAuth sign-in): https://policies.google.com/privacy
+• Resend (email delivery): https://resend.com/legal/privacy-policy
+• GitHub (issue tracking): https://docs.github.com/en/site-policy/privacy-policies
+
+10. CHILDREN'S PRIVACY
+Scrunch is not intended for use by individuals under 13 years of age. We do not knowingly collect personal information from children under 13.
+
+11. CHANGES TO THIS PRIVACY POLICY
+We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated "Last Updated" date.
+
+12. CONTACT US
+If you have questions about this Privacy Policy or wish to exercise your privacy rights, contact:
+Email: sharipaltrowitz@gmail.com
