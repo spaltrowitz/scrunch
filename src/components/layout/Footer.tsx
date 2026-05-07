@@ -15,6 +15,8 @@ export function Footer() {
           <Link to="/community" className="hover:text-violet-600 no-underline py-2 min-h-[44px] inline-flex items-center">Community</Link>
           <span>·</span>
           <Link to="/terms" className="hover:text-violet-600 no-underline py-2 min-h-[44px] inline-flex items-center">Terms</Link>
+          <span>·</span>
+          <Link to="/privacy" className="hover:text-violet-600 no-underline py-2 min-h-[44px] inline-flex items-center">Privacy</Link>
         </div>
       </div>
     </footer>

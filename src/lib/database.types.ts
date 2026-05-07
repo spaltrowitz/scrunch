@@ -105,12 +105,24 @@ export interface ProductReview {
   profile?: Pick<Profile, 'display_name' | 'curl_pattern' | 'porosity' | 'hair_density'>
 }
 
+export interface AnalyticsEvent {
+  id: string
+  event_type: string
+  page_path: string | null
+  referrer: string | null
+  screen_width: number | null
+  metadata: Record<string, unknown> | null
+  user_id: string | null
+  created_at: string
+}
+
 export interface Database {
   public: {
     Tables: {
       profiles: { Row: Profile; Insert: Partial<Profile> & { id: string }; Update: Partial<Profile>; Relationships: [] }
       products: { Row: Product; Insert: Omit<Product, 'id' | 'created_at' | 'updated_at' | 'avg_rating' | 'review_count'>; Update: Partial<Product>; Relationships: [] }
       product_reviews: { Row: ProductReview; Insert: Omit<ProductReview, 'id' | 'created_at' | 'updated_at'>; Update: Partial<ProductReview>; Relationships: [] }
+      analytics_events: { Row: AnalyticsEvent; Insert: { event_type: string; page_path?: string | null; referrer?: string | null; screen_width?: number | null; metadata?: Record<string, unknown> | null }; Update: Partial<AnalyticsEvent>; Relationships: [] }
     }
     Views: Record<string, never>
     Functions: Record<string, never>

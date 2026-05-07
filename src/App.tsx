@@ -10,6 +10,7 @@ import { ToastProvider } from './hooks/useToast'
 import { ToastContainer } from './components/ui/ToastContainer'
 import { usePageTitle } from './hooks/usePageTitle'
 import { useMigrateLocalRatings } from './hooks/useMigrateLocalRatings'
+import { useAnalytics } from './hooks/useAnalytics'
 
 const PAGE_PLACEHOLDER = <div className="flex-1 animate-pulse bg-gray-50" />
 
@@ -26,6 +27,7 @@ const IngredientCheckerPage = lazy(() => import('./pages/IngredientCheckerPage')
 const Community = lazy(() => import('./pages/Community').then(m => ({ default: m.Community })))
 const About = lazy(() => import('./pages/About').then(m => ({ default: m.About })))
 const Terms = lazy(() => import('./pages/Terms').then(m => ({ default: m.Terms })))
+const Privacy = lazy(() => import('./pages/Privacy').then(m => ({ default: m.Privacy })))
 const Recommendations = lazy(() => import('./pages/Recommendations').then(m => ({ default: m.Recommendations })))
 const CategoryPage = lazy(() => import('./pages/CategoryPage').then(m => ({ default: m.CategoryPage })))
 const NotFound = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })))
@@ -49,6 +51,11 @@ function MigrationRunner() {
   return null
 }
 
+function AnalyticsRunner() {
+  useAnalytics()
+  return null
+}
+
 function AppRoutes() {
   const { loading } = useAuth()
   if (loading) return PAGE_PLACEHOLDER
@@ -56,6 +63,7 @@ function AppRoutes() {
     <Suspense fallback={<div className="flex items-center justify-center py-20 text-gray-400">Loading…</div>}>
       <PageTitleUpdater />
       <MigrationRunner />
+      <AnalyticsRunner />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -71,6 +79,7 @@ function AppRoutes() {
         <Route path="/community" element={<Community />} />
         <Route path="/about" element={<About />} />
         <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="/category/:slug" element={<CategoryPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
