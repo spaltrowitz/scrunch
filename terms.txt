@@ -1,0 +1,68 @@
+TERMS OF SERVICE
+Scrunch
+Last Updated: May 7, 2026
+
+1. ACCEPTANCE OF TERMS
+By accessing or using the Scrunch web application ("Scrunch," "we," "us," or "our") at spaltrowitz.github.io/scrunch, you agree to these Terms of Service. If you do not agree, please do not use the application.
+
+2. SERVICE DESCRIPTION
+Scrunch is a free curly hair product discovery tool that helps users find products based on their hair type and preferences. Features include:
+• Browsing and filtering a curated product database
+• Rating and reviewing hair care products
+• Submitting product requests for products not yet in the database
+• Saving and organizing products
+
+3. USER ACCOUNTS
+• You may use Scrunch without creating an account. Anonymous usage stores ratings locally in your browser.
+• You may create an account using email/password or Google Sign-In.
+• You are responsible for maintaining the confidentiality of your account credentials.
+• You must provide accurate information when creating an account.
+
+4. USER CONTENT
+• "User Content" includes product ratings, reviews, product requests, and feedback you submit.
+• You retain ownership of your User Content.
+• By submitting User Content, you grant us a non-exclusive, royalty-free license to display your ratings and reviews within the application.
+• Product requests are submitted as GitHub Issues on a public repository. By submitting a product request, you understand it will be publicly visible.
+• You agree not to submit content that is false, misleading, defamatory, or infringes on any third party's rights.
+
+5. PRODUCT INFORMATION
+• Product information in Scrunch is provided for informational purposes only.
+• We make reasonable efforts to ensure accuracy of product details, ingredients, and CG (Curly Girl) method status, but we do not guarantee completeness or accuracy.
+• Always verify product ingredients directly from the manufacturer before use, especially if you have allergies or sensitivities.
+• We are not responsible for any adverse reactions resulting from product use.
+
+6. ACCEPTABLE USE
+You agree not to:
+• Scrape, crawl, or automated-harvest data from the application
+• Submit false product reviews or ratings
+• Impersonate another person or misrepresent your affiliation
+• Attempt to gain unauthorized access to our systems or other users' accounts
+• Use the service for any unlawful purpose
+
+7. INTELLECTUAL PROPERTY
+• The Scrunch application, including its design, code, and curated product database, is owned by us.
+• Product names, brand names, and images belong to their respective owners.
+• Product images are sourced from publicly available retailer APIs and open-source databases.
+
+8. LIMITATION OF LIABILITY
+SCRUNCH IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED. TO THE FULLEST EXTENT PERMITTED BY LAW, WE SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES ARISING FROM YOUR USE OF THE SERVICE, INCLUDING BUT NOT LIMITED TO:
+• Inaccurate product information or ingredient lists
+• Allergic reactions or adverse effects from products found through Scrunch
+• Loss of data, including ratings or saved products
+• Service interruptions or downtime
+
+9. TERMINATION
+We reserve the right to suspend or terminate your account at any time for violation of these Terms, without prior notice.
+
+10. THIRD-PARTY SERVICES
+Scrunch integrates with third-party services (Supabase, Google, GitHub, Resend). Your use of these services is subject to their respective terms of service.
+
+11. CHANGES TO TERMS
+We may update these Terms of Service from time to time. Changes will be posted on this page with an updated "Last Updated" date. Your continued use of the service after changes constitutes acceptance of the modified terms.
+
+12. GOVERNING LAW
+These Terms shall be governed by the laws of the State of New York, without regard to conflict of law provisions.
+
+13. CONTACT US
+For questions about these Terms of Service, contact:
+Email: sharipaltrowitz@gmail.com
