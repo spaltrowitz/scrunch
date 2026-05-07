@@ -27,32 +27,19 @@ export function Home() {
       {/* Hero */}
       <section className="flex flex-col items-center justify-center px-4 py-16 md:py-24 text-center bg-gradient-to-b from-violet-50 to-white">
         <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight max-w-2xl">
-          Finally, one place for curly hair that actually works.
+          Find curly hair products that actually work.
         </h1>
 
-        <p className="text-sm md:text-base text-gray-600 mb-4 max-w-xl leading-relaxed">
-          Find products that actually work for your curls.
+        <p className="text-sm md:text-base text-gray-500 mb-8 max-w-lg leading-relaxed">
+          410+ products checked for CG approval. Personalized recommendations based on your hair type. No ads, no hype.
         </p>
 
-        <p className="text-xs md:text-sm text-gray-500 mb-6 max-w-lg leading-relaxed">
-          Get personalized recommendations based on your hair type. No ads, no hype, just science.
-        </p>
-
-        <div className="flex flex-col items-center gap-3">
-          <Link
-            to="/products"
-            className="px-6 py-3 min-h-[44px] flex items-center rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium text-sm transition-colors"
-          >
-            Browse Products →
-          </Link>
-          <a
-            href="#how-it-works"
-            className="text-xs text-gray-500 hover:text-violet-600 no-underline transition-colors min-h-[44px] flex items-center"
-          >
-            See how it works ↓
-          </a>
-        </div>
-
+        <Link
+          to="/products"
+          className="px-6 py-3 min-h-[44px] flex items-center rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium text-sm transition-colors"
+        >
+          Browse Products
+        </Link>
       </section>
 
       {/* How It Works */}
