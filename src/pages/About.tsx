@@ -43,7 +43,7 @@ export function About() {
           </p>
         </section>
 
-        <section className="bg-white border border-gray-200 rounded-lg p-6">
+        <section className="md:hidden bg-white border border-gray-200 rounded-lg p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-1">📱 Add Scrunch to Your Home Screen</h2>
           <p className="text-sm text-gray-500 mb-4">
             Use Scrunch like a real app - no app store needed.
