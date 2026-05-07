@@ -5,6 +5,7 @@ import { AuthProvider } from './lib/auth'
 import { useAuth } from './lib/auth.utils'
 import { Header } from './components/layout/Header'
 import { Footer } from './components/layout/Footer'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { ToastProvider } from './hooks/useToast'
 import { ToastContainer } from './components/ui/ToastContainer'
 import { usePageTitle } from './hooks/usePageTitle'
@@ -27,6 +28,7 @@ const About = lazy(() => import('./pages/About').then(m => ({ default: m.About }
 const Terms = lazy(() => import('./pages/Terms').then(m => ({ default: m.Terms })))
 const Recommendations = lazy(() => import('./pages/Recommendations').then(m => ({ default: m.Recommendations })))
 const CategoryPage = lazy(() => import('./pages/CategoryPage').then(m => ({ default: m.CategoryPage })))
+const NotFound = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })))
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -70,6 +72,7 @@ function AppRoutes() {
         <Route path="/about" element={<About />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/category/:slug" element={<CategoryPage />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
   )
@@ -84,7 +87,9 @@ function App() {
             <div className="min-h-screen flex flex-col bg-gray-50">
               <Header />
               <main className="flex-1">
-                <AppRoutes />
+                <ErrorBoundary>
+                  <AppRoutes />
+                </ErrorBoundary>
               </main>
               <Footer />
               <ToastContainer />

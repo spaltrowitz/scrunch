@@ -91,7 +91,7 @@ export function Recommendations() {
   const userId = user?.id
   const { data: profile, isLoading: profileLoading } = useUserProfile(userId)
   const { data: remoteReviews = [], isLoading: reviewsLoading } = useUserReviews(userId)
-  const { data: productsData, isLoading: _productsLoading } = useRecommendationProducts()
+  const { data: productsData } = useRecommendationProducts()
   const products = useMemo(() => productsData?.products ?? [], [productsData])
 
   // For logged-out users, build reviews from localStorage ratings

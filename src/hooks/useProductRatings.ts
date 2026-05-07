@@ -85,8 +85,8 @@ export function useRatingMutation() {
         application_method: null,
         routine_context: null,
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await supabase.from('product_reviews').upsert(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase generic types don't align with upsert payload shape
         payload as any,
         { onConflict: 'user_id,product_id' }
       )

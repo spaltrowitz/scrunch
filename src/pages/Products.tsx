@@ -63,7 +63,7 @@ export function Products() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
   const { addToast } = useToast()
-  const { data, isLoading: _productsLoading, error: _productsError } = useCatalogProducts()
+  const { data } = useCatalogProducts()
   const products = useMemo(() => data?.products ?? [], [data])
   const { data: userReviews = [], isLoading: reviewsLoading, error: reviewsError } = useUserReviews(user?.id)
   const loading = !data

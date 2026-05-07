@@ -112,7 +112,7 @@ export interface Database {
       products: { Row: Product; Insert: Omit<Product, 'id' | 'created_at' | 'updated_at' | 'avg_rating' | 'review_count'>; Update: Partial<Product>; Relationships: [] }
       product_reviews: { Row: ProductReview; Insert: Omit<ProductReview, 'id' | 'created_at' | 'updated_at'>; Update: Partial<ProductReview>; Relationships: [] }
     }
-    Views: {}
-    Functions: {}
+    Views: Record<string, never>
+    Functions: Record<string, never>
   }
 }

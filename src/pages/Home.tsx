@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { ProductImage } from '../hooks/useProductImage'
 import { useHomeProducts } from '../hooks/useHomeProducts'
@@ -16,14 +15,12 @@ export function Home() {
   const { data } = useHomeProducts()
   const products = data?.products ?? []
 
-  // Primary: notes-based filter. Falls back to hardcoded list until products are tagged in Supabase.
-  const hairtokProducts = useMemo(() => {
-    const byNotes = products.filter(p => p.notes?.toLowerCase().includes('hairtok'))
-    if (byNotes.length > 0) return byNotes.slice(0, 6)
-    return products
-      .filter(p => HAIRTOK_PRODUCT_NAMES.some(name => p.name.toLowerCase().includes(name.toLowerCase())))
-      .slice(0, 6)
-  }, [products])
+  const byNotes = products.filter(p => p.notes?.toLowerCase().includes('hairtok'))
+  const hairtokProducts = byNotes.length > 0
+    ? byNotes.slice(0, 6)
+    : products
+        .filter(p => HAIRTOK_PRODUCT_NAMES.some(name => p.name.toLowerCase().includes(name.toLowerCase())))
+        .slice(0, 6)
 
   return (
     <div className="min-h-screen">
