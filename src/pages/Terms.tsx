@@ -143,7 +143,7 @@ export function Terms() {
 
         <div className="text-center pt-4 text-xs text-gray-400">
           <p>By using Scrunch, you acknowledge and agree to these terms.</p>
-          <p className="mt-1">Questions? Reach us via the feedback button or GitHub.</p>
+          <p className="mt-1">Questions? Tap the 💬 feedback button in the header.</p>
         </div>
       </div>
     </div>

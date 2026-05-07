@@ -153,16 +153,7 @@ export function Privacy() {
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mb-2">Contact</h2>
           <p>
-            Questions about your privacy? Reach us via the feedback button in the app, or
-            open an issue on our{' '}
-            <a
-              href="https://github.com/spaltrowitz/scrunch"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-violet-600 hover:underline"
-            >
-              GitHub repository
-            </a>.
+            Questions about your privacy? Tap the 💬 feedback button in the header to reach us.
           </p>
         </section>
 
