@@ -24,7 +24,7 @@ import {
   trackRecommendationShown,
   trackRecommendationEngaged,
 } from '../lib/analytics'
-import { safeLocalSet } from '../lib/safeStorage'
+import { safeLocalSet, safeLocalGet } from '../lib/safeStorage'
 
 const EMPTY_SET: Set<string> = new Set()
 const ALGORITHM_VERSION = 'v1'
@@ -276,12 +276,11 @@ export function Recommendations() {
       action: 'bookmark',
       algorithm_version: ALGORITHM_VERSION,
     })
-    try {
-      const stored = JSON.parse(localStorage.getItem('scrunch_actions') || '{}')
-      if (!stored[productId]) stored[productId] = []
-      if (!stored[productId].includes('bookmarked')) stored[productId].push('bookmarked')
-      localStorage.setItem('scrunch_actions', JSON.stringify(stored))
-    } catch { /* ignore */ }
+    let stored: Record<string, string[]> = {}
+    try { stored = JSON.parse(safeLocalGet('scrunch_actions') || '{}') } catch { stored = {} }
+    if (!stored[productId]) stored[productId] = []
+    if (!stored[productId].includes('bookmarked')) stored[productId].push('bookmarked')
+    safeLocalSet('scrunch_actions', JSON.stringify(stored))
   }, [tier])
 
   const dismissMutation = useMutation({
