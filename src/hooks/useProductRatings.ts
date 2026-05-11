@@ -3,6 +3,7 @@ import { useAuth } from '../lib/auth.utils'
 import { supabase } from '../lib/supabase'
 import { getLocalRatings } from '../lib/localProfile'
 import { trackRatingSubmitted } from '../lib/analytics'
+import { safeLocalSet } from '../lib/safeStorage'
 import type { RepurchaseIntent } from '../lib/database.types'
 
 export type TriedRating = 'loved' | 'liked' | 'ok' | 'disliked'
@@ -73,7 +74,7 @@ export function useRatingMutation() {
       if (!user) {
         const local = getLocalRatings()
         local[input.productId] = input.rating
-        localStorage.setItem('scrunch_ratings', JSON.stringify(local))
+        safeLocalSet('scrunch_ratings', JSON.stringify(local))
         return
       }
 
@@ -125,7 +126,7 @@ export function useDeleteRating() {
       if (!user) {
         const local = getLocalRatings()
         delete local[productId]
-        localStorage.setItem('scrunch_ratings', JSON.stringify(local))
+        safeLocalSet('scrunch_ratings', JSON.stringify(local))
         return
       }
 

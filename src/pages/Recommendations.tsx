@@ -24,6 +24,7 @@ import {
   trackRecommendationShown,
   trackRecommendationEngaged,
 } from '../lib/analytics'
+import { safeLocalSet } from '../lib/safeStorage'
 
 const EMPTY_SET: Set<string> = new Set()
 const ALGORITHM_VERSION = 'v1'
@@ -263,7 +264,7 @@ export function Recommendations() {
       // Save to localStorage for logged-out users
       const localRatings = getLocalRatings()
       localRatings[productId] = ratingLabel
-      localStorage.setItem('scrunch_ratings', JSON.stringify(localRatings))
+      safeLocalSet('scrunch_ratings', JSON.stringify(localRatings))
       setShowRatingPopup(null)
     }
   }, [userId, rateMutation, tier])

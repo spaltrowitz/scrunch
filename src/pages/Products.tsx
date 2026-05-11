@@ -16,6 +16,7 @@ import {
   trackSearchPerformed,
   trackFilterApplied,
 } from '../lib/analytics'
+import { safeLocalSet } from '../lib/safeStorage'
 
 type TriedRating = 'loved' | 'liked' | 'ok' | 'disliked'
 type ProductAction = 'tried' | 'bookmarked'
@@ -52,7 +53,7 @@ function storeActions(actions: ProductActions) {
   for (const [key, set] of Object.entries(actions)) {
     serializable[key] = [...set]
   }
-  localStorage.setItem('scrunch_actions', JSON.stringify(serializable))
+  safeLocalSet('scrunch_actions', JSON.stringify(serializable))
 }
 
 function getStoredNotes(): ProductNotes {
@@ -62,7 +63,7 @@ function getStoredNotes(): ProductNotes {
 }
 
 function storeNotes(notes: ProductNotes) {
-  localStorage.setItem('scrunch_notes', JSON.stringify(notes))
+  safeLocalSet('scrunch_notes', JSON.stringify(notes))
 }
 
 export function Products() {
@@ -220,7 +221,7 @@ export function Products() {
         setRatings(prev => {
           const next = { ...prev }
           delete next[key]
-          localStorage.setItem('scrunch_ratings', JSON.stringify(next))
+          safeLocalSet('scrunch_ratings', JSON.stringify(next))
           return next
         })
         if (user && isUuid(key)) {
@@ -256,7 +257,7 @@ export function Products() {
     })
     setRatings(prev => {
       const next = { ...prev, [key]: rating }
-      localStorage.setItem('scrunch_ratings', JSON.stringify(next))
+      safeLocalSet('scrunch_ratings', JSON.stringify(next))
       return next
     })
 

@@ -4,6 +4,7 @@ import { useAuth } from '../lib/auth.utils'
 import { getLocalRatings } from '../lib/localProfile'
 import { supabase } from '../lib/supabase'
 import { useToast } from './useToast.utils'
+import { safeLocalSet, safeLocalRemove } from '../lib/safeStorage'
 
 const MIGRATION_KEY = 'scrunch_ratings_migrated'
 
@@ -55,9 +56,9 @@ export function useMigrateLocalRatings() {
         if (!isUuid(key)) remaining[key] = localRatings[key]
       }
       if (Object.keys(remaining).length === 0) {
-        localStorage.removeItem('scrunch_ratings')
+        safeLocalRemove('scrunch_ratings')
       } else {
-        localStorage.setItem('scrunch_ratings', JSON.stringify(remaining))
+        safeLocalSet('scrunch_ratings', JSON.stringify(remaining))
       }
       return reviews.length
     },
@@ -68,7 +69,7 @@ export function useMigrateLocalRatings() {
         queryClient.invalidateQueries({ queryKey: ['review-count'] })
         queryClient.invalidateQueries({ queryKey: ['product-rating'] })
       }
-      localStorage.setItem(MIGRATION_KEY, 'true')
+      safeLocalSet(MIGRATION_KEY, 'true')
     },
     onError: (error) => {
       console.error('Rating migration failed:', error)
@@ -78,11 +79,15 @@ export function useMigrateLocalRatings() {
 
   useEffect(() => {
     if (loading || !user || attempted.current) return
-    if (localStorage.getItem(MIGRATION_KEY) === 'true') return
+    try {
+      if (localStorage.getItem(MIGRATION_KEY) === 'true') return
+    } catch {
+      // Storage unavailable; treat as not-yet-migrated.
+    }
 
     const localRatings = getLocalRatings()
     if (Object.keys(localRatings).length === 0) {
-      localStorage.setItem(MIGRATION_KEY, 'true')
+      safeLocalSet(MIGRATION_KEY, 'true')
       return
     }
 

@@ -116,13 +116,24 @@ export function Community() {
   const [showSearchBox, setShowSearchBox] = useState(true)
   const [thankedIds, setThankedIds] = useState<Set<string>>(new Set())
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const requestIdRef = useRef(0)
+  const mountedRef = useRef(true)
+  useEffect(() => {
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
 
   const runSearch = useCallback(async (q: string) => {
     if (!q.trim()) return
+    const myId = ++requestIdRef.current
     setLoading(true)
     setQuestion('')
 
     const { results: redditResults, status, searchTerms } = await searchReddit(q)
+
+    // Drop stale responses: another search started after this one, or component unmounted.
+    if (!mountedRef.current || myId !== requestIdRef.current) return
+
     const aiAnswer = status === 'ok' ? generateRedditSummary(redditResults) : null
 
     const newQ: CommunityQuestion = {
