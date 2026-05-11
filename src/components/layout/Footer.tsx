@@ -16,14 +16,6 @@ export function Footer() {
           >
             💜 Tip
           </Link>
-          <a
-            href="https://github.com/spaltrowitz/scrunch"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-violet-600 no-underline py-2 min-h-[44px] inline-flex items-center"
-          >
-            GitHub ↗
-          </a>
           <FeedbackButton inline />
         </nav>
         <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-gray-400">
@@ -31,17 +23,7 @@ export function Footer() {
           <span aria-hidden="true">·</span>
           <Link to="/privacy" className="hover:text-violet-600 no-underline">Privacy</Link>
           <span aria-hidden="true">·</span>
-          <span>
-            © {year} Scrunch · Made with 💜 by{' '}
-            <a
-              href="https://spaltrowitz.github.io/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-violet-600 underline"
-            >
-              Shari
-            </a>
-          </span>
+          <span>© {year} Scrunch</span>
         </div>
       </div>
     </footer>
