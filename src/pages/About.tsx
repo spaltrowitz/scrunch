@@ -1,6 +1,20 @@
+import { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { ScrunchLogo } from '../components/ui/ScrunchLogo'
+import { TipJar } from '../components/TipJar'
 
 export function About() {
+  const location = useLocation()
+
+  // HashRouter swallows secondary fragments — handle #support manually so
+  // the footer "💜 Tip" link scrolls to the TipJar.
+  useEffect(() => {
+    if (location.hash === '#support') {
+      const el = document.getElementById('support')
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [location.hash])
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
       <div className="text-center mb-10">
@@ -33,15 +47,15 @@ export function About() {
           <p className="text-sm text-gray-700">
             Scrunch is free and ad-free.{' '}
             <a
-              href="https://spaltrowitz.github.io/#support"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#support"
               className="text-violet-600 hover:text-violet-700 font-medium underline"
             >
-              Support the project →
+              Tip the project ↓
             </a>
           </p>
         </section>
+
+        <TipJar />
 
         <section className="md:hidden bg-white border border-gray-200 rounded-lg p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-1">📱 Add Scrunch to Your Home Screen</h2>

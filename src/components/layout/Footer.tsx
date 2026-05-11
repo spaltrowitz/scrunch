@@ -10,6 +10,12 @@ export function Footer() {
           <Link to="/about" className="hover:text-violet-600 no-underline py-2 min-h-[44px] inline-flex items-center">About</Link>
           <Link to="/community" className="hover:text-violet-600 no-underline py-2 min-h-[44px] inline-flex items-center">Community</Link>
           <Link to="/ingredient-checker" className="hover:text-violet-600 no-underline py-2 min-h-[44px] inline-flex items-center">Ingredient Checker</Link>
+          <Link
+            to="/about#support"
+            className="hover:text-pink-600 no-underline py-2 min-h-[44px] inline-flex items-center font-medium"
+          >
+            💜 Tip
+          </Link>
           <a
             href="https://github.com/spaltrowitz/scrunch"
             target="_blank"
@@ -25,7 +31,17 @@ export function Footer() {
           <span aria-hidden="true">·</span>
           <Link to="/privacy" className="hover:text-violet-600 no-underline">Privacy</Link>
           <span aria-hidden="true">·</span>
-          <span>© {year} Scrunch · Made with 💜 by Shari</span>
+          <span>
+            © {year} Scrunch · Made with 💜 by{' '}
+            <a
+              href="https://spaltrowitz.github.io/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-violet-600 underline"
+            >
+              Shari
+            </a>
+          </span>
         </div>
       </div>
     </footer>
