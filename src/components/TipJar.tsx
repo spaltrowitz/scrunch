@@ -8,7 +8,7 @@
  */
 
 const VENMO_HANDLE = 'shari-paltrowitz'
-const NOTE = 'Support%20Scrunch'
+const NOTE = 'Scrunch%20%F0%9F%A7%B4'
 
 const TIP_BUTTON_BASE =
   'flex flex-col items-center justify-center gap-1 px-5 py-4 rounded-xl border-2 transition-all min-w-[120px] no-underline'
@@ -37,9 +37,9 @@ export function TipJar({ compact = false }: { compact?: boolean }) {
           rel="noopener noreferrer"
           className={`${TIP_BUTTON_BASE} bg-white border-pink-200 hover:border-pink-400 hover:shadow-md`}
         >
-          <span className="text-2xl" aria-hidden="true">🍵</span>
+          <span className="text-2xl" aria-hidden="true">🧴</span>
           <span className="text-base font-semibold text-gray-900">$5</span>
-          <span className="text-xs text-gray-500">Buy me a matcha</span>
+          <span className="text-xs text-gray-500">Contribute to my next curl cream</span>
         </a>
         <a
           href={`https://venmo.com/${VENMO_HANDLE}?txn=pay&note=${NOTE}`}
