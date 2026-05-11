@@ -428,11 +428,11 @@ export function Products() {
       ) : (
         <>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {visibleProducts.map((product, i) => {
+            {visibleProducts.map((product) => {
               const key = productKey(product)
               return (
                 <ProductCard
-                  key={`${key}-${i}`}
+                  key={key}
                   product={product}
                   productKey={key}
                   hasTried={hasAction(key, 'tried')}

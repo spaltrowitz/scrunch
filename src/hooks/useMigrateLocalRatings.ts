@@ -27,16 +27,17 @@ export function useMigrateLocalRatings() {
       const ratingMap: Record<string, number> = { loved: 5, liked: 4, ok: 3, disliked: 1 }
       const repurchaseMap: Record<string, string> = { loved: 'yes', liked: 'yes', ok: 'maybe', disliked: 'no' }
 
-      const reviews = keys
-        .filter(productId => /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(productId))
-        .map(productId => ({
-          user_id: userId,
-          product_id: productId,
-          rating: ratingMap[localRatings[productId]] ?? 3,
-          would_repurchase: repurchaseMap[localRatings[productId]] ?? 'maybe',
-          status: 'tried_once' as const,
-          photo_urls: [] as string[],
-        }))
+      const isUuid = (k: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(k)
+      const uuidKeys = keys.filter(isUuid)
+
+      const reviews = uuidKeys.map(productId => ({
+        user_id: userId,
+        product_id: productId,
+        rating: ratingMap[localRatings[productId]] ?? 3,
+        would_repurchase: repurchaseMap[localRatings[productId]] ?? 'maybe',
+        status: 'tried_once' as const,
+        photo_urls: [] as string[],
+      }))
 
       if (reviews.length === 0) return 0
 
@@ -47,7 +48,17 @@ export function useMigrateLocalRatings() {
 
       if (error) throw error
 
-      localStorage.removeItem('scrunch_ratings')
+      // Only drop migrated UUID keys; keep seed-product ratings (keyed "Brand::Name")
+      // so they aren't lost on login.
+      const remaining: Record<string, string> = {}
+      for (const key of keys) {
+        if (!isUuid(key)) remaining[key] = localRatings[key]
+      }
+      if (Object.keys(remaining).length === 0) {
+        localStorage.removeItem('scrunch_ratings')
+      } else {
+        localStorage.setItem('scrunch_ratings', JSON.stringify(remaining))
+      }
       return reviews.length
     },
     onSuccess: (count) => {
