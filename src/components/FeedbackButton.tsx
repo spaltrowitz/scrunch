@@ -1,14 +1,9 @@
 import { useState } from 'react'
+import { supabase } from '../lib/supabase'
 
-const GITHUB_REPO = 'spaltrowitz/scrunch'
+const FUNCTION_NAME = 'submit-feedback'
 
 type FeedbackType = 'bug' | 'idea' | 'love'
-
-const LABELS: Record<FeedbackType, string> = {
-  bug: 'bug',
-  idea: 'enhancement',
-  love: 'feedback',
-}
 
 const PLACEHOLDERS: Record<FeedbackType, string> = {
   bug: "What happened? What did you expect to happen?\n\nSteps to reproduce:\n1. \n2. \n3. ",
@@ -21,6 +16,7 @@ export function FeedbackButton({ inline }: { inline?: boolean }) {
   const [type, setType] = useState<FeedbackType>('love')
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
+  const [website, setWebsite] = useState('') // honeypot
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -32,57 +28,16 @@ export function FeedbackButton({ inline }: { inline?: boolean }) {
     setSubmitting(true)
     setError(null)
 
-    const issueBody = [
-      `**Type:** ${type}`,
-      `**Submitted from:** Scrunch app`,
-      '',
-      body,
-      '',
-      '---',
-      `*Submitted via in-app feedback on ${new Date().toISOString()}*`,
-    ].join('\n')
-
-    // Create GitHub issue via the public API (no auth needed for public repos)
-    const url = `https://api.github.com/repos/${GITHUB_REPO}/issues`
     try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/vnd.github.v3+json',
-        },
-        body: JSON.stringify({
-          title: `[${type}] ${title}`,
-          body: issueBody,
-          labels: [LABELS[type], 'from-app'],
-          assignees: ['copilot'],
-        }),
+      const { data, error: fnError } = await supabase.functions.invoke(FUNCTION_NAME, {
+        body: { type, title: title.trim(), body: body.trim(), website },
       })
-
-      if (res.status === 401 || res.status === 403) {
-        // Fallback: open GitHub issue in new tab (pre-filled)
-        const params = new URLSearchParams({
-          title: `[${type}] ${title}`,
-          body: issueBody,
-          labels: `${LABELS[type]},from-app`,
-          assignees: 'copilot',
-        })
-        window.open(`https://github.com/${GITHUB_REPO}/issues/new?${params}`, '_blank')
-        setSubmitted(true)
-        return
-      }
-
-      if (!res.ok) throw new Error(`GitHub API error: ${res.status}`)
+      if (fnError) throw fnError
+      if (!data?.ok) throw new Error('Submission failed')
       setSubmitted(true)
-    } catch {
-      // Fallback: open in GitHub directly
-      const params = new URLSearchParams({
-        title: `[${type}] ${title}`,
-        body: issueBody,
-        labels: `${LABELS[type]},from-app`,
-      })
-      window.open(`https://github.com/${GITHUB_REPO}/issues/new?${params}`, '_blank')
-      setSubmitted(true)
+    } catch (err) {
+      console.error('Feedback submission failed:', err)
+      setError("Couldn't send right now. Please try again in a moment.")
     } finally {
       setSubmitting(false)
     }
@@ -93,6 +48,7 @@ export function FeedbackButton({ inline }: { inline?: boolean }) {
     setSubmitted(false)
     setTitle('')
     setBody('')
+    setWebsite('')
     setType('love')
     setError(null)
   }
@@ -125,7 +81,7 @@ export function FeedbackButton({ inline }: { inline?: boolean }) {
                 <div className="text-3xl mb-3">🎉</div>
                 <h3 className="font-semibold text-gray-900 mb-1">Thanks for your feedback!</h3>
                 <p className="text-sm text-gray-500 mb-4">
-                  A GitHub issue has been created and assigned to Copilot for triage.
+                  We've logged it — you'll see your idea or fix show up in a future update.
                 </p>
                 <button onClick={handleClose} className="text-sm text-violet-600 hover:underline cursor-pointer">
                   Close
@@ -197,8 +153,20 @@ export function FeedbackButton({ inline }: { inline?: boolean }) {
                   {submitting ? 'Submitting...' : 'Submit Feedback'}
                 </button>
 
+                {/* Honeypot — hidden from real users, attractive to bots */}
+                <label className="hidden" aria-hidden="true">
+                  Website
+                  <input
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                  />
+                </label>
+
                 <p className="text-xs text-gray-400 text-center mt-3">
-                  Creates a GitHub issue assigned to Copilot for automatic triage
+                  No account needed — we'll route this to the team.
                 </p>
               </form>
             )}
