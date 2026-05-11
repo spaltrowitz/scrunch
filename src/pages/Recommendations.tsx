@@ -393,7 +393,7 @@ export function Recommendations() {
       {userReviews.length > 0 && (
         <section>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Your Ratings</h2>
-          {lovedReviews.length > 0 && <RatingGroup label="👍 Loved" count={lovedReviews.length} colorClass="text-green-700" reviews={lovedReviews} />}
+          {lovedReviews.length > 0 && <RatingGroup label="💚 Loved" count={lovedReviews.length} colorClass="text-pink-700" reviews={lovedReviews} />}
           {likedReviews.length > 0 && <RatingGroup label="👍 Liked" count={likedReviews.length} colorClass="text-emerald-600" reviews={likedReviews} />}
           {mehReviews.length > 0 && <RatingGroup label="😐 It was ok" count={mehReviews.length} colorClass="text-amber-700" reviews={mehReviews} />}
           {dislikedReviews.length > 0 && <RatingGroup label="👎 Didn't like" count={dislikedReviews.length} colorClass="text-red-700" reviews={dislikedReviews} />}

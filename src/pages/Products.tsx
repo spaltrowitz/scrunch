@@ -10,6 +10,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth.utils'
 import { useCatalogProducts, useUserReviews } from '../hooks/useProducts'
 import { useToast } from '../hooks/useToast.utils'
+import { MIN_RATINGS_FOR_ADVANCED } from '../components/recommendations/recommendationEngine'
 
 type TriedRating = 'loved' | 'liked' | 'ok' | 'disliked'
 type ProductAction = 'tried' | 'bookmarked'
@@ -142,7 +143,7 @@ export function Products() {
       addToast('Failed to remove review. Please try again.', 'error')
     },
     onSuccess: () => {
-      addToast('Review removed.', 'success')
+      addToast('Review removed', 'success')
       if (userId) {
         queryClient.invalidateQueries({ queryKey: ['reviews', userId] })
       }
@@ -168,7 +169,7 @@ export function Products() {
       addToast('Failed to save rating. Please try again.', 'error')
     },
     onSuccess: () => {
-      addToast('Rating saved!', 'success')
+      addToast(userId ? 'Saved · synced' : 'Saved · on this device', 'success')
       if (userId) {
         queryClient.invalidateQueries({ queryKey: ['reviews', userId] })
       }
@@ -192,7 +193,7 @@ export function Products() {
       addToast('Failed to save note. Please try again.', 'error')
     },
     onSuccess: () => {
-      addToast('Note saved!', 'success')
+      addToast(userId ? 'Note saved · synced' : 'Note saved · on this device', 'success')
       if (userId) {
         queryClient.invalidateQueries({ queryKey: ['reviews', userId] })
       }
@@ -307,7 +308,7 @@ export function Products() {
 
   const approvedCount = useMemo(() => products.filter(p => p.cg_status === 'approved').length, [products])
   const userRatingCount = Object.keys(ratings).length
-  const ratingsNeeded = Math.max(0, 10 - userRatingCount)
+  const ratingsNeeded = Math.max(0, MIN_RATINGS_FOR_ADVANCED - userRatingCount)
   const hasFilters = selectedCategories.size > 0 || showApprovedOnly || showGoodPlus || !!search || !!brandFilter || !!regionFilter
 
   const suggestions = useMemo(() => {
@@ -350,7 +351,12 @@ export function Products() {
     return (
       <div className="max-w-5xl mx-auto px-4 py-12">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Products</h1>
-        <p className="text-gray-500 animate-pulse">Loading products…</p>
+        <div className="h-4 w-72 bg-gray-100 rounded mb-8 animate-pulse" />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-32 bg-white border border-gray-200 rounded-xl animate-pulse" />
+          ))}
+        </div>
       </div>
     )
   }
@@ -369,11 +375,11 @@ export function Products() {
               Rate {ratingsNeeded} more product{ratingsNeeded !== 1 ? 's' : ''} to unlock personalized suggestions ✨
             </p>
             <p className="text-xs text-violet-600 mt-0.5">
-              {userRatingCount}/10 rated - click "Tried it?" on products you've used
+              {userRatingCount}/{MIN_RATINGS_FOR_ADVANCED} rated - click "Tried it?" on products you've used
             </p>
           </div>
           <div className="w-full sm:w-24 h-2 bg-violet-200 rounded-full shrink-0">
-            <div className="h-2 bg-violet-500 rounded-full transition-all" style={{ width: `${Math.min(100, userRatingCount * 10)}%` }} />
+            <div className="h-2 bg-violet-500 rounded-full transition-all" style={{ width: `${Math.min(100, (userRatingCount / MIN_RATINGS_FOR_ADVANCED) * 100)}%` }} />
           </div>
         </div>
       )}

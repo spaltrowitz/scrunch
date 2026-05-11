@@ -14,6 +14,20 @@ import { useAnalytics } from './hooks/useAnalytics'
 
 const PAGE_PLACEHOLDER = <div className="flex-1 animate-pulse bg-gray-50" />
 
+function PageSkeleton() {
+  return (
+    <div className="max-w-5xl mx-auto px-4 py-12 animate-pulse">
+      <div className="h-7 w-48 bg-gray-200 rounded mb-3" />
+      <div className="h-4 w-72 bg-gray-100 rounded mb-8" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="h-32 bg-white border border-gray-200 rounded-xl" />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 const Home = lazy(() => import('./pages/Home').then(m => ({ default: m.Home })))
 const Login = lazy(() => import('./pages/Login').then(m => ({ default: m.Login })))
 const SignUp = lazy(() => import('./pages/SignUp').then(m => ({ default: m.SignUp })))
@@ -60,7 +74,7 @@ function AppRoutes() {
   const { loading } = useAuth()
   if (loading) return PAGE_PLACEHOLDER
   return (
-    <Suspense fallback={<div className="flex items-center justify-center py-20 text-gray-400">Loading…</div>}>
+    <Suspense fallback={<PageSkeleton />}>
       <PageTitleUpdater />
       <MigrationRunner />
       <AnalyticsRunner />

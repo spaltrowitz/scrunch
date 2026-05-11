@@ -1,9 +1,15 @@
 import { Link } from 'react-router-dom'
 import { ProductImage } from '../hooks/useProductImage'
 import { useHomeProducts } from '../hooks/useHomeProducts'
+import { useProductCount } from '../hooks/useProducts'
 
-// Fallback product names for HairTok section. Auto-bypassed when Supabase products have 'hairtok' in notes.
-const HAIRTOK_PRODUCT_NAMES = ['K18', 'Olaplex', 'Rosemary Oil']
+// Tag stored in `products.notes` text to mark a product as currently trending on HairTok.
+// Lower-cased substring match. Centralized here so curation isn't hidden in component code.
+const HAIRTOK_TAG = 'hairtok'
+
+// Fallback product-name keywords used only if no Supabase product carries the HAIRTOK_TAG.
+// Useful for seed-data demos and when the Supabase fetch falls back to bundled seeds.
+const HAIRTOK_FALLBACK_NAMES = ['K18', 'Olaplex', 'Rosemary Oil'] as const
 
 const FEATURED_CREATORS = [
   { name: 'Manes by Mell', handle: 'manesbymell', description: 'Curl science & product reviews' },
@@ -11,15 +17,22 @@ const FEATURED_CREATORS = [
   { name: 'BiancaReneeToday', handle: 'biancareneetoday', description: 'Product battles & comparisons' },
 ] as const
 
+function roundedCount(n: number): string {
+  if (n < 50) return `${n}`
+  return `${Math.floor(n / 10) * 10}+`
+}
+
 export function Home() {
   const { data } = useHomeProducts()
   const products = data?.products ?? []
+  const { data: productCount } = useProductCount()
+  const countLabel = roundedCount(productCount ?? 0)
 
-  const byNotes = products.filter(p => p.notes?.toLowerCase().includes('hairtok'))
+  const byNotes = products.filter(p => p.notes?.toLowerCase().includes(HAIRTOK_TAG))
   const hairtokProducts = byNotes.length > 0
     ? byNotes.slice(0, 6)
     : products
-        .filter(p => HAIRTOK_PRODUCT_NAMES.some(name => p.name.toLowerCase().includes(name.toLowerCase())))
+        .filter(p => HAIRTOK_FALLBACK_NAMES.some(name => p.name.toLowerCase().includes(name.toLowerCase())))
         .slice(0, 6)
 
   return (
@@ -31,7 +44,7 @@ export function Home() {
         </h1>
 
         <p className="text-sm md:text-base text-gray-500 mb-8 max-w-lg leading-relaxed">
-          410+ products checked for CG approval. Personalized recommendations based on your hair type. No ads, no hype.
+          {countLabel} products checked for CG approval. Personalized recommendations based on your hair type. No ads, no hype.
         </p>
 
         <Link
@@ -42,64 +55,35 @@ export function Home() {
         </Link>
       </section>
 
-      {/* How It Works */}
+      {/* How Scrunch works + why it's different */}
       <section id="how-it-works" className="py-16 px-4 bg-white border-t border-gray-200">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">
-            How Scrunch Works
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 text-center">
+            How Scrunch works
           </h2>
+          <p className="text-sm text-gray-500 mb-8 text-center max-w-xl mx-auto">
+            Ingredient-checked, ad-free, built by a curly. Three steps from browsing to a personalized shelf.
+          </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="p-6 rounded-lg border border-gray-200 bg-white text-center">
               <p className="text-3xl mb-3">🔍</p>
               <h3 className="text-base font-semibold text-gray-900 mb-2">Browse</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
-                Explore 400+ curly hair products by category, brand, or ingredients.
+                {countLabel} curly hair products, every ingredient list reviewed for sulfates, silicones, and drying alcohols.
               </p>
             </div>
             <div className="p-6 rounded-lg border border-gray-200 bg-white text-center">
               <p className="text-3xl mb-3">⭐</p>
               <h3 className="text-base font-semibold text-gray-900 mb-2">Rate</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
-                Rate products you've tried. We learn what works for your hair.
+                Tap "Tried it?" on what you've used. No ads, no affiliate links — just your honest takes.
               </p>
             </div>
             <div className="p-6 rounded-lg border border-gray-200 bg-white text-center">
               <p className="text-3xl mb-3">✨</p>
-              <h3 className="text-base font-semibold text-gray-900 mb-2">Get Matched</h3>
+              <h3 className="text-base font-semibold text-gray-900 mb-2">Get matched</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
-                See personalized picks based on your ratings and hair profile.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Why Choose Scrunch */}
-      <section className="py-16 px-4 bg-gray-50 border-t border-gray-200">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">
-            Why Scrunch?
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-lg border border-gray-200 bg-white text-center">
-              <p className="text-3xl mb-3">🧪</p>
-              <h3 className="text-base font-semibold text-gray-900 mb-2">Ingredient-Checked</h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                Every product reviewed for curly hair friendliness. Spot sulfates, silicones, and drying alcohols instantly.
-              </p>
-            </div>
-            <div className="p-6 rounded-lg border border-gray-200 bg-white text-center">
-              <p className="text-3xl mb-3">💚</p>
-              <h3 className="text-base font-semibold text-gray-900 mb-2">Ad-Free & Independent</h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                No sponsored placements or affiliate links. Just honest, community-driven recommendations.
-              </p>
-            </div>
-            <div className="p-6 rounded-lg border border-gray-200 bg-white text-center">
-              <p className="text-3xl mb-3">💁‍♀️</p>
-              <h3 className="text-base font-semibold text-gray-900 mb-2">Built by Someone Like You</h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                Created by a curly-haired person who was tired of guessing which products would work.
+                Personalized picks based on your curl pattern, porosity, and what you've loved so far.
               </p>
             </div>
           </div>

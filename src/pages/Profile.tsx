@@ -9,7 +9,17 @@ export function ProfilePage() {
   const { data: profile, isLoading, error } = useUserProfile(user?.id)
   const loading = isLoading && !error
 
-  if (loading) return <div className="text-center py-12 text-gray-500">Loading...</div>
+  if (loading) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-12 animate-pulse">
+        <div className="h-7 w-40 bg-gray-200 rounded mb-8" />
+        <div className="space-y-4">
+          <div className="h-48 bg-white border border-gray-200 rounded-xl" />
+          <div className="h-32 bg-white border border-gray-200 rounded-xl" />
+        </div>
+      </div>
+    )
+  }
 
   const isProfileEmpty = !profile || (!profile.porosity && !profile.curl_pattern && !profile.onboarding_completed)
 
@@ -112,13 +122,13 @@ export function ProfilePage() {
             </div>
           </div>
 
-          {/* Custom Brand */}
+          {/* Custom Brand - inline with Hair Profile */}
           {profile!.custom_brand && (
             <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h2 className="font-semibold text-gray-900 mb-4">Custom Brand</h2>
+              <h2 className="font-semibold text-gray-900 mb-4">Currently using</h2>
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-500">Currently using:</span>
+                  <span className="text-sm text-gray-500">Brand:</span>
                   <span className="text-sm font-medium text-gray-900">
                     {CUSTOM_BRANDS.find(b => b.id === profile!.custom_brand)?.name || profile!.custom_brand}
                   </span>
@@ -158,13 +168,6 @@ export function ProfilePage() {
               {profile!.profile_public ? 'Shared' : 'Private'}
             </span>
           </div>
-
-          <button
-            onClick={() => navigate('/onboarding')}
-            className="w-full py-2.5 text-sm text-violet-600 border border-violet-200 rounded-lg hover:bg-violet-50 cursor-pointer"
-          >
-            Edit Profile →
-          </button>
 
           <div className="mt-6 pt-6 border-t border-gray-200">
             <h2 className="font-semibold text-gray-900 mb-3">Quick Links</h2>
@@ -209,7 +212,7 @@ function ProfileField({ label, value }: { label: string; value: string | null | 
           </a>
         )}
       </span>
-      <p className={`font-medium capitalize ${value ? 'text-gray-900' : 'text-gray-300'}`}>
+      <p className={`font-medium capitalize ${value ? 'text-gray-900' : 'text-gray-500'}`}>
         {value || 'Not set'}
       </p>
     </div>

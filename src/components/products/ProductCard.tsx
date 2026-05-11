@@ -101,7 +101,7 @@ export const ProductCard = memo(function ProductCard({
             aria-label={hasTried ? 'Update rating' : 'Mark as tried'}
             className={`text-xs px-3 py-2 min-h-[44px] rounded-full border cursor-pointer transition ${
               hasTried
-                ? rating === 'loved' ? 'bg-green-100 border-green-300 text-green-700'
+                ? rating === 'loved' ? 'bg-pink-100 border-pink-300 text-pink-700'
                   : rating === 'liked' ? 'bg-emerald-100 border-emerald-300 text-emerald-700'
                   : rating === 'disliked' ? 'bg-red-100 border-red-300 text-red-700'
                   : 'bg-amber-100 border-amber-300 text-amber-700'
@@ -186,10 +186,15 @@ function RatingPopup({
 }) {
   if (!isOpen) return null
   return (
-    <div className="mt-2 p-3 bg-violet-50 border border-violet-200 rounded-lg">
+    <div
+      role="dialog"
+      aria-modal="false"
+      aria-label="Rate this product"
+      className="mt-2 p-3 bg-violet-50 border border-violet-200 rounded-lg"
+    >
       <p className="text-xs font-medium text-gray-700 mb-2">How was it for your hair?</p>
       <div className="grid grid-cols-2 sm:flex gap-2">
-        <button onClick={() => onSubmit('loved')} className="text-xs py-2.5 min-h-[40px] bg-green-100 text-green-700 rounded-lg border border-green-200 hover:bg-green-200 cursor-pointer font-medium sm:flex-1">
+        <button onClick={() => onSubmit('loved')} className="text-xs py-2.5 min-h-[40px] bg-pink-100 text-pink-700 rounded-lg border border-pink-200 hover:bg-pink-200 cursor-pointer font-medium sm:flex-1">
           💚 Loved it
         </button>
         <button onClick={() => onSubmit('liked')} className="text-xs py-2.5 min-h-[40px] bg-emerald-100 text-emerald-700 rounded-lg border border-emerald-200 hover:bg-emerald-200 cursor-pointer font-medium sm:flex-1">
@@ -202,7 +207,7 @@ function RatingPopup({
           👎 Didn't like
         </button>
       </div>
-      <button onClick={onClose} className="text-xs text-gray-400 mt-2 hover:text-gray-600 cursor-pointer min-h-[36px]">Cancel</button>
+      <button onClick={onClose} className="text-xs text-gray-500 mt-2 hover:text-gray-700 cursor-pointer min-h-[36px]">Cancel</button>
     </div>
   )
 }

@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../lib/auth.utils'
 import { ScrunchLogo } from '../ui/ScrunchLogo'
-import { FeedbackButton } from '../FeedbackButton'
 
 export function Header() {
   const { user, signOut } = useAuth()
@@ -37,7 +36,6 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <FeedbackButton inline />
           {user ? (
             <div className="flex items-center gap-3">
               <Link to="/profile" className="text-sm text-gray-600 hover:text-violet-600 no-underline hidden sm:inline">
@@ -64,6 +62,8 @@ export function Header() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden text-gray-600 hover:text-violet-600 cursor-pointer p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label="Toggle menu"
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-nav"
           >
             {mobileMenuOpen ? '✕' : '☰'}
           </button>
@@ -72,7 +72,7 @@ export function Header() {
 
       {/* Mobile nav */}
       {mobileMenuOpen && (
-        <nav className="md:hidden border-t border-gray-100 bg-white px-4 py-3 flex flex-col gap-1 text-sm">
+        <nav id="mobile-nav" className="md:hidden border-t border-gray-100 bg-white px-4 py-3 flex flex-col gap-1 text-sm">
           <div className="flex flex-col">
             <Link to="/about" className={`no-underline py-3 min-h-[44px] flex items-center ${isActive('/about')}`} onClick={() => setMobileMenuOpen(false)}>About</Link>
             <Link to="/products" className={`no-underline py-3 min-h-[44px] flex items-center ${isActive('/products')}`} onClick={() => setMobileMenuOpen(false)}>Browse</Link>
@@ -84,9 +84,6 @@ export function Header() {
             {user && (
               <Link to="/profile" className={`no-underline py-3 min-h-[44px] flex items-center ${isActive('/profile')}`} onClick={() => setMobileMenuOpen(false)}>Profile</Link>
             )}
-            <div className="py-3 min-h-[44px] flex items-center">
-              <FeedbackButton inline />
-            </div>
           </div>
         </nav>
       )}

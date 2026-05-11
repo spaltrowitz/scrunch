@@ -1,12 +1,10 @@
 import { useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
-import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/auth.utils'
 import { PRODUCT_CATEGORY_LABELS, PRODUCT_CATEGORY_DESCRIPTIONS } from '../lib/constants'
 import { ProductImage } from '../hooks/useProductImage'
 import type { ProductReview, Profile } from '../lib/database.types'
-import { useProduct } from '../hooks/useProducts'
+import { useProduct, useProductReviews } from '../hooks/useProducts'
 import { useToast } from '../hooks/useToast.utils'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { useProductRating, useRatingMutation } from '../hooks/useProductRatings'
@@ -17,7 +15,7 @@ type ReviewWithProfile = ProductReview & {
 }
 
 const RATING_OPTIONS: { value: TriedRating; label: string; icon: string; numeric: number; bg: string; border: string; text: string }[] = [
-  { value: 'loved', label: 'Loved it', icon: '💚', numeric: 5, bg: 'bg-green-100', border: 'border-green-200', text: 'text-green-700' },
+  { value: 'loved', label: 'Loved it', icon: '💚', numeric: 5, bg: 'bg-pink-100', border: 'border-pink-200', text: 'text-pink-700' },
   { value: 'liked', label: 'Liked it', icon: '👍', numeric: 4, bg: 'bg-emerald-100', border: 'border-emerald-200', text: 'text-emerald-700' },
   { value: 'ok', label: 'Ok', icon: '😐', numeric: 3, bg: 'bg-amber-100', border: 'border-amber-200', text: 'text-amber-700' },
   { value: 'disliked', label: "Didn't like", icon: '👎', numeric: 1, bg: 'bg-red-100', border: 'border-red-200', text: 'text-red-700' },
@@ -49,20 +47,7 @@ export function ProductDetail() {
   const { data: myRatingData } = useProductRating(id ?? null)
   const ratingMutation = useRatingMutation()
 
-  const { data: reviewsData = [], isLoading: reviewsLoading, error: reviewsError } = useQuery({
-    queryKey: ['product-reviews', id],
-    enabled: !!id,
-    queryFn: async () => {
-      if (!id) return []
-      const { data, error } = await supabase
-        .from('product_reviews')
-        .select('id,user_id,product_id,rating,results_notes,created_at, profile:profiles!product_reviews_user_id_fkey(display_name,curl_pattern,porosity)')
-        .eq('product_id', id)
-        .order('created_at', { ascending: false })
-      if (error) throw error
-      return (data as ReviewWithProfile[] | null) ?? []
-    },
-  })
+  const { data: reviewsData = [], isLoading: reviewsLoading, error: reviewsError } = useProductReviews(id) as { data: ReviewWithProfile[]; isLoading: boolean; error: unknown }
   const loading = (productLoading || reviewsLoading) && !(productError || reviewsError)
   const userId = user?.id
   const { reviews, myReview } = useMemo(() => {
@@ -97,7 +82,7 @@ export function ProductDetail() {
     setSelectedRating(rating)
     try {
       await ratingMutation.mutateAsync({ productId: product.id, rating, notes: personalNote })
-      addToast(user ? 'Review saved!' : 'Rating saved locally!', 'success')
+      addToast(user ? 'Saved · synced' : 'Saved · on this device', 'success')
     } catch {
       addToast('Failed to save your review. Please try again.', 'error')
     }

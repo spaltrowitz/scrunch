@@ -168,6 +168,43 @@ export function useProduct(id?: string) {
   })
 }
 
+export function useProductCount() {
+  return useQuery({
+    queryKey: ['product-count'],
+    queryFn: async () => {
+      try {
+        const { count, error } = await supabase
+          .from('products')
+          .select('id', { count: 'exact', head: true })
+        if (!error && typeof count === 'number' && count > 0) return count
+      } catch {
+        // fall through to seed fallback
+      }
+      return SEED_PRODUCTS.length
+    },
+    placeholderData: SEED_PRODUCTS.length,
+    staleTime: 60 * 60 * 1000,
+  })
+}
+
+export function useProductReviews(productId?: string) {
+  return useQuery({
+    queryKey: ['product-reviews', productId],
+    enabled: !!productId,
+    queryFn: async () => {
+      if (!productId) return []
+      const { data, error } = await supabase
+        .from('product_reviews')
+        .select('id,user_id,product_id,rating,results_notes,created_at, profile:profiles!product_reviews_user_id_fkey(display_name,curl_pattern,porosity)')
+        .eq('product_id', productId)
+        .order('created_at', { ascending: false })
+      if (error) throw error
+      return data ?? []
+    },
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
 export function useUserReviews(userId?: string) {
   return useQuery({
     queryKey: ['reviews', userId],

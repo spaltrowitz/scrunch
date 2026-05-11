@@ -9,6 +9,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
+    "types:check": "tsc --noEmit",
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"

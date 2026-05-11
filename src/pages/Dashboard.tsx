@@ -2,6 +2,7 @@ import { useAuth } from '../lib/auth.utils'
 import { Link } from 'react-router-dom'
 import { useUserProfile, useUserReviewCount } from '../hooks/useProducts'
 import { getLocalRatingCount } from '../lib/localProfile'
+import { MIN_RATINGS_FOR_ADVANCED } from '../components/recommendations/recommendationEngine'
 
 export function Dashboard() {
   const { user } = useAuth()
@@ -42,7 +43,7 @@ export function Dashboard() {
       )}
 
       {/* Step 2: Rate some products */}
-      {profileComplete && ratingCount < 5 && (
+      {profileComplete && ratingCount < MIN_RATINGS_FOR_ADVANCED && (
         <div className="mb-8">
           {/* CGM beginner transition guidance */}
           {cgmExperience === 'just_starting' && (
@@ -63,7 +64,7 @@ export function Dashboard() {
           <div className="p-6 bg-emerald-50 border border-emerald-200 rounded-xl">
             <h2 className="font-semibold text-gray-900 mb-2">Now, rate products you've used</h2>
             <p className="text-sm text-gray-600 mb-4">
-              You've rated {ratingCount} product{ratingCount !== 1 ? 's' : ''}. The more you rate, the better we can recommend
+              You've rated {ratingCount} of {MIN_RATINGS_FOR_ADVANCED} products. The more you rate, the better we can recommend
               products for your hair type.
             </p>
             <Link
@@ -77,7 +78,7 @@ export function Dashboard() {
       )}
 
       {/* Ready state: profile done + some ratings */}
-      {profileComplete && ratingCount >= 5 && (
+      {profileComplete && ratingCount >= MIN_RATINGS_FOR_ADVANCED && (
         <p className="text-gray-600 mb-6">Here's what's new for you.</p>
       )}
 
