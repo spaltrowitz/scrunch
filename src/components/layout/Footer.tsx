@@ -7,9 +7,6 @@ export function Footer() {
     <footer className="border-t border-gray-200 py-8 mt-auto bg-white">
       <div className="max-w-6xl mx-auto px-4 flex flex-col items-center gap-4">
         <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-gray-600">
-          <Link to="/about" className="hover:text-violet-600 no-underline py-2 min-h-[44px] inline-flex items-center">About</Link>
-          <Link to="/community" className="hover:text-violet-600 no-underline py-2 min-h-[44px] inline-flex items-center">Community</Link>
-          <Link to="/ingredient-checker" className="hover:text-violet-600 no-underline py-2 min-h-[44px] inline-flex items-center">Ingredient Checker</Link>
           <Link
             to="/about#support"
             className="hover:text-pink-600 no-underline py-2 min-h-[44px] inline-flex items-center font-medium"
