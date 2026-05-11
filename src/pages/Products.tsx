@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
 import type { ProductCategory, Product, ProductReview } from '../lib/database.types'
@@ -11,6 +11,11 @@ import { useAuth } from '../lib/auth.utils'
 import { useCatalogProducts, useUserReviews } from '../hooks/useProducts'
 import { useToast } from '../hooks/useToast.utils'
 import { MIN_RATINGS_FOR_ADVANCED } from '../components/recommendations/recommendationEngine'
+import {
+  trackRatingSubmitted,
+  trackSearchPerformed,
+  trackFilterApplied,
+} from '../lib/analytics'
 
 type TriedRating = 'loved' | 'liked' | 'ok' | 'disliked'
 type ProductAction = 'tried' | 'bookmarked'
@@ -255,6 +260,13 @@ export function Products() {
       return next
     })
 
+    trackRatingSubmitted({
+      product_id: key,
+      rating,
+      source: 'products',
+      is_authenticated: !!user,
+    })
+
     // Persist to Supabase
     if (user && isUuid(key)) {
       upsertReviewMutation.mutate({ productId: key, rating })
@@ -346,6 +358,43 @@ export function Products() {
     [filteredProducts, visibleCount],
   )
   const hasMore = visibleCount < filteredProducts.length
+
+  // Debounced search-performed event (fires after user pauses typing for 600ms).
+  useEffect(() => {
+    if (search.trim().length < 2) return
+    const t = setTimeout(() => {
+      const trimmed = search.trim()
+      trackSearchPerformed({
+        source: 'products',
+        query_length: trimmed.length,
+        word_count: trimmed.split(/\s+/).length,
+        results_count: filteredProducts.length,
+      })
+    }, 600)
+    return () => clearTimeout(t)
+  }, [search, filteredProducts.length])
+
+  // Filter-applied event for each non-search filter change.
+  useEffect(() => {
+    if (selectedCategories.size === 0) return
+    trackFilterApplied({ filter_type: 'category', value: Array.from(selectedCategories).sort().join(',') })
+  }, [selectedCategories])
+  useEffect(() => {
+    if (!brandFilter) return
+    trackFilterApplied({ filter_type: 'brand', value: brandFilter })
+  }, [brandFilter])
+  useEffect(() => {
+    if (!regionFilter) return
+    trackFilterApplied({ filter_type: 'region', value: regionFilter })
+  }, [regionFilter])
+  useEffect(() => {
+    if (!showApprovedOnly) return
+    trackFilterApplied({ filter_type: 'cg_status', value: 'approved_only' })
+  }, [showApprovedOnly])
+  useEffect(() => {
+    if (!showGoodPlus) return
+    trackFilterApplied({ filter_type: 'good_plus', value: 'on' })
+  }, [showGoodPlus])
 
   if (loading) {
     return (

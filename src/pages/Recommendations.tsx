@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
@@ -20,8 +20,13 @@ import { RecommendedCard } from '../components/recommendations/RecommendedCard'
 import { RatingGroup } from '../components/recommendations/RatingGroup'
 import { SavedProducts } from '../components/recommendations/SavedProducts'
 import { IngredientRecsSection } from '../components/recommendations/IngredientRecsSection'
+import {
+  trackRecommendationShown,
+  trackRecommendationEngaged,
+} from '../lib/analytics'
 
 const EMPTY_SET: Set<string> = new Set()
+const ALGORITHM_VERSION = 'v1'
 
 async function loadCollaborativeRecs(
   userProfile: Profile,
@@ -204,6 +209,28 @@ export function Recommendations() {
 
   // ----- mutations -----
 
+  // Fire one recommendation_shown event per product whenever the recommended
+  // list changes. Key includes tier so a tier upgrade re-emits impressions.
+  const shownKey = useMemo(
+    () => `${tier}:${recommendedProducts.map(p => p.id).join(',')}`,
+    [tier, recommendedProducts],
+  )
+  useEffect(() => {
+    if (recommendedProducts.length === 0) return
+    recommendedProducts.forEach((p, rank) => {
+      trackRecommendationShown({
+        product_id: p.id,
+        rank,
+        score: p._score ?? null,
+        tier: String(tier),
+        algorithm_version: ALGORITHM_VERSION,
+      })
+    })
+    // shownKey is the stable identity of the impression set; deps lint disabled
+    // because tier/recommendedProducts are baked into shownKey.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shownKey])
+
   const rateMutation = useMutation({
     mutationFn: async ({ productId, rating }: { productId: string; rating: number }) => {
       if (!userId) return
@@ -221,27 +248,40 @@ export function Recommendations() {
   })
 
   const handleRate = useCallback(async (productId: string, rating: number) => {
+    const ratingLabel: 'loved' | 'liked' | 'ok' | 'disliked' =
+      rating >= 5 ? 'loved' : rating >= 4 ? 'liked' : rating >= 2 ? 'ok' : 'disliked'
+    trackRecommendationEngaged({
+      product_id: productId,
+      tier: String(tier),
+      action: 'rate',
+      algorithm_version: ALGORITHM_VERSION,
+    })
     if (userId) {
       try { await rateMutation.mutateAsync({ productId, rating }) }
       finally { setShowRatingPopup(null) }
     } else {
       // Save to localStorage for logged-out users
-      const ratingLabel = rating >= 5 ? 'loved' : rating >= 4 ? 'liked' : rating >= 2 ? 'ok' : 'disliked'
       const localRatings = getLocalRatings()
       localRatings[productId] = ratingLabel
       localStorage.setItem('scrunch_ratings', JSON.stringify(localRatings))
       setShowRatingPopup(null)
     }
-  }, [userId, rateMutation])
+  }, [userId, rateMutation, tier])
 
   const handleBookmark = useCallback((productId: string) => {
+    trackRecommendationEngaged({
+      product_id: productId,
+      tier: String(tier),
+      action: 'bookmark',
+      algorithm_version: ALGORITHM_VERSION,
+    })
     try {
       const stored = JSON.parse(localStorage.getItem('scrunch_actions') || '{}')
       if (!stored[productId]) stored[productId] = []
       if (!stored[productId].includes('bookmarked')) stored[productId].push('bookmarked')
       localStorage.setItem('scrunch_actions', JSON.stringify(stored))
     } catch { /* ignore */ }
-  }, [])
+  }, [tier])
 
   const dismissMutation = useMutation({
     mutationFn: async ({ productId, notes }: { productId: string; notes: string }) => {
@@ -261,11 +301,17 @@ export function Recommendations() {
 
   const handleDismiss = useCallback(async (productId: string) => {
     if (!userId || dismissReasons.size === 0) return
+    trackRecommendationEngaged({
+      product_id: productId,
+      tier: String(tier),
+      action: 'dismiss',
+      algorithm_version: ALGORITHM_VERSION,
+    })
     const reasonText = [...dismissReasons].join(', ')
     const notes = dismissNote.trim() ? `${reasonText}. ${dismissNote.trim()}` : reasonText
     try { await dismissMutation.mutateAsync({ productId, notes }) }
     finally { setDismissingProduct(null); setDismissReasons(new Set()); setDismissNote('') }
-  }, [userId, dismissReasons, dismissNote, dismissMutation])
+  }, [userId, dismissReasons, dismissNote, dismissMutation, tier])
 
   const handleToggleDismissReason = useCallback((reason: string) => {
     setDismissReasons(prev => {

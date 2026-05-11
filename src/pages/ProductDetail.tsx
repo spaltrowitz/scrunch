@@ -81,7 +81,7 @@ export function ProductDetail() {
     if (!product) return
     setSelectedRating(rating)
     try {
-      await ratingMutation.mutateAsync({ productId: product.id, rating, notes: personalNote })
+      await ratingMutation.mutateAsync({ productId: product.id, rating, notes: personalNote, source: 'detail' })
       addToast(user ? 'Saved · synced' : 'Saved · on this device', 'success')
     } catch {
       addToast('Failed to save your review. Please try again.', 'error')

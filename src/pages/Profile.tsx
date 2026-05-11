@@ -1,13 +1,16 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/auth.utils'
 import { CURL_PATTERNS, POROSITY_OPTIONS, parseSensitivity, INGREDIENT_PREFERENCE_LABELS, CUSTOM_BRANDS, HERO_INGREDIENTS } from '../lib/constants'
 import { useUserProfile } from '../hooks/useProducts'
+import { getAnalyticsOptOut, setAnalyticsOptOut } from '../lib/analytics'
 
 export function ProfilePage() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const { data: profile, isLoading, error } = useUserProfile(user?.id)
   const loading = isLoading && !error
+  const [optedOut, setOptedOut] = useState(getAnalyticsOptOut())
 
   if (loading) {
     return (
@@ -181,6 +184,27 @@ export function ProfilePage() {
                 <p className="text-xs text-gray-500">Personalized recommendations</p>
               </button>
             </div>
+          </div>
+
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <h2 className="font-semibold text-gray-900 mb-3">Privacy</h2>
+            <label className="flex items-start gap-3 p-3 bg-white rounded-lg border border-gray-200 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={optedOut}
+                onChange={(e) => {
+                  setAnalyticsOptOut(e.target.checked)
+                  setOptedOut(e.target.checked)
+                }}
+                className="mt-1 cursor-pointer"
+              />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">Opt out of usage analytics</p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Stop sending page views and product-interaction events. We never track you across the web — this turns off our own first-party usage data too.
+                </p>
+              </div>
+            </label>
           </div>
         </div>
       )}

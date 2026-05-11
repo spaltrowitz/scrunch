@@ -39,10 +39,15 @@ export function Privacy() {
               </ul>
             </div>
             <div>
-              <h3 className="font-medium text-gray-800">We also collect basic page view analytics:</h3>
+              <h3 className="font-medium text-gray-800">We also collect first-party usage analytics:</h3>
               <ul className="list-disc pl-5 mt-1 space-y-1">
-                <li>Pages visited (no personal identifiers attached)</li>
-                <li>Used to understand which features are useful and where users get stuck</li>
+                <li>Page views (path and referrer, no personal identifiers)</li>
+                <li>Product interactions — ratings submitted, recommendations shown and engaged with, filters applied</li>
+                <li>Search shape only — query length and word count, <strong>never the query text itself</strong></li>
+                <li>Onboarding step completion to find where users get stuck</li>
+                <li>All events stored on our own Supabase backend — never sent to Google Analytics, Meta, or any third party</li>
+                <li>Aggregate analytics are retained for up to 90 days, then deleted</li>
+                <li>You can opt out at any time from your Profile page</li>
               </ul>
             </div>
           </div>

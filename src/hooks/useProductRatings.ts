@@ -2,9 +2,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../lib/auth.utils'
 import { supabase } from '../lib/supabase'
 import { getLocalRatings } from '../lib/localProfile'
+import { trackRatingSubmitted } from '../lib/analytics'
 import type { RepurchaseIntent } from '../lib/database.types'
 
 export type TriedRating = 'loved' | 'liked' | 'ok' | 'disliked'
+export type RatingSource = 'products' | 'detail' | 'recommendations'
 
 const RATING_MAP: Record<TriedRating, number> = { loved: 5, liked: 4, ok: 3, disliked: 1 }
 const REPURCHASE_MAP: Record<TriedRating, RepurchaseIntent> = { loved: 'yes', liked: 'yes', ok: 'maybe', disliked: 'no' }
@@ -55,6 +57,7 @@ interface RatingInput {
   productId: string
   rating: TriedRating
   notes?: string
+  source?: RatingSource
 }
 
 /**
@@ -93,6 +96,12 @@ export function useRatingMutation() {
       if (error) throw error
     },
     onSuccess: (_data, input) => {
+      trackRatingSubmitted({
+        product_id: input.productId,
+        rating: input.rating,
+        source: input.source ?? 'products',
+        is_authenticated: !!user,
+      })
       queryClient.invalidateQueries({ queryKey: ['product-rating', input.productId] })
       queryClient.invalidateQueries({ queryKey: ['product-reviews', input.productId] })
       if (user) {

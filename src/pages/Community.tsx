@@ -6,6 +6,7 @@ import {
   type RedditResult,
   type SearchStatus,
 } from '../lib/communitySearch'
+import { trackSearchPerformed } from '../lib/analytics'
 
 interface CommunityQuestion {
   id: string
@@ -137,6 +138,14 @@ export function Community() {
     setHistory(prev => [newQ, ...prev])
     setLoading(false)
     setShowSearchBox(false)
+
+    const trimmed = q.trim()
+    trackSearchPerformed({
+      source: 'community',
+      query_length: trimmed.length,
+      word_count: trimmed.split(/\s+/).length,
+      results_count: redditResults.length,
+    })
   }, [])
 
   const handleAsk = async (e: React.FormEvent) => {

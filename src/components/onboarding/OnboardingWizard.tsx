@@ -21,6 +21,7 @@ import type {
 } from '../../lib/database.types'
 import { useUserProfile } from '../../hooks/useProducts'
 import { useToast } from '../../hooks/useToast.utils'
+import { trackOnboardingStep, trackOnboardingCompleted } from '../../lib/analytics'
 
 interface OnboardingData {
   curl_pattern: CurlPattern | null
@@ -162,6 +163,11 @@ export function OnboardingWizard() {
       addToast('Failed to save your profile. Please try again.', 'error')
     },
     onSuccess: () => {
+      trackOnboardingCompleted({
+        total_steps: TOTAL_STEPS,
+        is_editing: isEditing,
+        is_authenticated: !!user,
+      })
       addToast('Profile saved!', 'success')
       queryClient.invalidateQueries({ queryKey: ['profile', user?.id ?? 'local'] })
       navigate('/profile')
@@ -175,6 +181,15 @@ export function OnboardingWizard() {
     } finally {
       setSaving(false)
     }
+  }
+
+  const goToNextStep = () => {
+    trackOnboardingStep({
+      step_index: step,
+      total_steps: TOTAL_STEPS,
+      is_editing: isEditing,
+    })
+    setStep(s => s + 1)
   }
 
   if (loadingProfile) return <div className="text-center py-12 text-gray-500">Loading...</div>
@@ -254,7 +269,7 @@ export function OnboardingWizard() {
               ))}
               <button
                 type="button"
-                onClick={() => { update('porosity', null as unknown as Porosity); setStep(s => s + 1) }}
+                onClick={() => { update('porosity', null as unknown as Porosity); goToNextStep() }}
                 className="w-full px-4 py-3 rounded-lg border border-dashed border-gray-300 text-sm text-gray-400 hover:text-gray-600 hover:border-gray-400 cursor-pointer transition text-left"
               >
                 🧪 Not sure yet - I'll figure it out later
@@ -512,7 +527,7 @@ export function OnboardingWizard() {
               ))}
               <button
                 type="button"
-                onClick={() => { update('custom_brand', null); update('custom_hero_ingredients', []); setStep(s => s + 1) }}
+                onClick={() => { update('custom_brand', null); update('custom_hero_ingredients', []); goToNextStep() }}
                 className="w-full px-4 py-3 rounded-lg border border-dashed border-gray-300 text-sm text-gray-400 hover:text-gray-600 hover:border-gray-400 cursor-pointer transition text-left"
               >
                 I don't use a custom brand - skip this
@@ -638,14 +653,14 @@ export function OnboardingWizard() {
             <div className="flex gap-3">
               <button
                 type="button"
-                onClick={() => setStep(s => s + 1)}
+                onClick={goToNextStep}
                 className="px-4 py-2 text-sm text-gray-400 hover:text-gray-600 cursor-pointer"
               >
                 I'll come back to this →
               </button>
               <button
                 type="button"
-                onClick={() => setStep(s => s + 1)}
+                onClick={goToNextStep}
                 className="px-6 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 cursor-pointer"
               >
                 Next →
