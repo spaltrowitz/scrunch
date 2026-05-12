@@ -23,23 +23,21 @@ Tweak the wording slightly per sub — say "wavy" in r/Wavyhair, "natural hair" 
 
 ### Title
 
-> This community taught me everything about my curls — I built a free app to give back, would love your honest feedback
+> I made a free app for finding CG-approved curly hair products — built it as a thank-you to this community
 
 ### Body
 
-> Honestly, I learned how to take care of my hair from this community. Spreadsheets people pulled together, ingredient breakdowns in old threads, before/afters, the random comment that finally made porosity click for me — that's where I figured out my routine. None of that exists without people generously sharing what worked for them.
+> Spent way too many years bouncing between CurlScan, IsItCG, random spreadsheets, and old Reddit threads trying to figure out if a product was actually CG-friendly. Most of what I know about my hair I learned from this community — I figured the least I could do was build the tool I always wished existed.
 >
-> But also: it's a lot. I spent way too long bouncing between CurlScan and IsItCG, scrolling through massive spreadsheets, watching videos, and digging through old threads trying to piece it together. The info is all out there, it's just scattered.
+> It's called Scrunch. Free, no ads, no brand deals, no affiliate links. You paste in an ingredient list or look up a product and it tells you immediately if it's CG-approved, with the reasoning — which silicone is non-water-soluble, which alcohol is drying, etc.
 >
-> So I built something called Scrunch as my way of giving back — a free web app that pulls it all into one place. You can look up products and see right away if they're CG-approved based on their ingredients, build a hair profile with your type and porosity, track what you've tried and whether it worked, and get matched to products that fit your curl pattern, porosity, and ingredient sensitivities. As more curlies rate things, it'll start learning from people with similar hair too — so being an early tester actually shapes what gets recommended next.
->
-> No ads, no brand deals, no paid promotions, nothing to sell. Just a thank-you to the community that taught me.
->
-> I'd genuinely love for you to try it and tell me what you think — what's confusing, what's broken, what's missing, what feels off. There's a feedback button right in the app (no signup or GitHub account needed, it goes straight to me) and you can request products to add to the database too.
+> 410 products in the database so far. You can also build a quick hair profile (curl pattern, porosity, sensitivities) and it'll match you to products that fit. As more people rate things, the recs get smarter — so early testers genuinely shape what gets recommended.
 >
 > https://spaltrowitz.github.io/scrunch/
 >
-> Thanks for everything you've all shared — hoping this is useful back. 💜
+> I'd love brutal feedback — what's broken, what's confusing, what's missing, what I got wrong about an ingredient. Feedback button is built into the app, no signup needed, comes straight to me.
+>
+> Hoping it's actually useful. 💜
 
 ---
 
@@ -47,21 +45,19 @@ Tweak the wording slightly per sub — say "wavy" in r/Wavyhair, "natural hair" 
 
 ### Title
 
-> A thank-you to this community — free ingredient analysis tool I built, would love your scrutiny
+> Free ingredient analysis tool I built — would value scrutiny from this community
 
 ### Body
 
-> Most of what I know about reading hair-care ingredients I learned from threads in this sub and the broader CG community — people patiently explaining why a "natural" surfactant can still be drying, what makes a silicone water-soluble, why certain alcohols behave differently. That generosity is why I figured out my own routine.
+> Most of what I know about reading ingredient labels I learned from threads in this sub. So I built a free tool called Scrunch that breaks down product ingredients against CG method rules — flags non-water-soluble silicones, harsh sulfates, drying alcohols, mineral oil, petrolatum, with the reasoning shown for each.
 >
-> As a way of giving back, I built a free web app called Scrunch that breaks down product ingredients against curly girl method rules — flagging non-water-soluble silicones, harsh sulfates, drying alcohols, mineral oil, petrolatum, etc. It cross-references multiple sources rather than relying on a single list, and categorizes products as approved, caution, or not CG-friendly with the reasoning shown.
+> Cross-references multiple sources rather than relying on a single CG list, since they disagree on edge cases.
 >
-> It also lets you build a hair profile, track products you've tried, and get matched to products that fit your curl pattern and ingredient sensitivities. As more people rate things, the recs will incorporate signal from users with similar hair.
+> 410 products in the database. No ads, no brand deals, no affiliate links.
 >
-> No ads, no brand partnerships, nothing to sell. I'd really value scrutiny from this community specifically — if you find an ingredient miscategorized or a rule applied wrong, please tell me (feedback button in the app, no signup needed). I want to get the science right.
+> If you find an ingredient miscategorized or a rule applied wrong, please call it out — feedback button is in the app, no signup needed. I want to get the science right.
 >
 > https://spaltrowitz.github.io/scrunch/
->
-> Thanks for everything this community has taught me. 💜
 
 ---
 
@@ -69,17 +65,18 @@ Tweak the wording slightly per sub — say "wavy" in r/Wavyhair, "natural hair" 
 
 Target: "Curly Girl Method", "Wavy Hair Community", "Curly Girl Method for Beginners", "Natural Hair Care" groups.
 
-> Hey everyone — I learned how to take care of my hair from this group and others like it. The spreadsheets people pulled together, the ingredient breakdowns, the before/afters and tips — that's where I actually figured out my routine. So I wanted to give something back.
+> Spent way too many years going between spreadsheets, ingredient checkers, and old threads trying to figure out if a product was actually CG-friendly. Most of what I learned about my hair came from groups like this one — I built the tool I always wished existed as a thank-you.
 >
-> I built a free web app called Scrunch that pulls a lot of what this community has taught me into one place. You can check if a product is CG-approved with a full ingredient breakdown, build a hair profile, track what you've tried and how it worked, and get matched to products that fit your curl pattern and ingredient sensitivities. Early testers' ratings actually shape what the app recommends next.
+> It's called Scrunch. Free, no ads, no affiliate links, no brand deals. You can:
+> - Check any product's ingredients against CG rules (it tells you which ones are problematic and why)
+> - Build a profile (curl pattern, porosity, sensitivities)
+> - Get matched to products that should work for you — gets smarter as people rate
 >
-> It's completely free. No ads, no sponsored products, no brand deals — just a thank-you to the community that taught me.
->
-> I'd genuinely love for you to try it and tell me what you think. What's confusing, what's broken, what's missing? There's a feedback button in the app (no signup needed) that comes straight to me.
+> 410 products in the database so far. Wavies absolutely welcome.
 >
 > https://spaltrowitz.github.io/scrunch/
 >
-> Wavies are absolutely welcome too, this isn't just for tight curls. 💜
+> Looking for honest feedback — what's confusing, what's broken, what I should add. Feedback button is in the app, comes straight to me. 💜
 
 ---
 
