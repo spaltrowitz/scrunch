@@ -29,7 +29,7 @@ Tweak the wording slightly per sub — say "wavy" in r/Wavyhair, "natural hair" 
 
 > Like a lot of you I spent way too long scrolling through massive spreadsheets, bouncing between CurlScan and IsItCG, digging through old threads, and watching videos trying to piece together which products actually work for my hair. The info is all out there but it's so scattered and honestly kind of exhausting to navigate.
 >
-> So I built something called Scrunch — it's a free web app that pulls it all into one place. You can look up products and see right away if they're CG-approved or not based on their ingredients, build a hair profile with your type and porosity and all that, track what you've tried and whether it worked for you, and find products that work for people with similar hair.
+> So I built something called Scrunch — it's a free web app that pulls it all into one place. You can look up products and see right away if they're CG-approved or not based on their ingredients, build a hair profile with your type and porosity and all that, track what you've tried and whether it worked for you, and get matched to products that fit your curl pattern, porosity, and ingredient sensitivities. As more curlies rate things, it'll start learning from people with similar hair too — so being an early tester actually shapes what gets recommended next.
 >
 > There are no ads, no brand deals, no paid promotions, and I'm not selling anything. This community is the reason I figured out how to take care of my hair in the first place and this is just me trying to give something useful back.
 >
@@ -51,7 +51,7 @@ Tweak the wording slightly per sub — say "wavy" in r/Wavyhair, "natural hair" 
 
 > I built a free web app called Scrunch that breaks down product ingredients against curly girl method rules — it flags non-water-soluble silicones, harsh sulfates, drying alcohols, mineral oil, petrolatum, and so on. It cross-references multiple sources instead of relying on just one, and categorizes products as approved, caution, or not CG-friendly with the reasoning.
 >
-> It also lets you build a hair profile, track products you've tried, and get recommendations from people with similar hair.
+> It also lets you build a hair profile, track products you've tried, and get matched to products that fit your curl pattern and ingredient sensitivities. As more people rate things, the recs will incorporate signal from users with similar hair.
 >
 > No ads, no brand partnerships, completely free. I'm looking for folks who care about ingredient accuracy to try it out — your feedback would help a lot.
 >
@@ -65,7 +65,7 @@ Target: "Curly Girl Method", "Wavy Hair Community", "Curly Girl Method for Begin
 
 > Hey everyone — I wanted to share something I've been working on. It's a free web app called Scrunch for finding curly girl-approved products.
 >
-> If you're anything like me you've spent way too much time going back and forth between spreadsheets and ingredient checkers and Reddit threads trying to figure out what's actually CG-friendly. I built Scrunch to bring all of that into one place — you can check if a product is approved with a full ingredient breakdown, build a hair profile, track what you've tried and how it worked, and get recommendations based on people with similar hair.
+> If you're anything like me you've spent way too much time going back and forth between spreadsheets and ingredient checkers and Reddit threads trying to figure out what's actually CG-friendly. I built Scrunch to bring all of that into one place — you can check if a product is approved with a full ingredient breakdown, build a hair profile, track what you've tried and how it worked, and get matched to products that fit your curl pattern and ingredient sensitivities. Early testers' ratings actually shape what the app recommends next.
 >
 > It's completely free. No ads, no sponsored products, no brand deals. Just a passion project from someone this community helped figure out their curls.
 >
