@@ -33,9 +33,9 @@ Tweak the wording slightly per sub — say "wavy" in r/Wavyhair, "natural hair" 
 >
 > There are no ads, no brand deals, no paid promotions, and I'm not selling anything. This community is the reason I figured out how to take care of my hair in the first place and this is just me trying to give something useful back.
 >
-> I'm looking for early testers — people who'll poke around and tell me what's confusing, what's broken, and what they wish it did. There's a feedback button right in the app so you can report stuff without having to come back here.
+> I'm looking for early testers — people who'll poke around and tell me what's confusing, what's broken, and what they wish it did. There's a feedback button right in the app (no signup or GitHub account needed — it goes straight to me).
 >
-> [Link to Scrunch]
+> https://spaltrowitz.github.io/scrunch/
 >
 > If there are products you want in the database you can request them through the app too and they'll get added.
 
@@ -55,7 +55,7 @@ Tweak the wording slightly per sub — say "wavy" in r/Wavyhair, "natural hair" 
 >
 > No ads, no brand partnerships, completely free. I'm looking for folks who care about ingredient accuracy to try it out — your feedback would help a lot.
 >
-> [Link to Scrunch]
+> https://spaltrowitz.github.io/scrunch/
 
 ---
 
@@ -69,9 +69,9 @@ Target: "Curly Girl Method", "Wavy Hair Community", "Curly Girl Method for Begin
 >
 > It's completely free. No ads, no sponsored products, no brand deals. Just a passion project from someone this community helped figure out their curls.
 >
-> I'm looking for people to try it out and give honest feedback — there's a feedback button in the app that makes it easy to tell me what's working and what isn't.
+> I'm looking for people to try it out and give honest feedback — there's a feedback button in the app (no signup needed) that makes it easy to tell me what's working and what isn't.
 >
-> [Link to Scrunch]
+> https://spaltrowitz.github.io/scrunch/
 >
 > Wavies are absolutely welcome too, this isn't just for tight curls.
 
@@ -83,7 +83,7 @@ Target: "Curly Girl Method", "Wavy Hair Community", "Curly Girl Method for Begin
 >
 > Would you be down to try it out and let me know what you think? Even just a few minutes of poking around would be really helpful. There's a feedback button in the corner if anything is confusing or broken.
 >
-> [Link]
+> https://spaltrowitz.github.io/scrunch/
 >
 > No pressure — just want honest reactions from real people before I put it out there more broadly.
 
