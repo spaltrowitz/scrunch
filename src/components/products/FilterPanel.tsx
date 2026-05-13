@@ -148,38 +148,32 @@ export function FilterPanel({
               <option key={brand} value={brand}>{brand}</option>
             ))}
           </select>
-          <details className="sm:flex-1">
-            <summary className="px-3 py-2.5 min-h-[44px] border border-gray-200 rounded-lg text-sm bg-white cursor-pointer flex items-center justify-between hover:border-violet-300 transition">
-              <span>🌍 Region {regionFilter && <span className="text-violet-600 font-medium">· {regionFilter}</span>}</span>
-              <span className="text-gray-400 text-xs ml-2">▾</span>
-            </summary>
-            <select
-              value={regionFilter}
-              onChange={(e) => onRegionFilterChange(e.target.value)}
-              className="mt-2 w-full px-3 py-2.5 min-h-[44px] border border-gray-200 rounded-lg text-sm bg-white"
-            >
-              <option value="">🌍 All Countries</option>
-              <option value="US">🇺🇸 United States</option>
-              <option value="CA">🇨🇦 Canada</option>
-              <option value="UK">🇬🇧 United Kingdom</option>
-              <option value="EU">🇪🇺 Europe</option>
-              <option value="AU">🇦🇺 Australia</option>
-              <option value="IN">🇮🇳 India</option>
-              <option value="BR">🇧🇷 Brazil</option>
-              <option value="JP">🇯🇵 Japan</option>
-              <option value="KR">🇰🇷 South Korea</option>
-              <option value="NG">🇳🇬 Nigeria</option>
-              <option value="ZA">🇿🇦 South Africa</option>
-              <option value="PH">🇵🇭 Philippines</option>
-              <option value="MX">🇲🇽 Mexico</option>
-              <option value="CO">🇨🇴 Colombia</option>
-              <option value="AR">🇦🇷 Argentina</option>
-              <option value="JM">🇯🇲 Jamaica</option>
-              <option value="TR">🇹🇷 Turkey</option>
-              <option value="SE">🇸🇪 Scandinavia</option>
-              <option value="KE">🇰🇪 East Africa</option>
-            </select>
-          </details>
+          <select
+            value={regionFilter}
+            onChange={(e) => onRegionFilterChange(e.target.value)}
+            className="px-3 py-2.5 min-h-[44px] border border-gray-200 rounded-lg text-sm bg-white hover:border-violet-300 transition"
+          >
+            <option value="">🌍 All Countries</option>
+            <option value="US">🇺🇸 United States</option>
+            <option value="CA">🇨🇦 Canada</option>
+            <option value="UK">🇬🇧 United Kingdom</option>
+            <option value="EU">🇪🇺 Europe</option>
+            <option value="AU">🇦🇺 Australia</option>
+            <option value="IN">🇮🇳 India</option>
+            <option value="BR">🇧🇷 Brazil</option>
+            <option value="JP">🇯🇵 Japan</option>
+            <option value="KR">🇰🇷 South Korea</option>
+            <option value="NG">🇳🇬 Nigeria</option>
+            <option value="ZA">🇿🇦 South Africa</option>
+            <option value="PH">🇵🇭 Philippines</option>
+            <option value="MX">🇲🇽 Mexico</option>
+            <option value="CO">🇨🇴 Colombia</option>
+            <option value="AR">🇦🇷 Argentina</option>
+            <option value="JM">🇯🇲 Jamaica</option>
+            <option value="TR">🇹🇷 Turkey</option>
+            <option value="SE">🇸🇪 Scandinavia</option>
+            <option value="KE">🇰🇪 East Africa</option>
+          </select>
         </div>
 
         {/* Toggles */}

@@ -95,7 +95,7 @@ export function RequestProductForm({ onClose }: { onClose: () => void }) {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-3">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="text-xs font-medium text-gray-700 block mb-1">Brand *</label>
             <input
@@ -104,7 +104,7 @@ export function RequestProductForm({ onClose }: { onClose: () => void }) {
               value={request.brand}
               onChange={(e) => setRequest(r => ({ ...r, brand: e.target.value }))}
               placeholder="e.g., SheaMoisture"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+              className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
             />
           </div>
           <div>
@@ -115,7 +115,7 @@ export function RequestProductForm({ onClose }: { onClose: () => void }) {
               value={request.name}
               onChange={(e) => setRequest(r => ({ ...r, name: e.target.value }))}
               placeholder="e.g., Curl Smoothie"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+              className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
             />
           </div>
         </div>
@@ -124,7 +124,7 @@ export function RequestProductForm({ onClose }: { onClose: () => void }) {
           <select
             value={request.category}
             onChange={(e) => setRequest(r => ({ ...r, category: e.target.value as ProductCategory | '' }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white"
+            className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-lg text-sm bg-white"
           >
             <option value="">Select a category (optional)</option>
             {Object.entries(PRODUCT_CATEGORY_LABELS).map(([value, label]) => (
@@ -139,15 +139,15 @@ export function RequestProductForm({ onClose }: { onClose: () => void }) {
             value={request.link}
             onChange={(e) => setRequest(r => ({ ...r, link: e.target.value }))}
             placeholder="https://target.com/..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+            className="w-full px-3 py-3 min-h-[44px] border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
           />
         </div>
-        <label className="flex items-start gap-2 text-xs text-gray-600 cursor-pointer select-none">
+        <label className="flex items-start gap-3 text-xs text-gray-600 cursor-pointer select-none min-h-[44px] py-2">
           <input
             type="checkbox"
             checked={confirmed}
             onChange={(e) => setConfirmed(e.target.checked)}
-            className="mt-0.5 accent-violet-600"
+            className="mt-0.5 w-5 h-5 accent-violet-600 shrink-0"
           />
           <span>I confirm this is a <strong>hair care product</strong> for curly or wavy hair (shampoo, conditioner, gel, cream, oil, treatment, etc.)</span>
         </label>
@@ -160,7 +160,7 @@ export function RequestProductForm({ onClose }: { onClose: () => void }) {
         <button
           type="submit"
           disabled={!request.brand.trim() || !request.name.trim() || !confirmed || submitting}
-          className="w-full py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 disabled:opacity-50 cursor-pointer"
+          className="w-full py-3 min-h-[44px] bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 disabled:opacity-50 cursor-pointer"
         >
           {submitting ? 'Submitting…' : 'Submit Request'}
         </button>

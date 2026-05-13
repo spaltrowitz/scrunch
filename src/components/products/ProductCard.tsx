@@ -94,8 +94,8 @@ export const ProductCard = memo(function ProductCard({
         </div>
       )}
 
-      <div className="pl-0 sm:pl-20">
-        <div className="flex gap-2 items-center">
+      <div className="pl-0">
+        <div className="flex flex-wrap gap-2 items-center">
           <button
             onClick={onToggleTried}
             aria-label={hasTried ? 'Update rating' : 'Mark as tried'}
