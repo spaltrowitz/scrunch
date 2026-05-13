@@ -21,6 +21,32 @@ interface FilterPanelProps {
   onRequestProduct: () => void
 }
 
+const CATEGORY_EMOJI: Record<ProductCategory, string> = {
+  clarifying_shampoo: '🫧',
+  dry_shampoo: '🌬️',
+  low_poo: '🧴',
+  co_wash: '🫗',
+  rinse_out_conditioner: '🚿',
+  deep_conditioner: '🧖‍♀️',
+  leave_in_conditioner: '💧',
+  curl_cream: '🧁',
+  gel: '✨',
+  mousse: '☁️',
+  custard: '🍮',
+  oil_serum: '🫒',
+  spray_refresher: '💦',
+  protein_treatment: '💪',
+  scalp_treatment: '🌿',
+  bond_repair: '🔗',
+}
+
+const CATEGORY_GROUPS: { label: string; categories: ProductCategory[] }[] = [
+  { label: 'Cleanse', categories: ['clarifying_shampoo', 'low_poo', 'co_wash', 'dry_shampoo'] },
+  { label: 'Condition', categories: ['rinse_out_conditioner', 'deep_conditioner', 'leave_in_conditioner'] },
+  { label: 'Style', categories: ['curl_cream', 'gel', 'mousse', 'custard', 'spray_refresher'] },
+  { label: 'Treat', categories: ['oil_serum', 'protein_treatment', 'scalp_treatment', 'bond_repair'] },
+]
+
 export function FilterPanel({
   selectedCategories,
   onToggleCategory,
@@ -73,29 +99,39 @@ export function FilterPanel({
 
       {/* Filter content - always visible on desktop, toggled on mobile */}
       <div className={`${filtersOpen ? 'block' : 'hidden'} md:block`}>
-        {/* Category chips */}
-        <div className="mb-4">
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(PRODUCT_CATEGORY_LABELS).map(([value, label]) => {
-              const cat = value as ProductCategory
-              const isSelected = selectedCategories.has(cat)
-              const count = categoryCounts[cat] ?? 0
-              return (
-                <button
-                  key={value}
-                  onClick={() => onToggleCategory(cat)}
-                  title={PRODUCT_CATEGORY_DESCRIPTIONS[cat]}
-                  className={`text-xs px-3 py-2 min-h-[44px] rounded-full border cursor-pointer transition ${
-                    isSelected
-                      ? 'bg-violet-100 border-violet-300 text-violet-700 font-medium'
-                      : 'border-gray-200 text-gray-500 hover:border-gray-300'
-                  }`}
-                >
-                  {label} <span className="text-gray-400 ml-0.5">{count}</span>
-                </button>
-              )
-            })}
-          </div>
+        {/* Category groups */}
+        <div className="mb-5 space-y-3">
+          {CATEGORY_GROUPS.map(group => (
+            <div key={group.label}>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1.5 pl-1">
+                {group.label}
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {group.categories.map(cat => {
+                  const isSelected = selectedCategories.has(cat)
+                  const count = categoryCounts[cat] ?? 0
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => onToggleCategory(cat)}
+                      title={PRODUCT_CATEGORY_DESCRIPTIONS[cat]}
+                      className={`inline-flex items-center gap-1.5 text-xs px-3 py-2 min-h-[44px] rounded-full border cursor-pointer transition-all duration-150 ${
+                        isSelected
+                          ? 'bg-violet-600 border-violet-600 text-white shadow-sm shadow-violet-200'
+                          : 'bg-white border-gray-200 text-gray-600 hover:border-violet-300 hover:bg-violet-50'
+                      }`}
+                    >
+                      <span className="text-sm leading-none">{CATEGORY_EMOJI[cat]}</span>
+                      <span className="font-medium">{PRODUCT_CATEGORY_LABELS[cat]}</span>
+                      <span className={`text-[10px] tabular-nums ${isSelected ? 'text-violet-200' : 'text-gray-400'}`}>
+                        {count}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Brand + Region filters */}
@@ -103,7 +139,7 @@ export function FilterPanel({
           <select
             value={brandFilter}
             onChange={(e) => onBrandFilterChange(e.target.value)}
-            className="px-3 py-2.5 min-h-[44px] border border-gray-300 rounded-lg text-sm bg-white"
+            className="px-3 py-2.5 min-h-[44px] border border-gray-200 rounded-lg text-sm bg-white hover:border-violet-300 transition"
           >
             <option value="">All Brands ({allBrands.length})</option>
             {allBrands.map(brand => (
@@ -111,14 +147,14 @@ export function FilterPanel({
             ))}
           </select>
           <details className="sm:flex-1">
-            <summary className="px-3 py-2.5 min-h-[44px] border border-gray-300 rounded-lg text-sm bg-white cursor-pointer flex items-center justify-between hover:border-violet-300">
+            <summary className="px-3 py-2.5 min-h-[44px] border border-gray-200 rounded-lg text-sm bg-white cursor-pointer flex items-center justify-between hover:border-violet-300 transition">
               <span>🌍 Region {regionFilter && <span className="text-violet-600 font-medium">· {regionFilter}</span>}</span>
-              <span className="text-gray-400 text-xs ml-2">change ▾</span>
+              <span className="text-gray-400 text-xs ml-2">▾</span>
             </summary>
             <select
               value={regionFilter}
               onChange={(e) => onRegionFilterChange(e.target.value)}
-              className="mt-2 w-full px-3 py-2.5 min-h-[44px] border border-gray-300 rounded-lg text-sm bg-white"
+              className="mt-2 w-full px-3 py-2.5 min-h-[44px] border border-gray-200 rounded-lg text-sm bg-white"
             >
               <option value="">🌍 All Countries</option>
               <option value="US">🇺🇸 United States</option>
@@ -145,23 +181,29 @@ export function FilterPanel({
         </div>
 
         {/* Toggles */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-4">
-          <label className="flex items-center gap-2 cursor-pointer text-sm min-h-[44px] sm:min-h-0">
-            <input
-              type="checkbox"
-              checked={showApprovedOnly}
-              onChange={(e) => onShowApprovedOnlyChange(e.target.checked)}
-              className="accent-violet-600 w-5 h-5 sm:w-4 sm:h-4"
-            />
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5 mb-4">
+          <label className="flex items-center gap-2.5 cursor-pointer text-sm min-h-[44px] sm:min-h-0 select-none group">
+            <div className={`relative w-9 h-5 rounded-full transition-colors ${showApprovedOnly ? 'bg-violet-600' : 'bg-gray-200 group-hover:bg-gray-300'}`}>
+              <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${showApprovedOnly ? 'translate-x-4' : 'translate-x-0.5'}`} />
+              <input
+                type="checkbox"
+                checked={showApprovedOnly}
+                onChange={(e) => onShowApprovedOnlyChange(e.target.checked)}
+                className="sr-only"
+              />
+            </div>
             <span className="text-gray-600">CG-approved only</span>
           </label>
-          <label className="flex items-center gap-2 cursor-pointer text-sm min-h-[44px] sm:min-h-0">
-            <input
-              type="checkbox"
-              checked={showGoodPlus}
-              onChange={(e) => onShowGoodPlusChange(e.target.checked)}
-              className="accent-emerald-600 w-5 h-5 sm:w-4 sm:h-4"
-            />
+          <label className="flex items-center gap-2.5 cursor-pointer text-sm min-h-[44px] sm:min-h-0 select-none group">
+            <div className={`relative w-9 h-5 rounded-full transition-colors ${showGoodPlus ? 'bg-emerald-600' : 'bg-gray-200 group-hover:bg-gray-300'}`}>
+              <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${showGoodPlus ? 'translate-x-4' : 'translate-x-0.5'}`} />
+              <input
+                type="checkbox"
+                checked={showGoodPlus}
+                onChange={(e) => onShowGoodPlusChange(e.target.checked)}
+                className="sr-only"
+              />
+            </div>
             <span className="text-gray-600">🐰 Cruelty-free only</span>
           </label>
         </div>
@@ -170,18 +212,18 @@ export function FilterPanel({
       {/* Count + actions row - always visible on desktop */}
       <div className="hidden md:flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <p className="text-xs text-gray-400">{filteredCount} products</p>
+          <p className="text-sm text-gray-500 font-medium">{filteredCount} products</p>
           {hasFilters && (
-            <button onClick={onClearFilters} className="text-xs text-violet-600 hover:underline cursor-pointer">
+            <button onClick={onClearFilters} className="text-xs text-violet-600 hover:underline cursor-pointer font-medium">
               Clear all filters
             </button>
           )}
         </div>
         <button
           onClick={onRequestProduct}
-          className="text-xs px-3 py-1.5 text-violet-600 border border-violet-200 rounded-lg hover:bg-violet-50 cursor-pointer"
+          className="text-xs px-4 py-2 text-violet-600 border border-violet-200 rounded-full hover:bg-violet-50 cursor-pointer transition font-medium"
         >
-          Can't find a product? Request it →
+          + Request a product
         </button>
       </div>
 
@@ -189,9 +231,9 @@ export function FilterPanel({
       <div className="md:hidden mb-4">
         <button
           onClick={onRequestProduct}
-          className="w-full text-sm px-4 py-2.5 min-h-[44px] text-violet-600 border border-violet-200 rounded-lg hover:bg-violet-50 cursor-pointer"
+          className="w-full text-sm px-4 py-2.5 min-h-[44px] text-violet-600 border border-violet-200 rounded-full hover:bg-violet-50 cursor-pointer transition font-medium"
         >
-          Can't find a product? Request it →
+          + Request a product
         </button>
       </div>
     </>

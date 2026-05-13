@@ -400,11 +400,11 @@ export function Products() {
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto px-4 py-12">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Products</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Browse Products</h1>
         <div className="h-4 w-72 bg-gray-100 rounded mb-8 animate-pulse" />
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-32 bg-white border border-gray-200 rounded-xl animate-pulse" />
+            <div key={i} className="h-40 bg-white border border-gray-100 rounded-2xl animate-pulse" />
           ))}
         </div>
       </div>
@@ -413,23 +413,25 @@ export function Products() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">Products</h1>
-      <p className="text-gray-600 mb-6">
-        {products.length} products from the r/curlyhair holy grail list · {approvedCount} CG-approved
-      </p>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-1">Browse Products</h1>
+        <p className="text-gray-500">
+          {products.length} products · <span className="text-green-600 font-medium">{approvedCount} CG-approved</span>
+        </p>
+      </div>
 
       {user && ratingsNeeded > 0 && (
-        <div className="mb-6 p-4 bg-violet-50 border border-violet-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="mb-6 p-4 bg-gradient-to-r from-violet-50 to-fuchsia-50 border border-violet-100 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <p className="text-sm font-medium text-violet-900">
               Rate {ratingsNeeded} more product{ratingsNeeded !== 1 ? 's' : ''} to unlock personalized suggestions ✨
             </p>
             <p className="text-xs text-violet-600 mt-0.5">
-              {userRatingCount}/{MIN_RATINGS_FOR_ADVANCED} rated - click "Tried it?" on products you've used
+              {userRatingCount}/{MIN_RATINGS_FOR_ADVANCED} rated — click "Tried it?" on products you've used
             </p>
           </div>
-          <div className="w-full sm:w-24 h-2 bg-violet-200 rounded-full shrink-0">
-            <div className="h-2 bg-violet-500 rounded-full transition-all" style={{ width: `${Math.min(100, (userRatingCount / MIN_RATINGS_FOR_ADVANCED) * 100)}%` }} />
+          <div className="w-full sm:w-28 h-2.5 bg-violet-200/50 rounded-full shrink-0 overflow-hidden">
+            <div className="h-2.5 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-full transition-all" style={{ width: `${Math.min(100, (userRatingCount / MIN_RATINGS_FOR_ADVANCED) * 100)}%` }} />
           </div>
         </div>
       )}
@@ -462,22 +464,22 @@ export function Products() {
       )}
 
       {filteredProducts.length === 0 ? (
-        <div className="text-center py-16 px-4">
-          <div className="text-4xl mb-4">🔍</div>
+        <div className="text-center py-20 px-4">
+          <div className="text-5xl mb-4">🔍</div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No products found</h3>
-          <p className="text-gray-500 mb-6 max-w-md mx-auto">
-            No products match your current filters. Try adjusting your search or filters.
+          <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+            Try adjusting your search or filters to find what you're looking for.
           </p>
           <button
             onClick={clearFilters}
-            className="px-5 py-3 min-h-[44px] text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 cursor-pointer transition-colors"
+            className="px-6 py-3 min-h-[44px] text-sm font-medium text-white bg-violet-600 rounded-full hover:bg-violet-700 cursor-pointer transition-colors shadow-sm"
           >
             Clear all filters
           </button>
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {visibleProducts.map((product) => {
               const key = productKey(product)
               return (
@@ -503,10 +505,10 @@ export function Products() {
             })}
           </div>
           {hasMore && (
-            <div className="text-center mt-6">
+            <div className="text-center mt-8">
               <button
                 onClick={() => setVisibleCount(prev => prev + PRODUCTS_PER_PAGE)}
-                className="px-6 py-3 min-h-[44px] text-sm font-medium text-violet-600 border border-violet-200 rounded-lg hover:bg-violet-50 cursor-pointer transition"
+                className="px-8 py-3 min-h-[44px] text-sm font-medium text-violet-600 border border-violet-200 rounded-full hover:bg-violet-50 cursor-pointer transition shadow-sm"
               >
                 Show more ({filteredProducts.length - visibleCount} remaining)
               </button>

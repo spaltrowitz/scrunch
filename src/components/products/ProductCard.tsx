@@ -83,13 +83,13 @@ export const ProductCard = memo(function ProductCard({
   )
 
   return (
-    <div className="flex flex-col p-4 bg-white rounded-xl border border-gray-200 hover:border-violet-300 transition">
+    <div className="flex flex-col p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-violet-200 transition-all duration-200">
       {isUuid(productKey) ? (
-        <Link to={`/products/${product.id}`} className="flex gap-4 min-w-0 mb-2">
+        <Link to={`/products/${product.id}`} className="flex gap-3 min-w-0 mb-2">
           {productInfo}
         </Link>
       ) : (
-        <div className="flex gap-4 min-w-0 mb-2">
+        <div className="flex gap-3 min-w-0 mb-2">
           {productInfo}
         </div>
       )}
