@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { PRODUCT_CATEGORY_LABELS, PRODUCT_CATEGORY_DESCRIPTIONS } from '../../lib/constants'
 import type { ProductCategory } from '../../lib/database.types'
 
@@ -48,6 +48,106 @@ const CATEGORY_GROUPS: { label: string; categories: ProductCategory[] }[] = [
   { label: 'Style', categories: ['curl_cream', 'gel', 'mousse', 'custard', 'spray_refresher'] },
   { label: 'Treat', categories: ['oil_serum', 'protein_treatment', 'scalp_treatment', 'bond_repair'] },
 ]
+
+const REGION_OPTIONS: { value: string; label: string; flag: string }[] = [
+  { value: '', label: 'All Countries', flag: '🌍' },
+  { value: 'US', label: 'United States', flag: '🇺🇸' },
+  { value: 'CA', label: 'Canada', flag: '🇨🇦' },
+  { value: 'UK', label: 'United Kingdom', flag: '🇬🇧' },
+  { value: 'EU', label: 'Europe', flag: '🇪🇺' },
+  { value: 'AU', label: 'Australia', flag: '🇦🇺' },
+  { value: 'IN', label: 'India', flag: '🇮🇳' },
+  { value: 'BR', label: 'Brazil', flag: '🇧🇷' },
+  { value: 'JP', label: 'Japan', flag: '🇯🇵' },
+  { value: 'KR', label: 'South Korea', flag: '🇰🇷' },
+  { value: 'NG', label: 'Nigeria', flag: '🇳🇬' },
+  { value: 'ZA', label: 'South Africa', flag: '🇿🇦' },
+  { value: 'PH', label: 'Philippines', flag: '🇵🇭' },
+  { value: 'MX', label: 'Mexico', flag: '🇲🇽' },
+  { value: 'CO', label: 'Colombia', flag: '🇨🇴' },
+  { value: 'AR', label: 'Argentina', flag: '🇦🇷' },
+  { value: 'JM', label: 'Jamaica', flag: '🇯🇲' },
+  { value: 'TR', label: 'Turkey', flag: '🇹🇷' },
+  { value: 'SE', label: 'Scandinavia', flag: '🇸🇪' },
+  { value: 'KE', label: 'East Africa', flag: '🇰🇪' },
+]
+
+function RegionDropdown({
+  value,
+  onChange,
+}: {
+  value: string
+  onChange: (value: string) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const selected = REGION_OPTIONS.find((r) => r.value === value) ?? REGION_OPTIONS[0]
+
+  useEffect(() => {
+    if (!open) return
+    const handleClick = (e: MouseEvent) => {
+      if (!containerRef.current?.contains(e.target as Node)) setOpen(false)
+    }
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    document.addEventListener('keydown', handleKey)
+    return () => {
+      document.removeEventListener('mousedown', handleClick)
+      document.removeEventListener('keydown', handleKey)
+    }
+  }, [open])
+
+  return (
+    <div ref={containerRef} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className="w-full sm:w-auto flex items-center justify-between gap-2 px-3 py-2.5 min-h-[44px] border border-gray-200 rounded-lg text-sm bg-white hover:border-violet-300 transition"
+      >
+        <span className="truncate">
+          <span className="mr-1.5">{selected.flag}</span>
+          {selected.label}
+        </span>
+        <span className={`text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} aria-hidden>▾</span>
+      </button>
+      {open && (
+        <ul
+          role="listbox"
+          aria-label="Region"
+          className="absolute z-20 left-0 right-0 sm:right-auto sm:min-w-[14rem] mt-1 max-h-72 overflow-auto bg-white border border-gray-200 rounded-lg shadow-lg py-1"
+        >
+          {REGION_OPTIONS.map((opt) => {
+            const isSelected = opt.value === value
+            return (
+              <li key={opt.value || 'all'}>
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={isSelected}
+                  onClick={() => {
+                    onChange(opt.value)
+                    setOpen(false)
+                  }}
+                  className={`w-full text-left px-3 py-2 text-sm flex items-center gap-2 hover:bg-violet-50 transition ${
+                    isSelected ? 'bg-violet-50 text-violet-700 font-medium' : 'text-gray-700'
+                  }`}
+                >
+                  <span>{opt.flag}</span>
+                  <span className="flex-1">{opt.label}</span>
+                  {isSelected && <span aria-hidden>✓</span>}
+                </button>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </div>
+  )
+}
 
 export function FilterPanel({
   selectedCategories,
@@ -148,32 +248,7 @@ export function FilterPanel({
               <option key={brand} value={brand}>{brand}</option>
             ))}
           </select>
-          <select
-            value={regionFilter}
-            onChange={(e) => onRegionFilterChange(e.target.value)}
-            className="px-3 py-2.5 min-h-[44px] border border-gray-200 rounded-lg text-sm bg-white hover:border-violet-300 transition"
-          >
-            <option value="">🌍 All Countries</option>
-            <option value="US">🇺🇸 United States</option>
-            <option value="CA">🇨🇦 Canada</option>
-            <option value="UK">🇬🇧 United Kingdom</option>
-            <option value="EU">🇪🇺 Europe</option>
-            <option value="AU">🇦🇺 Australia</option>
-            <option value="IN">🇮🇳 India</option>
-            <option value="BR">🇧🇷 Brazil</option>
-            <option value="JP">🇯🇵 Japan</option>
-            <option value="KR">🇰🇷 South Korea</option>
-            <option value="NG">🇳🇬 Nigeria</option>
-            <option value="ZA">🇿🇦 South Africa</option>
-            <option value="PH">🇵🇭 Philippines</option>
-            <option value="MX">🇲🇽 Mexico</option>
-            <option value="CO">🇨🇴 Colombia</option>
-            <option value="AR">🇦🇷 Argentina</option>
-            <option value="JM">🇯🇲 Jamaica</option>
-            <option value="TR">🇹🇷 Turkey</option>
-            <option value="SE">🇸🇪 Scandinavia</option>
-            <option value="KE">🇰🇪 East Africa</option>
-          </select>
+          <RegionDropdown value={regionFilter} onChange={onRegionFilterChange} />
         </div>
 
         {/* Toggles */}

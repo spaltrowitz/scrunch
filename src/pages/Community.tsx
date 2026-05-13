@@ -7,6 +7,10 @@ import {
   type SearchStatus,
 } from '../lib/communitySearch'
 import { trackSearchPerformed } from '../lib/analytics'
+import { supabase } from '../lib/supabase'
+import { useAuth } from '../lib/auth.utils'
+import { ShareRoutineForm } from '../components/community/ShareRoutineForm'
+import { RoutineCard } from '../components/community/RoutineCard'
 
 interface CommunityQuestion {
   id: string
@@ -110,6 +114,8 @@ function AskCommunityPrompt() {
 }
 
 export function Community() {
+  const { user } = useAuth()
+  const [activeTab, setActiveTab] = useState<'search' | 'routines'>('search')
   const [question, setQuestion] = useState('')
   const [loading, setLoading] = useState(false)
   const [history, setHistory] = useState<CommunityQuestion[]>([])
@@ -118,10 +124,39 @@ export function Community() {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const requestIdRef = useRef(0)
   const mountedRef = useRef(true)
+
+  // Routines state
+  const [routines, setRoutines] = useState<any[]>([])
+  const [routinesLoading, setRoutinesLoading] = useState(false)
+  const [showRoutineForm, setShowRoutineForm] = useState(false)
+
   useEffect(() => {
     mountedRef.current = true
     return () => { mountedRef.current = false }
   }, [])
+
+  // Load routines when tab is active
+  useEffect(() => {
+    if (activeTab !== 'routines') return
+    loadRoutines()
+  }, [activeTab])
+
+  async function loadRoutines() {
+    setRoutinesLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('routines')
+        .select('*, profiles(display_name, curl_pattern, porosity)')
+        .eq('is_public', true)
+        .order('created_at', { ascending: false })
+        .limit(50)
+      if (!error && data) setRoutines(data)
+    } catch {
+      // silently fail — routines are supplemental
+    } finally {
+      setRoutinesLoading(false)
+    }
+  }
 
   const runSearch = useCallback(async (q: string) => {
     if (!q.trim()) return
@@ -182,17 +217,86 @@ export function Community() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">
-        Community
-        {totalResults > 0 && (
-          <span className="ml-2 text-sm font-normal text-gray-400">
-            {totalResults} result{totalResults !== 1 ? 's' : ''} found
-          </span>
-        )}
-      </h1>
-      <p className="text-gray-600 mb-8">
-        Ask anything about curly or wavy hair. We'll search the top Reddit communities for real answers.
+      <h1 className="text-2xl font-bold text-gray-900 mb-2">Community</h1>
+      <p className="text-gray-600 mb-6">
+        Ask questions, browse real answers, and share your routine.
       </p>
+
+      {/* Tabs */}
+      <div className="flex gap-1 mb-8 bg-gray-100 rounded-lg p-1">
+        <button
+          onClick={() => setActiveTab('search')}
+          className={`flex-1 py-2.5 min-h-[44px] text-sm font-medium rounded-md cursor-pointer transition ${
+            activeTab === 'search'
+              ? 'bg-white text-violet-700 shadow-sm'
+              : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          🔍 Ask & Search
+        </button>
+        <button
+          onClick={() => setActiveTab('routines')}
+          className={`flex-1 py-2.5 min-h-[44px] text-sm font-medium rounded-md cursor-pointer transition ${
+            activeTab === 'routines'
+              ? 'bg-white text-violet-700 shadow-sm'
+              : 'text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          🌀 Routines
+        </button>
+      </div>
+
+      {activeTab === 'routines' ? (
+        <div>
+          {/* Share routine CTA */}
+          {!showRoutineForm ? (
+            <div className="mb-6 p-5 bg-gradient-to-r from-violet-50 to-fuchsia-50 border border-violet-100 rounded-xl">
+              <h3 className="font-semibold text-gray-900 text-sm mb-1">Share your hair routine 🌀</h3>
+              <p className="text-xs text-gray-500 mb-3">
+                Like r/curlyhair — all posts require a routine. Include shampoo, conditioner, treatments, styling products, application method, and how you dry and protect your hair.
+              </p>
+              <button
+                onClick={() => setShowRoutineForm(true)}
+                className="px-5 py-2.5 min-h-[44px] bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 cursor-pointer transition"
+              >
+                + Share My Routine
+              </button>
+            </div>
+          ) : (
+            <div className="mb-6">
+              <ShareRoutineForm
+                onClose={() => setShowRoutineForm(false)}
+                onSuccess={() => { setShowRoutineForm(false); loadRoutines() }}
+              />
+            </div>
+          )}
+
+          {/* Routines list */}
+          {routinesLoading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-32 bg-white border border-gray-100 rounded-xl animate-pulse" />
+              ))}
+            </div>
+          ) : routines.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="text-4xl mb-3">🌀</div>
+              <h3 className="font-semibold text-gray-900 mb-2">No routines shared yet</h3>
+              <p className="text-sm text-gray-500 max-w-sm mx-auto">
+                Be the first to share your routine! Help others with similar hair find products that work.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {routines.map(routine => (
+                <RoutineCard key={routine.id} routine={routine} />
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <>
+      {/* Search tab content */}
 
       {/* Ask a question - collapses after first submission */}
       {showSearchBox ? (
@@ -432,6 +536,8 @@ export function Community() {
           </div>
         ))}
       </div>
+        </>
+      )}
     </div>
   )
 }
