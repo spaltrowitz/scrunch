@@ -45,7 +45,7 @@ Tweak the wording slightly per sub — say "wavy" in r/Wavyhair, "natural hair" 
 > - Wash: L'Oréal Paris EverPure Sulfate-Free Clarifying Shampoo
 > - Conditioner: Prose (custom)
 > - Styler: Prose custom curl cream — applied to soaking-wet hair, scrunched
-> - Dry: Air dried
+> - Dry: Mostly air dry, occasional diffuser
 > - Sleep: Silk pillowcase
 
 ---
