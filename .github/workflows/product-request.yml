@@ -1,7 +1,7 @@
 name: Auto-add requested product
 on:
   issues:
-    types: [opened, labeled]
+    types: [opened]
 
 jobs:
   process-product-request:
@@ -84,16 +84,25 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            // Assign Copilot to the issue
-            try {
-              await github.rest.issues.addAssignees({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                assignees: ['copilot']
-              });
-            } catch (e) {
-              console.log('Could not assign copilot:', e.message);
+            // Assign Copilot coding agent to the issue (assignee username is 'Copilot')
+            let assigned = false;
+            for (const handle of ['Copilot', 'copilot']) {
+              try {
+                await github.rest.issues.addAssignees({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  assignees: [handle]
+                });
+                assigned = true;
+                console.log(`Assigned ${handle}`);
+                break;
+              } catch (e) {
+                console.log(`Could not assign ${handle}:`, e.message);
+              }
+            }
+            if (!assigned) {
+              core.warning('Copilot coding agent could not be assigned. Enable it in repo settings or assign manually.');
             }
 
             const isBrandScan = context.payload.issue.labels.some(l => l.name === 'brand-scan')
