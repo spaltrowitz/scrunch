@@ -79,31 +79,47 @@ jobs:
 
             core.setOutput('valid', 'true');
 
-      - name: Assign to Copilot
+      - name: Assign Copilot coding agent
         if: steps.spam_check.outputs.valid == 'true'
         uses: actions/github-script@v7
         with:
           script: |
-            // Assign Copilot coding agent to the issue (assignee username is 'Copilot')
-            let assigned = false;
-            for (const handle of ['Copilot', 'copilot']) {
-              try {
-                await github.rest.issues.addAssignees({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: context.issue.number,
-                  assignees: [handle]
-                });
-                assigned = true;
-                console.log(`Assigned ${handle}`);
-                break;
-              } catch (e) {
-                console.log(`Could not assign ${handle}:`, e.message);
+            // Copilot is a Bot actor, not a User — REST addAssignees only accepts Users.
+            // Use GraphQL: look up the Copilot suggested actor for this repo, then
+            // call replaceActorsForAssignable with the bot's node ID.
+            const issueNodeId = context.payload.issue.node_id;
+
+            const suggested = await github.graphql(`
+              query($owner: String!, $name: String!) {
+                repository(owner: $owner, name: $name) {
+                  suggestedActors(capabilities: [CAN_BE_ASSIGNED], first: 100) {
+                    nodes { login __typename ... on Bot { id } ... on User { id } }
+                  }
+                }
               }
+            `, { owner: context.repo.owner, name: context.repo.repo });
+
+            const copilot = suggested.repository.suggestedActors.nodes.find(
+              n => n.login === 'copilot-swe-agent' || n.login === 'Copilot'
+            );
+
+            if (!copilot) {
+              core.warning(
+                'Copilot coding agent not available as an assignee. ' +
+                'Enable it at: Repo Settings → Code, planning, and automation → Copilot → Coding agent.'
+              );
+              return;
             }
-            if (!assigned) {
-              core.warning('Copilot coding agent could not be assigned. Enable it in repo settings or assign manually.');
-            }
+
+            await github.graphql(`
+              mutation($assignableId: ID!, $actorIds: [ID!]!) {
+                replaceActorsForAssignable(input: { assignableId: $assignableId, actorIds: $actorIds }) {
+                  assignable { ... on Issue { number } }
+                }
+              }
+            `, { assignableId: issueNodeId, actorIds: [copilot.id] });
+
+            console.log(`Assigned ${copilot.login} (${copilot.__typename}) to issue #${context.issue.number}`);
 
             const isBrandScan = context.payload.issue.labels.some(l => l.name === 'brand-scan')
 
