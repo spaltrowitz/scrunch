@@ -20,7 +20,6 @@ jobs:
   auto-merge:
     runs-on: ubuntu-latest
     if: >
-      github.event.pull_request.draft == false &&
       (
         github.event.pull_request.user.login == 'copilot-swe-agent[bot]' ||
         github.event.pull_request.user.login == 'Copilot' ||
@@ -37,14 +36,23 @@ jobs:
               { owner: context.repo.owner, repo: context.repo.repo,
                 pull_number: context.payload.pull_request.number, per_page: 100 }
             );
-            const allowed = files.every(f =>
+            const allowed = files.length > 0 && files.every(f =>
               f.filename.startsWith('src/data/') ||
+              f.filename.startsWith('src/test/') ||
               f.filename.startsWith('supabase/migrations/') ||
               f.filename === 'src/lib/ingredients/ingredientData.ts'
             );
             console.log(`Files: ${files.map(f => f.filename).join(', ')}`);
             console.log(`In-scope: ${allowed}`);
             core.setOutput('in_scope', allowed ? 'true' : 'false');
+
+      - name: Mark PR ready for review (if draft)
+        if: steps.scope.outputs.in_scope == 'true' && github.event.pull_request.draft == true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr ready "${{ github.event.pull_request.number }}" \
+            --repo "${{ github.repository }}"
 
       - name: Enable auto-merge (squash)
         if: steps.scope.outputs.in_scope == 'true'

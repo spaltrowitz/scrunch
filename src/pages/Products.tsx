@@ -28,6 +28,11 @@ type DisplayProduct = Product
 
 const PRODUCTS_PER_PAGE = 24
 
+/** Strip diacritics/accents for accent-insensitive search (e.g., "L'Oréal" matches "loreal") */
+function normalizeText(text: string): string {
+  return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+}
+
 function productKey(p: DisplayProduct): string {
   if (!p.id || p.id.startsWith('seed-')) return `${p.brand}::${p.name}`
   return p.id
@@ -299,7 +304,7 @@ export function Products() {
     if (regionFilter && (p.country_availability || ['US'])[0] !== regionFilter) return false
     if (showApprovedOnly && p.cg_status !== 'approved') return false
     if (showGoodPlus && p.cruelty_free !== 'yes') return false
-    if (search && !`${p.brand} ${p.name}`.toLowerCase().includes(search.toLowerCase())) return false
+    if (search && !normalizeText(`${p.brand} ${p.name}`).includes(normalizeText(search))) return false
     if (!isNarrowView && user) {
       const key = productKey(p)
       if (actions[key]?.has('tried')) return false
@@ -330,7 +335,7 @@ export function Products() {
       ...products.map(p => p.brand),
       ...products.map(p => `${p.brand} ${p.name}`),
     ])).sort()
-    return all.filter(s => s.toLowerCase().includes(search.toLowerCase())).slice(0, 8)
+    return all.filter(s => normalizeText(s).includes(normalizeText(search))).slice(0, 8)
   }, [products, search])
 
   const clearFilters = useCallback(() => {
