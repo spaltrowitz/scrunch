@@ -187,16 +187,16 @@ function RatingPopup({
     >
       <p className="text-xs font-medium text-gray-700 mb-2">How was it for your hair?</p>
       <div className="grid grid-cols-2 sm:flex gap-2">
-        <button onClick={() => onSubmit('loved')} className="text-xs py-2.5 min-h-[40px] bg-pink-100 text-pink-700 rounded-lg border border-pink-200 hover:bg-pink-200 cursor-pointer font-medium sm:flex-1">
+        <button onClick={() => onSubmit('loved')} className="text-xs py-2.5 min-h-[40px] bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer font-medium sm:flex-1">
           💚 Loved it
         </button>
-        <button onClick={() => onSubmit('liked')} className="text-xs py-2.5 min-h-[40px] bg-emerald-100 text-emerald-700 rounded-lg border border-emerald-200 hover:bg-emerald-200 cursor-pointer font-medium sm:flex-1">
+        <button onClick={() => onSubmit('liked')} className="text-xs py-2.5 min-h-[40px] bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer font-medium sm:flex-1">
           👍 Liked it
         </button>
-        <button onClick={() => onSubmit('ok')} className="text-xs py-2.5 min-h-[40px] bg-amber-100 text-amber-700 rounded-lg border border-amber-200 hover:bg-amber-200 cursor-pointer font-medium sm:flex-1">
+        <button onClick={() => onSubmit('ok')} className="text-xs py-2.5 min-h-[40px] bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer font-medium sm:flex-1">
           😐 It was ok
         </button>
-        <button onClick={() => onSubmit('disliked')} className="text-xs py-2.5 min-h-[40px] bg-red-100 text-red-700 rounded-lg border border-red-200 hover:bg-red-200 cursor-pointer font-medium sm:flex-1">
+        <button onClick={() => onSubmit('disliked')} className="text-xs py-2.5 min-h-[40px] bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer font-medium sm:flex-1">
           👎 Didn't like
         </button>
       </div>
