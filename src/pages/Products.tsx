@@ -26,7 +26,7 @@ type ProductNotes = Record<string, string>
 
 type DisplayProduct = Product
 
-const PRODUCTS_PER_PAGE = 20
+const PRODUCTS_PER_PAGE = 24
 
 function productKey(p: DisplayProduct): string {
   if (!p.id || p.id.startsWith('seed-')) return `${p.brand}::${p.name}`

@@ -142,7 +142,7 @@ export const ProductCard = memo(function ProductCard({
             📝 {note}
           </div>
         )}
-        {isEditingNote ? (
+        {isEditingNote && (
           <div className="mt-2">
             <textarea
               autoFocus
@@ -162,13 +162,6 @@ export const ProductCard = memo(function ProductCard({
               className="w-full text-xs px-3 py-2 border border-violet-300 rounded-lg resize-none h-16 focus:outline-none focus:ring-2 focus:ring-violet-500"
             />
           </div>
-        ) : !note && (
-          <button
-            onClick={onStartEditNote}
-            className="mt-2 text-xs text-gray-400 hover:text-violet-500 cursor-pointer min-h-[36px]"
-          >
-            + Add note
-          </button>
         )}
       </div>
     </div>
