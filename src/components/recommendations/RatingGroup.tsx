@@ -18,7 +18,6 @@ const CATEGORY_ICONS: Record<string, string> = {
   spray_refresher: '💦',
   protein_treatment: '💪',
   scalp_treatment: '🌿',
-  scalp_care: '🌿',
   bond_repair: '🔗',
 }
 

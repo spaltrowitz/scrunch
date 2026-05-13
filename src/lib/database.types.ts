@@ -17,7 +17,7 @@ export type ProductCategory =
   | 'rinse_out_conditioner' | 'deep_conditioner' | 'leave_in_conditioner'
   | 'curl_cream' | 'gel' | 'mousse' | 'custard'
   | 'oil_serum' | 'spray_refresher' | 'protein_treatment' | 'scalp_treatment'
-  | 'scalp_care' | 'bond_repair'
+  | 'bond_repair'
 
 export type CgStatus = 'approved' | 'not_approved' | 'caution'
 

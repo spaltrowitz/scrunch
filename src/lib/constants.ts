@@ -51,7 +51,6 @@ export const PRODUCT_CATEGORY_LABELS: Record<ProductCategory, string> = {
   spray_refresher: 'Spray / Refresher',
   protein_treatment: 'Protein Treatment',
   scalp_treatment: 'Scalp Treatment',
-  scalp_care: 'Scalp Care',
   bond_repair: 'Bond Repair',
 }
 
@@ -70,8 +69,7 @@ export const PRODUCT_CATEGORY_DESCRIPTIONS: Record<ProductCategory, string> = {
   oil_serum: 'Used to seal moisture (SOTC) or as a pre-poo. Look for pure, cold-pressed oils. Always check labels  -  many contain silicones.',
   spray_refresher: 'Revives curls between wash days or provides flexible hold. Virtually weightless.',
   protein_treatment: 'Helps curls "bounce back." Best for high porosity, fine, or damaged hair. Use when curls feel mushy or lack elasticity.',
-  scalp_treatment: 'Products specifically targeting scalp health  -  dryness, flakiness, irritation, or buildup.',
-  scalp_care: 'Scalp treatments, oils, and serums that nourish and support a healthy scalp environment.',
+  scalp_treatment: 'Scalp treatments, oils, and serums targeting scalp health — dryness, flakiness, irritation, buildup, or hair growth.',
   bond_repair: 'Bond-building treatments that repair broken disulfide bonds in hair damaged by heat, color, or chemical processing.',
 }
 
