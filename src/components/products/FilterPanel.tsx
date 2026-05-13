@@ -18,6 +18,8 @@ interface FilterPanelProps {
   hasFilters: boolean
   onClearFilters: () => void
   filteredCount: number
+  totalCount: number
+  approvedCount: number
   onRequestProduct: () => void
 }
 
@@ -63,6 +65,8 @@ export function FilterPanel({
   hasFilters,
   onClearFilters,
   filteredCount,
+  totalCount,
+  approvedCount,
   onRequestProduct,
 }: FilterPanelProps) {
   const [filtersOpen, setFiltersOpen] = useState(false)
@@ -100,36 +104,34 @@ export function FilterPanel({
       {/* Filter content - always visible on desktop, toggled on mobile */}
       <div className={`${filtersOpen ? 'block' : 'hidden'} md:block`}>
         {/* Category groups */}
-        <div className="mb-5 space-y-3">
+        <div className="mb-4 space-y-2">
           {CATEGORY_GROUPS.map(group => (
-            <div key={group.label}>
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1.5 pl-1">
+            <div key={group.label} className="flex flex-wrap items-center gap-1.5">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 w-16 shrink-0">
                 {group.label}
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {group.categories.map(cat => {
-                  const isSelected = selectedCategories.has(cat)
-                  const count = categoryCounts[cat] ?? 0
-                  return (
-                    <button
-                      key={cat}
-                      onClick={() => onToggleCategory(cat)}
-                      title={PRODUCT_CATEGORY_DESCRIPTIONS[cat]}
-                      className={`inline-flex items-center gap-1.5 text-xs px-3 py-2 min-h-[44px] rounded-full border cursor-pointer transition-all duration-150 ${
-                        isSelected
-                          ? 'bg-violet-600 border-violet-600 text-white shadow-sm shadow-violet-200'
-                          : 'bg-white border-gray-200 text-gray-600 hover:border-violet-300 hover:bg-violet-50'
-                      }`}
-                    >
-                      <span className="text-sm leading-none">{CATEGORY_EMOJI[cat]}</span>
-                      <span className="font-medium">{PRODUCT_CATEGORY_LABELS[cat]}</span>
-                      <span className={`text-[10px] tabular-nums ${isSelected ? 'text-violet-200' : 'text-gray-400'}`}>
-                        {count}
-                      </span>
-                    </button>
-                  )
-                })}
-              </div>
+              </span>
+              {group.categories.map(cat => {
+                const isSelected = selectedCategories.has(cat)
+                const count = categoryCounts[cat] ?? 0
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => onToggleCategory(cat)}
+                    title={PRODUCT_CATEGORY_DESCRIPTIONS[cat]}
+                    className={`inline-flex items-center gap-1 text-xs px-2.5 py-1.5 min-h-[36px] rounded-full border cursor-pointer transition-all duration-150 ${
+                      isSelected
+                        ? 'bg-violet-600 border-violet-600 text-white shadow-sm shadow-violet-200'
+                        : 'bg-white border-gray-200 text-gray-600 hover:border-violet-300 hover:bg-violet-50'
+                    }`}
+                  >
+                    <span className="text-xs leading-none">{CATEGORY_EMOJI[cat]}</span>
+                    <span className="font-medium">{PRODUCT_CATEGORY_LABELS[cat]}</span>
+                    <span className={`text-[10px] tabular-nums ${isSelected ? 'text-violet-200' : 'text-gray-400'}`}>
+                      {count}
+                    </span>
+                  </button>
+                )
+              })}
             </div>
           ))}
         </div>
@@ -212,7 +214,13 @@ export function FilterPanel({
       {/* Count + actions row - always visible on desktop */}
       <div className="hidden md:flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <p className="text-sm text-gray-500 font-medium">{filteredCount} products</p>
+          <p className="text-sm text-gray-600">
+            {hasFilters ? (
+              <><span className="font-medium">{filteredCount}</span> of {totalCount} products</>
+            ) : (
+              <><span className="font-medium">{totalCount}</span> products · <span className="text-green-600">{approvedCount} CG-approved</span></>
+            )}
+          </p>
           {hasFilters && (
             <button onClick={onClearFilters} className="text-xs text-violet-600 hover:underline cursor-pointer font-medium">
               Clear all filters

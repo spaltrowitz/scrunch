@@ -413,10 +413,10 @@ export function Products() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
-      <div className="mb-8">
+      <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900 mb-1">Browse Products</h1>
-        <p className="text-gray-500">
-          {products.length} products · <span className="text-green-600 font-medium">{approvedCount} CG-approved</span>
+        <p className="text-sm text-gray-500">
+          Curated curly hair products from r/curlyhair, Sephora, and #HairTok
         </p>
       </div>
 
@@ -454,6 +454,8 @@ export function Products() {
         hasFilters={hasFilters}
         onClearFilters={clearFilters}
         filteredCount={filteredProducts.length}
+        totalCount={products.length}
+        approvedCount={approvedCount}
         onRequestProduct={() => setShowRequestForm(true)}
       />
 
