@@ -72,7 +72,7 @@ export const ProductCard = memo(function ProductCard({
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2 mb-1">
           <div className="min-w-0">
-            <p className="text-xs text-gray-500">{product.brand}</p>
+            <p className="text-xs text-gray-500 truncate">{product.brand}</p>
             <h3 className="font-semibold text-gray-900 text-sm leading-tight truncate">{product.name}</h3>
           </div>
           {badges}
@@ -187,16 +187,16 @@ function RatingPopup({
     >
       <p className="text-xs font-medium text-gray-700 mb-2">How was it for your hair?</p>
       <div className="grid grid-cols-2 sm:flex gap-2">
-        <button onClick={() => onSubmit('loved')} className="text-xs py-2.5 min-h-[40px] bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer font-medium sm:flex-1">
+        <button onClick={() => onSubmit('loved')} className="text-xs py-2.5 min-h-[44px] bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer font-medium sm:flex-1">
           💚 Loved it
         </button>
-        <button onClick={() => onSubmit('liked')} className="text-xs py-2.5 min-h-[40px] bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer font-medium sm:flex-1">
+        <button onClick={() => onSubmit('liked')} className="text-xs py-2.5 min-h-[44px] bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer font-medium sm:flex-1">
           👍 Liked it
         </button>
-        <button onClick={() => onSubmit('ok')} className="text-xs py-2.5 min-h-[40px] bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer font-medium sm:flex-1">
+        <button onClick={() => onSubmit('ok')} className="text-xs py-2.5 min-h-[44px] bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer font-medium sm:flex-1">
           😐 It was ok
         </button>
-        <button onClick={() => onSubmit('disliked')} className="text-xs py-2.5 min-h-[40px] bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer font-medium sm:flex-1">
+        <button onClick={() => onSubmit('disliked')} className="text-xs py-2.5 min-h-[44px] bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer font-medium sm:flex-1">
           👎 Didn't like
         </button>
       </div>

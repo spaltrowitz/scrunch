@@ -10,6 +10,8 @@ export function Login() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
+  const [googleLoading, setGoogleLoading] = useState(false)
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -24,6 +26,16 @@ export function Login() {
     }
   }
 
+  const handleGoogleSignIn = async () => {
+    if (googleLoading) return
+    setGoogleLoading(true)
+    try {
+      await signInWithGoogle()
+    } catch {
+      setGoogleLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen sm:min-h-[80vh] flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
@@ -33,8 +45,9 @@ export function Login() {
         </div>
 
         <button
-          onClick={() => signInWithGoogle()}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 mb-4 cursor-pointer transition shadow-sm"
+          onClick={handleGoogleSignIn}
+          disabled={googleLoading}
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 mb-4 cursor-pointer transition shadow-sm disabled:opacity-50"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />

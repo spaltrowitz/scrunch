@@ -150,11 +150,11 @@ export function Community() {
         .eq('is_public', true)
         .order('created_at', { ascending: false })
         .limit(50)
-      if (!error && data) setRoutines(data)
+      if (!error && data && mountedRef.current) setRoutines(data)
     } catch {
       // silently fail — routines are supplemental
     } finally {
-      setRoutinesLoading(false)
+      if (mountedRef.current) setRoutinesLoading(false)
     }
   }
 

@@ -75,7 +75,7 @@ export function RoutineCard({ routine }: { routine: Routine }) {
             <div key={i} className="flex items-start gap-2">
               <span className="text-xs font-bold text-violet-300 mt-0.5 w-4 shrink-0">{step.order}.</span>
               <div className="min-w-0">
-                <p className="text-sm text-gray-900">
+                <p className="text-sm text-gray-900 truncate">
                   <span className="font-medium">{step.brand}</span>{' '}
                   <span className="text-gray-600">{step.product}</span>
                 </p>
