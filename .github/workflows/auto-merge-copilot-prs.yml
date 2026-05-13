@@ -54,11 +54,35 @@ jobs:
           gh pr ready "${{ github.event.pull_request.number }}" \
             --repo "${{ github.repository }}"
 
-      - name: Enable auto-merge (squash)
+      - name: Merge PR (auto if checks required, else direct)
         if: steps.scope.outputs.in_scope == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
         run: |
-          gh pr merge "${{ github.event.pull_request.number }}" \
-            --repo "${{ github.repository }}" \
-            --squash --auto --delete-branch
+          set -e
+          # Wait for GitHub to recompute mergeability after potential draft->ready.
+          for i in 1 2 3 4 5 6; do
+            state=$(gh pr view "$PR_NUMBER" --repo "$REPO" \
+              --json mergeable,mergeStateStatus,isDraft \
+              --jq '"\(.mergeable) \(.mergeStateStatus) \(.isDraft)"')
+            echo "Attempt $i: $state"
+            case "$state" in
+              "MERGEABLE CLEAN false"|"MERGEABLE HAS_HOOKS false"|"MERGEABLE UNSTABLE false")
+                break;;
+            esac
+            sleep 5
+          done
+
+          # Try --auto first (works only if a required check is configured).
+          # If that fails, fall through to an immediate squash merge.
+          if gh pr merge "$PR_NUMBER" --repo "$REPO" \
+               --squash --auto --delete-branch 2>/tmp/merge_err; then
+            echo "Auto-merge enabled."
+            exit 0
+          fi
+          echo "Auto-merge unavailable: $(cat /tmp/merge_err)"
+          echo "Falling back to direct squash merge."
+          gh pr merge "$PR_NUMBER" --repo "$REPO" \
+            --squash --delete-branch
