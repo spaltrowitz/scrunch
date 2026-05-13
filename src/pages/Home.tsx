@@ -49,14 +49,14 @@ export function Home() {
 
         <Link
           to="/products"
-          className="px-6 py-3 min-h-[44px] flex items-center rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium text-sm transition-colors"
+          className="px-6 py-3 min-h-[44px] flex items-center rounded-full bg-violet-600 text-white no-underline hover:bg-violet-700 font-medium text-sm transition-colors shadow-sm"
         >
           Browse Products
         </Link>
       </section>
 
       {/* How Scrunch works + why it's different */}
-      <section id="how-it-works" className="py-16 px-4 bg-white border-t border-gray-200">
+      <section id="how-it-works" className="py-16 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 text-center">
             How Scrunch works
@@ -65,21 +65,21 @@ export function Home() {
             Ingredient-checked, ad-free, built by a curly. Three steps from browsing to a personalized shelf.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-lg border border-gray-200 bg-white text-center">
+            <div className="p-6 rounded-2xl border border-gray-100 bg-white text-center shadow-sm hover:shadow-md transition-shadow">
               <p className="text-3xl mb-3">🔍</p>
               <h3 className="text-base font-semibold text-gray-900 mb-2">Browse</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
                 {countLabel} curly hair products, every ingredient list reviewed for sulfates, silicones, and drying alcohols.
               </p>
             </div>
-            <div className="p-6 rounded-lg border border-gray-200 bg-white text-center">
+            <div className="p-6 rounded-2xl border border-gray-100 bg-white text-center shadow-sm hover:shadow-md transition-shadow">
               <p className="text-3xl mb-3">⭐</p>
               <h3 className="text-base font-semibold text-gray-900 mb-2">Rate</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
                 Tap "Tried it?" on what you've used. No ads, no affiliate links — just your honest takes.
               </p>
             </div>
-            <div className="p-6 rounded-lg border border-gray-200 bg-white text-center">
+            <div className="p-6 rounded-2xl border border-gray-100 bg-white text-center shadow-sm hover:shadow-md transition-shadow">
               <p className="text-3xl mb-3">✨</p>
               <h3 className="text-base font-semibold text-gray-900 mb-2">Get matched</h3>
               <p className="text-sm text-gray-600 leading-relaxed">
@@ -92,7 +92,7 @@ export function Home() {
 
       {/* Trending on #HairTok */}
       {hairtokProducts.length > 0 && (
-        <section className="py-16 px-4 bg-gray-50 border-t border-gray-200">
+        <section className="py-16 px-4 bg-gray-50/50">
           <div className="max-w-6xl mx-auto">
             <div className="mb-8">
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
@@ -108,7 +108,7 @@ export function Home() {
                 <Link
                   key={product.id || `${product.brand}-${product.name}-${i}`}
                   to={product.id ? `/products/${product.id}` : '/products'}
-                  className="flex flex-col gap-2 p-3 rounded-lg border border-gray-200 bg-white hover:border-violet-300 hover:shadow-sm transition-all no-underline group"
+                  className="flex flex-col gap-2 p-3 rounded-2xl border border-gray-100 bg-white hover:border-violet-300 hover:shadow-md transition-all no-underline group shadow-sm"
                 >
                   <ProductImage
                     brand={product.brand}
@@ -132,7 +132,7 @@ export function Home() {
               {FEATURED_CREATORS.map(creator => (
                 <div
                   key={creator.handle}
-                  className="flex flex-col gap-1.5 p-4 rounded-lg border border-gray-200 bg-white hover:border-violet-300 hover:shadow-sm transition-all"
+                  className="flex flex-col gap-1.5 p-4 rounded-2xl border border-gray-100 bg-white hover:border-violet-300 hover:shadow-md transition-all shadow-sm"
                 >
                   <p className="text-sm font-semibold text-gray-900">
                     {creator.name}{' '}
@@ -143,7 +143,7 @@ export function Home() {
                     href={`https://tiktok.com/@${creator.handle}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-blue-600 hover:text-blue-800 font-medium no-underline mt-1"
+                    className="text-xs text-violet-600 hover:text-violet-800 font-medium no-underline mt-1"
                   >
                     View on TikTok ↗
                   </a>

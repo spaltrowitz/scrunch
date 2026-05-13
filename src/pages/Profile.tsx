@@ -39,7 +39,7 @@ export function ProfilePage() {
       </div>
 
       {isProfileEmpty ? (
-        <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
+        <div className="text-center py-16 bg-white rounded-2xl border border-gray-100 shadow-sm">
           <div className="text-4xl mb-4">👩‍🦱</div>
           <h2 className="text-lg font-semibold text-gray-900 mb-2">Let's set up your hair profile!</h2>
           <p className="text-sm text-gray-500 mb-6 max-w-sm mx-auto">
@@ -47,14 +47,14 @@ export function ProfilePage() {
           </p>
           <button
             onClick={() => navigate('/onboarding')}
-            className="px-6 py-2.5 bg-violet-600 text-white font-medium rounded-lg hover:bg-violet-700 cursor-pointer"
+            className="px-6 py-3 min-h-[44px] bg-violet-600 text-white font-medium rounded-full hover:bg-violet-700 cursor-pointer transition shadow-sm"
           >
             Start Hair Quiz (3 min) →
           </button>
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
             <h2 className="font-semibold text-gray-900 mb-4">Hair Profile</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
               {[
@@ -92,7 +92,7 @@ export function ProfilePage() {
             })()}
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
             <h2 className="font-semibold text-gray-900 mb-4">Goals & Sensitivities</h2>
             <div className="space-y-3">
               <div>
@@ -127,7 +127,7 @@ export function ProfilePage() {
 
           {/* Custom Brand - inline with Hair Profile */}
           {profile!.custom_brand && (
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
               <h2 className="font-semibold text-gray-900 mb-4">Currently using</h2>
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
@@ -162,42 +162,45 @@ export function ProfilePage() {
             </div>
           )}
 
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
             <div>
               <p className="text-sm font-medium text-gray-700">Share profile for recommendations</p>
               <p className="text-xs text-gray-500">Allow your anonymized hair data to power recommendations for others</p>
             </div>
-            <span className={`text-xs px-3 py-1 rounded-full ${profile!.profile_public ? 'bg-green-50 text-green-600' : 'bg-gray-200 text-gray-500'}`}>
-              {profile!.profile_public ? 'Shared' : 'Private'}
+            <span className={`text-xs px-3 py-1.5 rounded-full font-medium ${profile!.profile_public ? 'bg-green-50 text-green-600' : 'bg-gray-200 text-gray-500'}`}>
+              {profile!.profile_public ? '✓ Shared' : 'Private'}
             </span>
           </div>
 
           <div className="mt-6 pt-6 border-t border-gray-200">
             <h2 className="font-semibold text-gray-900 mb-3">Quick Links</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <button onClick={() => navigate('/my-products')} className="p-3 bg-white rounded-lg border border-gray-200 hover:border-violet-300 text-left cursor-pointer transition">
+              <button onClick={() => navigate('/my-products')} className="p-4 bg-white rounded-2xl border border-gray-100 hover:border-violet-200 hover:shadow-md text-left cursor-pointer transition-all shadow-sm">
                 <h3 className="font-medium text-gray-900 text-sm">📋 My Shelf</h3>
-                <p className="text-xs text-gray-500">Products you've tried and saved</p>
+                <p className="text-xs text-gray-500 mt-0.5">Products you've tried and saved</p>
               </button>
-              <button onClick={() => navigate('/recommendations')} className="p-3 bg-white rounded-lg border border-gray-200 hover:border-violet-300 text-left cursor-pointer transition">
+              <button onClick={() => navigate('/recommendations')} className="p-4 bg-white rounded-2xl border border-gray-100 hover:border-violet-200 hover:shadow-md text-left cursor-pointer transition-all shadow-sm">
                 <h3 className="font-medium text-gray-900 text-sm">✨ For You</h3>
-                <p className="text-xs text-gray-500">Personalized recommendations</p>
+                <p className="text-xs text-gray-500 mt-0.5">Personalized recommendations</p>
               </button>
             </div>
           </div>
 
           <div className="mt-6 pt-6 border-t border-gray-200">
             <h2 className="font-semibold text-gray-900 mb-3">Privacy</h2>
-            <label className="flex items-start gap-3 p-3 bg-white rounded-lg border border-gray-200 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={optedOut}
-                onChange={(e) => {
-                  setAnalyticsOptOut(e.target.checked)
-                  setOptedOut(e.target.checked)
-                }}
-                className="mt-1 cursor-pointer"
-              />
+            <label className="flex items-start gap-3 p-4 bg-white rounded-2xl border border-gray-100 cursor-pointer shadow-sm hover:border-violet-200 transition group min-h-[44px]">
+              <div className={`relative w-9 h-5 rounded-full transition-colors mt-0.5 shrink-0 ${optedOut ? 'bg-violet-600' : 'bg-gray-200 group-hover:bg-gray-300'}`}>
+                <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${optedOut ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                <input
+                  type="checkbox"
+                  checked={optedOut}
+                  onChange={(e) => {
+                    setAnalyticsOptOut(e.target.checked)
+                    setOptedOut(e.target.checked)
+                  }}
+                  className="sr-only"
+                />
+              </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-gray-900">Opt out of usage analytics</p>
                 <p className="text-xs text-gray-500 mt-0.5">

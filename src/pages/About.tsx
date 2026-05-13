@@ -45,13 +45,13 @@ export function About() {
 
         <TipJar />
 
-        <section className="md:hidden bg-white border border-gray-200 rounded-lg p-6">
+        <section className="md:hidden bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900 mb-1">📱 Add Scrunch to Your Home Screen</h2>
           <p className="text-sm text-gray-500 mb-4">
             Use Scrunch like a real app - no app store needed.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-gray-50 rounded-lg p-4">
+            <div className="bg-gray-50 rounded-xl p-4">
               <h3 className="text-sm font-semibold text-gray-900 mb-2">iPhone / iPad</h3>
               <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
                 <li>Open Scrunch in <span className="font-medium">Safari</span></li>
@@ -59,7 +59,7 @@ export function About() {
                 <li>Scroll down and tap <span className="font-medium">"Add to Home Screen"</span></li>
               </ol>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4">
+            <div className="bg-gray-50 rounded-xl p-4">
               <h3 className="text-sm font-semibold text-gray-900 mb-2">Android</h3>
               <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
                 <li>Open Scrunch in <span className="font-medium">Chrome</span></li>

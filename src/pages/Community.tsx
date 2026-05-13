@@ -275,7 +275,7 @@ export function Community() {
           {routinesLoading ? (
             <div className="space-y-4">
               {[1, 2, 3].map(i => (
-                <div key={i} className="h-32 bg-white border border-gray-100 rounded-xl animate-pulse" />
+                <div key={i} className="h-32 bg-white border border-gray-100 rounded-2xl animate-pulse" />
               ))}
             </div>
           ) : routines.length === 0 ? (
@@ -302,7 +302,7 @@ export function Community() {
       {showSearchBox ? (
         <>
           <form onSubmit={handleAsk} className="mb-8">
-            <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+            <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
               <textarea
                 value={question}
                 onChange={(e) => handleInputChange(e.target.value)}
@@ -406,7 +406,7 @@ export function Community() {
       {/* Results */}
       <div className="space-y-6">
         {history.map((item) => (
-          <div key={item.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden animate-[fadeIn_0.3s_ease-out]" style={{ animation: 'fadeIn 0.3s ease-out' }}>
+          <div key={item.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden animate-[fadeIn_0.3s_ease-out]" style={{ animation: 'fadeIn 0.3s ease-out' }}>
             {/* Question */}
             <div className="px-6 py-4 bg-violet-50 border-b border-violet-100">
               <p className="font-medium text-gray-900">{item.question}</p>

@@ -29,20 +29,20 @@ export function IngredientChecker() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Paste ingredients here, separated by commas..."
-          className="w-full h-32 p-3 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+          className="w-full h-32 p-3 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
         />
 
         <div className="flex gap-3 mt-3">
           <button
             onClick={handleAnalyze}
             disabled={!input.trim()}
-            className="px-5 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="px-5 py-2 bg-violet-600 text-white text-sm font-medium rounded-xl hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer min-h-[44px]"
           >
             Check Ingredients
           </button>
           <button
             onClick={handleTryExample}
-            className="px-4 py-2 text-sm text-violet-600 border border-violet-200 rounded-lg hover:bg-violet-50 cursor-pointer"
+            className="px-4 py-2 text-sm text-violet-600 border border-violet-200 rounded-xl hover:bg-violet-50 cursor-pointer min-h-[44px]"
           >
             See it in action
           </button>

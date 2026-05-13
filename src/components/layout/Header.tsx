@@ -43,7 +43,7 @@ export function Header() {
               </Link>
               <button
                 onClick={() => signOut()}
-                className="text-sm px-4 py-2 min-h-[44px] rounded-lg border border-gray-300 hover:bg-gray-50 cursor-pointer"
+                className="text-sm px-4 py-2 min-h-[44px] rounded-xl border border-gray-200 hover:bg-gray-50 cursor-pointer transition"
               >
                 Sign Out
               </button>
@@ -51,7 +51,7 @@ export function Header() {
           ) : (
             <Link
               to="/login"
-              className="text-sm px-4 py-2 min-h-[44px] inline-flex items-center rounded-lg bg-violet-600 text-white no-underline hover:bg-violet-700"
+              className="text-sm px-4 py-2 min-h-[44px] inline-flex items-center rounded-xl bg-violet-600 text-white no-underline hover:bg-violet-700 transition"
             >
               Sign In
             </Link>
