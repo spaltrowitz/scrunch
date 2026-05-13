@@ -43,18 +43,6 @@ export function About() {
           </div>
         </section>
 
-        <section className="bg-violet-50 rounded-lg px-4 py-3 text-center">
-          <p className="text-sm text-gray-700">
-            Scrunch is free and ad-free.{' '}
-            <a
-              href="#support"
-              className="text-violet-600 hover:text-violet-700 font-medium underline"
-            >
-              Tip the project ↓
-            </a>
-          </p>
-        </section>
-
         <TipJar />
 
         <section className="md:hidden bg-white border border-gray-200 rounded-lg p-6">

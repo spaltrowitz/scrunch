@@ -52,9 +52,6 @@ export function TipJar({ compact = false }: { compact?: boolean }) {
           <span className="text-xs opacity-90">Whatever you feel like</span>
         </a>
       </div>
-      <p className="text-xs text-gray-400 mt-4">
-        Opens Venmo · @{VENMO_HANDLE}
-      </p>
     </section>
   )
 }

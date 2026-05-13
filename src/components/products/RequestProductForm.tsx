@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { PRODUCT_CATEGORY_LABELS } from '../../lib/constants'
 import type { ProductCategory } from '../../lib/database.types'
+import { supabase } from '../../lib/supabase'
 
 interface ProductRequest {
   brand: string
@@ -30,9 +31,11 @@ export function RequestProductForm({ onClose }: { onClose: () => void }) {
   const [request, setRequest] = useState<ProductRequest>({ brand: '', name: '', category: '', link: '' })
   const [confirmed, setConfirmed] = useState(false)
   const [validationError, setValidationError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     const error = validateProductRequest(request)
@@ -41,24 +44,28 @@ export function RequestProductForm({ onClose }: { onClose: () => void }) {
       return
     }
     setValidationError(null)
+    setSubmitError(null)
+    setSubmitting(true)
 
-    // Create GitHub Issue with product-request label → triggers Copilot auto-add workflow
-    const issueBody = [
-      `### Brand\n${request.brand}`,
-      `### Product Name\n${request.name}`,
-      `### Category\n${request.category || 'Not specified'}`,
-      request.link ? `### Product Link\n${request.link}` : '',
-      `---`,
-      `*Submitted via Scrunch app on ${new Date().toISOString()}*`,
-    ].filter(Boolean).join('\n\n')
-
-    const params = new URLSearchParams({
-      title: `[Product Request] ${request.brand} - ${request.name}`,
-      body: issueBody,
-      labels: 'product-request,from-app',
-    })
-    window.open(`https://github.com/spaltrowitz/scrunch/issues/new?${params}`, '_blank')
-    setSubmitted(true)
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke('submit-feedback', {
+        body: {
+          type: 'product-request',
+          brand: request.brand.trim(),
+          name: request.name.trim(),
+          category: request.category || '',
+          link: request.link.trim(),
+        },
+      })
+      if (fnError) throw fnError
+      if (!data?.ok) throw new Error('Submission failed')
+      setSubmitted(true)
+    } catch (err) {
+      console.error('Product request failed:', err)
+      setSubmitError("Couldn't send right now. Please try again in a moment.")
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   if (submitted) {
@@ -67,8 +74,8 @@ export function RequestProductForm({ onClose }: { onClose: () => void }) {
         <div className="text-3xl mb-3">🎉</div>
         <h3 className="font-semibold text-gray-900 mb-1">Request submitted!</h3>
         <p className="text-sm text-gray-500 mb-4">
-          A GitHub issue has been created for <strong>{request.brand} {request.name}</strong>.
-          Copilot will automatically look up the product details, find an image, run ingredient analysis, and create a PR to add it.
+          Thanks! <strong>{request.brand} {request.name}</strong> has been queued up.
+          The product details, image, and ingredient analysis are looked up automatically — it'll show up in the database within a day or two.
         </p>
         <button onClick={onClose} className="text-sm text-violet-600 hover:underline cursor-pointer">
           Close
@@ -147,12 +154,15 @@ export function RequestProductForm({ onClose }: { onClose: () => void }) {
         {validationError && (
           <p className="text-xs text-red-600 bg-red-50 px-3 py-2 rounded-lg">{validationError}</p>
         )}
+        {submitError && (
+          <p className="text-xs text-red-600 bg-red-50 px-3 py-2 rounded-lg">{submitError}</p>
+        )}
         <button
           type="submit"
-          disabled={!request.brand.trim() || !request.name.trim() || !confirmed}
+          disabled={!request.brand.trim() || !request.name.trim() || !confirmed || submitting}
           className="w-full py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 disabled:opacity-50 cursor-pointer"
         >
-          Submit Request
+          {submitting ? 'Submitting…' : 'Submit Request'}
         </button>
       </form>
     </div>
