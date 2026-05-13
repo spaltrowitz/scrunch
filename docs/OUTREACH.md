@@ -38,6 +38,15 @@ Tweak the wording slightly per sub — say "wavy" in r/Wavyhair, "natural hair" 
 > I'd love brutal feedback — what's broken, what's confusing, what's missing, what I got wrong about an ingredient. Feedback button is built into the app, no signup needed, comes straight to me.
 >
 > Hoping it's actually useful. 💜
+>
+> ---
+>
+> **My routine** *(per sub rules):*
+> - Wash: L'Oréal Paris EverPure Sulfate-Free Clarifying Shampoo
+> - Conditioner: Prose (custom)
+> - Styler: Prose custom curl cream — applied to soaking-wet hair, scrunched
+> - Dry: Air dried
+> - Sleep: Silk pillowcase
 
 ---
 
