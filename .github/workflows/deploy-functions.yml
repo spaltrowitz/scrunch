@@ -22,19 +22,19 @@ jobs:
       - name: Deploy submit-feedback
         run: supabase functions deploy submit-feedback --project-ref rqmplfyuonkikdmqngrj
         env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE }}
 
       - name: Deploy create-product-issue
         run: supabase functions deploy create-product-issue --project-ref rqmplfyuonkikdmqngrj
         env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE }}
 
       - name: Deploy notify-product-added
         run: supabase functions deploy notify-product-added --project-ref rqmplfyuonkikdmqngrj
         env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE }}
 
       - name: Deploy find-product-image
         run: supabase functions deploy find-product-image --project-ref rqmplfyuonkikdmqngrj
         env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE }}
