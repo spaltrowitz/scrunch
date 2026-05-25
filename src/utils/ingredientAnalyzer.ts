@@ -1,8 +1,12 @@
+import { computeHealthScore, type HealthFlag, type HealthScoreResult } from './healthScoring'
+
 export interface IngredientResult {
   name: string
   status: 'approved' | 'caution' | 'not_approved'
   reason?: string
   category?: string
+  /** Health hazard flags for this ingredient (if any) */
+  healthFlags?: HealthFlag[]
 }
 
 export interface IngredientAnalysis {
@@ -11,6 +15,8 @@ export interface IngredientAnalysis {
   summary: string
   humectants: string[]
   proteins: string[]
+  /** Health/safety score (EWG-style) */
+  healthScore: HealthScoreResult
 }
 
 interface IngredientRule {
@@ -176,5 +182,18 @@ export function analyzeIngredients(raw: string): IngredientAnalysis {
   const humectants = detectHumectants(parsed)
   const proteins = detectProteins(parsed)
 
-  return { ingredients: results, overallStatus, summary, humectants, proteins }
+  // Compute health/safety score
+  const healthScore = computeHealthScore(parsed)
+
+  // Annotate individual results with health flags
+  for (const result of results) {
+    const flags = healthScore.flags.filter(f =>
+      f.ingredient.toLowerCase() === result.name.toLowerCase()
+    )
+    if (flags.length > 0) {
+      result.healthFlags = flags
+    }
+  }
+
+  return { ingredients: results, overallStatus, summary, humectants, proteins, healthScore }
 }
