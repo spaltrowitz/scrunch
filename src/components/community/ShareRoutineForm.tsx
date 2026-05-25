@@ -109,6 +109,7 @@ export function ShareRoutineForm({ onClose, onSuccess }: { onClose: () => void; 
         notes: s.notes.trim() || null,
       }))
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error: dbError } = await supabase.from('routines').insert({
         user_id: user.id,
         name: form.name.trim(),
@@ -121,7 +122,7 @@ export function ShareRoutineForm({ onClose, onSuccess }: { onClose: () => void; 
           refresh_notes: form.refreshNotes.trim() || null,
         }),
         is_public: form.isPublic,
-      })
+      } as any)
 
       if (dbError) throw dbError
       onSuccess()

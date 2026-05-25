@@ -8,7 +8,6 @@ import {
 } from '../lib/communitySearch'
 import { trackSearchPerformed } from '../lib/analytics'
 import { supabase } from '../lib/supabase'
-import { useAuth } from '../lib/auth.utils'
 import { ShareRoutineForm } from '../components/community/ShareRoutineForm'
 import { RoutineCard } from '../components/community/RoutineCard'
 
@@ -114,7 +113,6 @@ function AskCommunityPrompt() {
 }
 
 export function Community() {
-  const { user } = useAuth()
   const [activeTab, setActiveTab] = useState<'search' | 'routines'>('search')
   const [question, setQuestion] = useState('')
   const [loading, setLoading] = useState(false)
@@ -213,7 +211,6 @@ export function Community() {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [])
 
-  const totalResults = history.reduce((sum, h) => sum + h.redditResults.length, 0)
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
