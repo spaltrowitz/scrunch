@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { analyzeIngredients } from '../../utils/ingredientAnalyzer'
 import { CG_STATUS_CONFIG, HEALTH_SCORE_CONFIG } from '../../lib/constants'
-import { HAZARD_CATEGORY_LABELS } from '../../utils/healthHazardDb'
+import { HAZARD_CATEGORY_LABELS, HEALTH_SCORE_EXPLAINER } from '../../utils/healthHazardDb'
 
 const EXAMPLE_INGREDIENTS = `Water, Cetearyl Alcohol, Glycerin, Behentrimonium Chloride, Fragrance, Dimethicone, Panthenol, Coconut Oil`
 
@@ -117,6 +117,28 @@ export function IngredientChecker() {
               )}
             </div>
           )}
+
+          {/* How it works disclosure */}
+          <details className="mt-4 text-xs text-gray-500">
+            <summary className="cursor-pointer font-medium text-gray-600 hover:text-gray-800">
+              ℹ️ {HEALTH_SCORE_EXPLAINER.title}
+            </summary>
+            <div className="mt-2 space-y-2 pl-4">
+              <p>{HEALTH_SCORE_EXPLAINER.description}</p>
+              <ul className="list-disc pl-4 space-y-0.5">
+                {HEALTH_SCORE_EXPLAINER.methodology.map((step, i) => (
+                  <li key={i}>{step}</li>
+                ))}
+              </ul>
+              <p className="font-medium text-gray-600 mt-2">Sources:</p>
+              <ul className="list-disc pl-4 space-y-0.5">
+                {HEALTH_SCORE_EXPLAINER.sources.map((src, i) => (
+                  <li key={i}>{src}</li>
+                ))}
+              </ul>
+              <p className="italic mt-2 text-gray-400">{HEALTH_SCORE_EXPLAINER.disclaimer}</p>
+            </div>
+          </details>
         </div>
       )}
     </div>

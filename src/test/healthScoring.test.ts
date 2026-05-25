@@ -14,6 +14,7 @@ describe('computeHealthScore', () => {
     expect(result.flags).toHaveLength(1)
     expect(result.flags[0].category).toBe('carcinogen')
     expect(result.flags[0].severity).toBe('high')
+    // Only 3 ingredients — position weighting disabled for short lists
     expect(result.score).toBe(85) // 100 - 15
   })
 
@@ -60,6 +61,39 @@ describe('computeHealthScore', () => {
   it('does not double-count the same hazard ingredient', () => {
     const result = computeHealthScore(['DMDM Hydantoin', 'DMDM hydantoin'])
     expect(result.flags).toHaveLength(1)
+  })
+
+  it('amplifies deduction for hazards listed early in long ingredient lists', () => {
+    const longList = [
+      'DMDM Hydantoin', 'Water', 'Glycerin', 'Cetearyl Alcohol',
+      'Stearamidopropyl Dimethylamine', 'Isopropyl Alcohol', 'Panthenol',
+      'Tocopherol', 'Aloe Barbadensis', 'Citric Acid',
+      'Sodium Benzoate', 'Potassium Sorbate',
+    ]
+    const result = computeHealthScore(longList)
+    const dmdmFlag = result.flags.find(f => f.hazardName === 'DMDM Hydantoin')
+    expect(dmdmFlag).toBeDefined()
+    // Position 0 in 12-item list → multiplier 1.5x → 15 * 1.5 = 23
+    expect(dmdmFlag!.positionMultiplier).toBe(1.5)
+    expect(dmdmFlag!.deduction).toBe(23)
+  })
+
+  it('reduces deduction for hazards listed late in long ingredient lists', () => {
+    const longList = Array(25).fill('Water')
+    longList[22] = 'Methylparaben' // position 22 → multiplier 0.6
+    const result = computeHealthScore(longList)
+    const flag = result.flags.find(f => f.hazardName === 'Methylparaben')
+    expect(flag).toBeDefined()
+    expect(flag!.positionMultiplier).toBe(0.6)
+    expect(flag!.deduction).toBe(5) // 8 * 0.6 = 4.8 → rounded to 5
+  })
+
+  it('uses 1.0 multiplier for short ingredient lists regardless of position', () => {
+    const shortList = ['DMDM Hydantoin', 'Water', 'Glycerin']
+    const result = computeHealthScore(shortList)
+    const flag = result.flags[0]
+    expect(flag.positionMultiplier).toBe(1.0)
+    expect(flag.deduction).toBe(15)
   })
 
   it('detects low-severity fragrance allergens', () => {
