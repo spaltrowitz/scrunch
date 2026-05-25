@@ -250,11 +250,19 @@ export const HAZARD_DB: HazardIngredient[] = [
   },
   {
     name: 'Cinnamal (Cinnamaldehyde)',
-    aliases: [/\bcinnamal\b/i, /\bcinnamaldehyde\b/i],
+    aliases: [/^cinnamal$/i, /\bcinnamaldehyde\b/i],
     category: 'allergen',
     severity: 'moderate',
     concern: 'Strong fragrance allergen; high sensitization rate',
     source: 'EU Annex III; top allergen in patch testing',
+  },
+  {
+    name: 'Hexyl Cinnamal',
+    aliases: [/\bhexyl cinnamal\b/i],
+    category: 'allergen',
+    severity: 'low',
+    concern: 'Fragrance allergen; must be declared in EU',
+    source: 'EU Annex III (must be declared)',
   },
   {
     name: 'Isoeugenol',
@@ -292,7 +300,7 @@ export const HAZARD_DB: HazardIngredient[] = [
   },
   {
     name: 'Diethanolamine (DEA)',
-    aliases: [/\bdiethanolamine\b/i, /\b\bdea\b\b/i],
+    aliases: [/\bdiethanolamine\b/i, /\bcocamide dea\b/i, /\blauramide dea\b/i, /\boleamide dea\b/i],
     category: 'organ_toxin',
     severity: 'moderate',
     concern: 'Can form carcinogenic nitrosamines; liver and kidney effects',
@@ -401,8 +409,8 @@ export const HAZARD_DB: HazardIngredient[] = [
     source: 'IFRA standards; EU requires allergen disclosure >threshold',
   },
   {
-    name: 'Ethanolamines (MEA/DEA/TEA)',
-    aliases: [/\bmonoethanolamine\b/i, /\bmea\b(?=.*amine)/i, /\bcocamide mea\b/i, /\bcocamide dea\b/i, /\blauramide dea\b/i],
+    name: 'Ethanolamines (MEA/TEA)',
+    aliases: [/\bmonoethanolamine\b/i, /\bcocamide mea\b/i, /\blauramide mea\b/i],
     category: 'irritant',
     severity: 'low',
     concern: 'Can form nitrosamines; respiratory sensitizer',

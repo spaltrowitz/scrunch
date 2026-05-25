@@ -8,6 +8,10 @@ export interface HealthFlag {
   concern: string
   source: string
   deduction: number
+  /** Position in ingredient list (0-based). Lower = higher concentration */
+  position: number
+  /** Multiplier applied based on list position */
+  positionMultiplier: number
 }
 
 export interface HealthScoreResult {
@@ -18,34 +22,69 @@ export interface HealthScoreResult {
 }
 
 /**
+ * Position-based multiplier: ingredients listed earlier are present in higher
+ * concentrations, so their hazard is amplified.
+ *
+ * - Top 5 (positions 0-4): 1.5x deduction
+ * - Positions 5-9: 1.2x
+ * - Positions 10-19: 1.0x (baseline)
+ * - Position 20+: 0.6x (trace amounts, less concern)
+ */
+function positionMultiplier(position: number, totalIngredients: number): number {
+  if (totalIngredients < 10) return 1.0
+  if (position < 5) return 1.5
+  if (position < 10) return 1.2
+  if (position < 20) return 1.0
+  return 0.6
+}
+
+/**
  * Compute a health/safety score for a product based on its ingredient list.
  * Returns a 0-100 score where 100 = no known hazards found.
+ *
+ * Scoring accounts for ingredient list position — ingredients listed earlier
+ * are present in higher concentrations and receive amplified deductions.
  */
 export function computeHealthScore(ingredients: string[]): HealthScoreResult {
   const flags: HealthFlag[] = []
   const matched = new Set<string>()
 
-  for (const ingredient of ingredients) {
-    const normalized = ingredient.trim()
+  for (let i = 0; i < ingredients.length; i++) {
+    const normalized = ingredients[i].trim()
     if (!normalized) continue
 
+    // Find all matching hazards for this ingredient, pick the highest-severity one
+    let bestMatch: typeof HAZARD_DB[number] | null = null
+    const severityRank = { high: 3, moderate: 2, low: 1 }
+
     for (const hazard of HAZARD_DB) {
-      // Skip if we already matched this hazard (avoid double-counting)
       if (matched.has(hazard.name)) continue
 
       const isMatch = hazard.aliases.some(pattern => pattern.test(normalized))
       if (isMatch) {
-        matched.add(hazard.name)
-        flags.push({
-          ingredient: normalized,
-          hazardName: hazard.name,
-          category: hazard.category,
-          severity: hazard.severity,
-          concern: hazard.concern,
-          source: hazard.source,
-          deduction: SEVERITY_DEDUCTIONS[hazard.severity],
-        })
+        if (!bestMatch || severityRank[hazard.severity] > severityRank[bestMatch.severity]) {
+          bestMatch = hazard
+        }
       }
+    }
+
+    if (bestMatch) {
+      matched.add(bestMatch.name)
+      const multiplier = positionMultiplier(i, ingredients.length)
+      const baseDeduction = SEVERITY_DEDUCTIONS[bestMatch.severity]
+      const adjustedDeduction = Math.round(baseDeduction * multiplier)
+
+      flags.push({
+        ingredient: normalized,
+        hazardName: bestMatch.name,
+        category: bestMatch.category,
+        severity: bestMatch.severity,
+        concern: bestMatch.concern,
+        source: bestMatch.source,
+        deduction: adjustedDeduction,
+        position: i,
+        positionMultiplier: multiplier,
+      })
     }
   }
 
