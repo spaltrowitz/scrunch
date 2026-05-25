@@ -276,6 +276,8 @@ export function Products() {
     // Persist to Supabase
     if (user && isUuid(key)) {
       upsertReviewMutation.mutate({ productId: key, rating })
+    } else if (!user) {
+      addToast('Saved on this device · Sign in to sync across devices', 'success')
     }
   }
 
