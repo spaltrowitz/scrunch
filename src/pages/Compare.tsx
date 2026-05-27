@@ -7,6 +7,24 @@ import { PRODUCT_CATEGORY_LABELS } from '../lib/constants'
 import { IngredientRow } from '../components/products/IngredientCard'
 import type { Product } from '../lib/database.types'
 
+const EMPTY_PRODUCTS: Product[] = []
+
+function getCgStatusConfig(status: Product['cg_status']) {
+  return {
+    approved: { className: 'bg-green-50 text-green-600', shortLabel: '🟢 CG', label: '🟢 Approved' },
+    caution: { className: 'bg-amber-50 text-amber-600', shortLabel: '🟡 Caution', label: '🟡 Caution' },
+    not_approved: { className: 'bg-red-50 text-red-600', shortLabel: '🔴 Not CG', label: '🔴 Not Approved' },
+  }[status]
+}
+
+function isFragranceFree(product: Product) {
+  const productNotes = (product.notes || '').toLowerCase()
+  return product.fragrance_free === true
+    || productNotes.includes('fragrance-free')
+    || productNotes.includes('fragrance free')
+    || productNotes.includes('no added fragrance')
+}
+
 function ProductPicker({ label, selectedId, onSelect, excludeId }: {
   label: string
   selectedId: string | null
@@ -16,7 +34,7 @@ function ProductPicker({ label, selectedId, onSelect, excludeId }: {
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
   const { data } = useProducts()
-  const products = data?.products ?? []
+  const products = data?.products ?? EMPTY_PRODUCTS
 
   const filtered = useMemo(() => {
     if (!query.trim()) return []
@@ -39,7 +57,7 @@ function ProductPicker({ label, selectedId, onSelect, excludeId }: {
         </div>
         <button
           onClick={() => { setOpen(true); setQuery('') }}
-          className="text-xs text-violet-600 hover:underline cursor-pointer shrink-0"
+          className="text-xs text-violet-600 hover:underline cursor-pointer shrink-0 min-h-[44px] px-2"
         >
           Change
         </button>
@@ -85,10 +103,9 @@ function ProductPicker({ label, selectedId, onSelect, excludeId }: {
 }
 
 function ComparisonColumn({ product }: { product: Product }) {
-  const isCg = product.cg_status === 'approved'
+  const cgStatusConfig = getCgStatusConfig(product.cg_status)
   const isCf = product.cruelty_free === 'yes'
-  const productNotes = (product.notes || '').toLowerCase()
-  const isFragFree = productNotes.includes('fragrance-free') || productNotes.includes('fragrance free')
+  const isFragFree = isFragranceFree(product)
 
   return (
     <div className="flex-1 min-w-0">
@@ -106,8 +123,8 @@ function ComparisonColumn({ product }: { product: Product }) {
 
       {/* Badges */}
       <div className="flex flex-wrap justify-center gap-1 mb-4">
-        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isCg ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
-          {isCg ? '🟢 CG' : '🔴 Not CG'}
+        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${cgStatusConfig.className}`}>
+          {cgStatusConfig.shortLabel}
         </span>
         {isCf && <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600">🐰</span>}
         {isFragFree && <span className="text-xs px-2 py-0.5 rounded-full bg-violet-50 text-violet-600">🌸</span>}
@@ -139,34 +156,42 @@ function IngredientsComparison({ productA, productB }: { productA: Product; prod
       <div>
         <h3 className="font-medium text-gray-900 text-sm mb-2">{productA.brand} {productA.name}</h3>
         <p className="text-xs text-gray-500 mb-3">Tap ⓘ to learn more</p>
-        <div className="space-y-1 text-sm">
-          {productA.ingredients.map((ing, i) => {
-            const flagged = productA.flagged_ingredients.find(f => ing.toLowerCase().includes(f.name.toLowerCase()))
-            const isShared = setB.has(ing.toLowerCase().trim())
-            return (
-              <div key={i} className={isShared ? 'bg-blue-50 rounded px-1 -mx-1' : ''}>
-                <IngredientRow ingredient={ing} flagged={flagged ?? null} />
-              </div>
-            )
-          })}
-        </div>
+        {productA.ingredients.length > 0 ? (
+          <div className="space-y-1 text-sm">
+            {productA.ingredients.map((ing, i) => {
+              const flagged = productA.flagged_ingredients.find(f => ing.toLowerCase().includes(f.name.toLowerCase()))
+              const isShared = setB.has(ing.toLowerCase().trim())
+              return (
+                <div key={i} className={isShared ? 'bg-blue-50 rounded px-1 -mx-1' : ''}>
+                  <IngredientRow ingredient={ing} flagged={flagged ?? null} />
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          <p className="text-sm text-gray-500 bg-gray-50 rounded-lg px-3 py-3">No ingredient list yet.</p>
+        )}
       </div>
 
       {/* Product B ingredients */}
       <div>
         <h3 className="font-medium text-gray-900 text-sm mb-2">{productB.brand} {productB.name}</h3>
         <p className="text-xs text-gray-500 mb-3">Tap ⓘ to learn more</p>
-        <div className="space-y-1 text-sm">
-          {productB.ingredients.map((ing, i) => {
-            const flagged = productB.flagged_ingredients.find(f => ing.toLowerCase().includes(f.name.toLowerCase()))
-            const isShared = setA.has(ing.toLowerCase().trim())
-            return (
-              <div key={i} className={isShared ? 'bg-blue-50 rounded px-1 -mx-1' : ''}>
-                <IngredientRow ingredient={ing} flagged={flagged ?? null} />
-              </div>
-            )
-          })}
-        </div>
+        {productB.ingredients.length > 0 ? (
+          <div className="space-y-1 text-sm">
+            {productB.ingredients.map((ing, i) => {
+              const flagged = productB.flagged_ingredients.find(f => ing.toLowerCase().includes(f.name.toLowerCase()))
+              const isShared = setA.has(ing.toLowerCase().trim())
+              return (
+                <div key={i} className={isShared ? 'bg-blue-50 rounded px-1 -mx-1' : ''}>
+                  <IngredientRow ingredient={ing} flagged={flagged ?? null} />
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          <p className="text-sm text-gray-500 bg-gray-50 rounded-lg px-3 py-3">No ingredient list yet.</p>
+        )}
       </div>
 
       {sharedCount > 0 && (
@@ -228,7 +253,7 @@ export function Compare() {
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h2 className="font-semibold text-gray-900 mb-4">Quick Comparison</h2>
             <div className="space-y-3 text-sm">
-              <CompareRow label="CG Status" a={productA.cg_status === 'approved' ? '🟢 Approved' : '🔴 Not Approved'} b={productB.cg_status === 'approved' ? '🟢 Approved' : '🔴 Not Approved'} />
+              <CompareRow label="CG Status" a={getCgStatusConfig(productA.cg_status).label} b={getCgStatusConfig(productB.cg_status).label} />
               <CompareRow label="Cruelty-Free" a={productA.cruelty_free === 'yes' ? '🐰 Yes' : productA.cruelty_free === 'no' ? '❌ No' : '❓ Unknown'} b={productB.cruelty_free === 'yes' ? '🐰 Yes' : productB.cruelty_free === 'no' ? '❌ No' : '❓ Unknown'} />
               <CompareRow label="Ingredients" a={`${productA.ingredients.length} total`} b={`${productB.ingredients.length} total`} />
               <CompareRow label="Flagged" a={`${productA.flagged_ingredients.length} concern${productA.flagged_ingredients.length !== 1 ? 's' : ''}`} b={`${productB.flagged_ingredients.length} concern${productB.flagged_ingredients.length !== 1 ? 's' : ''}`} />
@@ -261,7 +286,7 @@ export function Compare() {
 
 function CompareRow({ label, a, b }: { label: string; a: string; b: string }) {
   return (
-    <div className="grid grid-cols-[120px_1fr_1fr] gap-2 items-center">
+    <div className="grid grid-cols-1 sm:grid-cols-[120px_1fr_1fr] gap-1 sm:gap-2 sm:items-center">
       <span className="text-gray-500 font-medium">{label}</span>
       <span className="text-gray-900">{a}</span>
       <span className="text-gray-900">{b}</span>

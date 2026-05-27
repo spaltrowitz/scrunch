@@ -93,10 +93,17 @@ export function ProductDetail() {
   if (loading) return <div className="text-center py-12 text-gray-500">Loading…</div>
   if (!product) return <div className="text-center py-12 text-gray-500">Product not found</div>
 
-  const isCg = product.cg_status === 'approved'
+  const cgStatusConfig = {
+    approved: { className: 'bg-green-50 text-green-600', label: '🟢 CG Approved' },
+    caution: { className: 'bg-amber-50 text-amber-600', label: '🟡 Caution' },
+    not_approved: { className: 'bg-red-50 text-red-600', label: '🔴 Not CG' },
+  }[product.cg_status]
   const isCf = product.cruelty_free === 'yes'
   const productNotes = (product.notes || '').toLowerCase()
-  const isFragFree = productNotes.includes('fragrance-free') || productNotes.includes('fragrance free') || productNotes.includes('no added fragrance')
+  const isFragFree = product.fragrance_free === true
+    || productNotes.includes('fragrance-free')
+    || productNotes.includes('fragrance free')
+    || productNotes.includes('no added fragrance')
 
   // Community rating stats
   const allRatings = [...reviews, ...(myReview ? [myReview] : [])].filter(r => r.rating != null)
@@ -135,8 +142,8 @@ export function ProductDetail() {
             <span className="text-gray-400 ml-1 cursor-help" title={PRODUCT_CATEGORY_DESCRIPTIONS[product.category]}>ⓘ</span>
           </p>
           <div className="flex flex-wrap items-center gap-2">
-            <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${isCg ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
-              {isCg ? '🟢 CG Approved' : '🔴 Not CG'}
+            <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${cgStatusConfig.className}`}>
+              {cgStatusConfig.label}
             </span>
             {isCf && <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 font-medium">🐰 Cruelty-Free</span>}
             {isFragFree && <span className="text-xs px-2.5 py-1 rounded-full bg-violet-50 text-violet-600 font-medium">🌸 Fragrance-Free</span>}
@@ -154,7 +161,7 @@ export function ProductDetail() {
       <div className="mb-6">
         <Link
          to={`/compare?a=${product.id}`}
-         className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-violet-600 bg-violet-50 border border-violet-200 rounded-lg hover:bg-violet-100 transition no-underline"
+         className="inline-flex items-center gap-2 px-4 py-2 min-h-[44px] text-sm font-medium text-violet-600 bg-violet-50 border border-violet-200 rounded-lg hover:bg-violet-100 transition no-underline"
         >
          ⚖️ Compare with another product
         </Link>

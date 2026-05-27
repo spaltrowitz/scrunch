@@ -23,7 +23,7 @@ function EducationCard({ edu }: { edu: IngredientEducation }) {
   }
 
   return (
-    <div className="mt-2 p-4 bg-gray-50 rounded-lg border border-gray-200 text-sm animate-in">
+    <div className="mt-2 p-4 bg-gray-50 rounded-lg border border-gray-200 text-sm">
       <div className="flex items-center gap-2 mb-2">
         <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
           {INGREDIENT_CATEGORY_LABELS[edu.category]}
@@ -56,11 +56,12 @@ export function IngredientRow({ ingredient, flagged }: IngredientRowProps) {
       <button
         type="button"
         onClick={() => isTappable && setExpanded(!expanded)}
-        className={`flex items-start gap-2 w-full text-left py-1 rounded-md transition ${
+        className={`flex items-start gap-2 w-full text-left py-2 min-h-[44px] rounded-md transition ${
           isTappable ? 'hover:bg-gray-50 cursor-pointer' : 'cursor-default'
         }`}
         disabled={!isTappable}
         aria-expanded={isTappable ? expanded : undefined}
+        aria-label={isTappable ? `${expanded ? 'Hide' : 'Show'} ingredient details for ${ingredient}` : undefined}
       >
         <span className="mt-0.5 shrink-0">
           {flagged ? (flagged.severity === 'bad' ? '🔴' : '🟡') : '🟢'}
