@@ -1,30 +1,5 @@
 import { PRODUCT_CATEGORY_LABELS } from '../../lib/constants'
-
-interface RoutineStepData {
-  order: number
-  category: string | null
-  brand: string
-  product: string
-  notes: string | null
-}
-
-interface RoutineStepsPayload {
-  products: RoutineStepData[]
-  styling_method: string | null
-  drying_method: string | null
-  sleep_protection: string | null
-  refresh_notes: string | null
-}
-
-interface Routine {
-  id: string
-  name: string
-  routine_type: string
-  steps: RoutineStepsPayload
-  is_public: boolean
-  created_at: string
-  profiles?: { display_name: string; curl_pattern: string | null; porosity: string | null } | null
-}
+import type { Routine, RoutineStepData, RoutineStepsPayload } from '../../lib/database.types'
 
 const TYPE_LABELS: Record<string, string> = {
   wash_day: '🚿 Wash Day',
@@ -34,7 +9,7 @@ const TYPE_LABELS: Record<string, string> = {
 }
 
 export function RoutineCard({ routine }: { routine: Routine }) {
-  const steps = typeof routine.steps === 'string' ? JSON.parse(routine.steps) : routine.steps
+  const steps = typeof routine.steps === 'string' ? JSON.parse(routine.steps) as RoutineStepsPayload : routine.steps
   const products: RoutineStepData[] = steps?.products || []
   const profile = routine.profiles
 
