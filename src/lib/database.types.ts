@@ -116,13 +116,55 @@ export interface AnalyticsEvent {
   created_at: string
 }
 
+export interface RoutineStepData {
+  order: number
+  category: ProductCategory | null
+  brand: string
+  product: string
+  notes: string | null
+}
+
+export interface RoutineStepsPayload {
+  products: RoutineStepData[]
+  styling_method: string | null
+  drying_method: string | null
+  sleep_protection: string | null
+  refresh_notes: string | null
+}
+
+export interface Routine {
+  id: string
+  user_id: string
+  name: string
+  routine_type: 'wash_day' | 'refresh' | 'deep_treatment' | 'custom'
+  steps: RoutineStepsPayload | string
+  is_public: boolean
+  created_at: string
+  updated_at: string
+  profiles?: Pick<Profile, 'display_name' | 'curl_pattern' | 'porosity'> | null
+}
+
+type SupabaseRecord<T> = T & Record<string, unknown>
+
 export interface Database {
   public: {
     Tables: {
-      profiles: { Row: Profile; Insert: Partial<Profile> & { id: string }; Update: Partial<Profile>; Relationships: [] }
-      products: { Row: Product; Insert: Omit<Product, 'id' | 'created_at' | 'updated_at' | 'avg_rating' | 'review_count'>; Update: Partial<Product>; Relationships: [] }
-      product_reviews: { Row: ProductReview; Insert: Omit<ProductReview, 'id' | 'created_at' | 'updated_at'>; Update: Partial<ProductReview>; Relationships: [] }
-      analytics_events: { Row: AnalyticsEvent; Insert: { event_type: string; page_path?: string | null; referrer?: string | null; screen_width?: number | null; metadata?: Record<string, unknown> | null }; Update: Partial<AnalyticsEvent>; Relationships: [] }
+      profiles: { Row: SupabaseRecord<Profile>; Insert: Partial<Profile> & { id: string }; Update: Partial<Profile>; Relationships: [] }
+      products: { Row: SupabaseRecord<Product>; Insert: Omit<Product, 'id' | 'created_at' | 'updated_at' | 'avg_rating' | 'review_count'>; Update: Partial<Product>; Relationships: [] }
+      product_reviews: { Row: SupabaseRecord<ProductReview>; Insert: Omit<ProductReview, 'id' | 'created_at' | 'updated_at'>; Update: Partial<ProductReview>; Relationships: [] }
+      routines: {
+        Row: SupabaseRecord<Routine>
+        Insert: {
+          user_id: string
+          name: string
+          routine_type: Routine['routine_type']
+          steps: string
+          is_public: boolean
+        }
+        Update: Partial<Routine>
+        Relationships: []
+      }
+      analytics_events: { Row: SupabaseRecord<AnalyticsEvent>; Insert: { event_type: string; page_path?: string | null; referrer?: string | null; screen_width?: number | null; metadata?: Record<string, unknown> | null }; Update: Partial<AnalyticsEvent>; Relationships: [] }
     }
     Views: Record<string, never>
     Functions: Record<string, never>

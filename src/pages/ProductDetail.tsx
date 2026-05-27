@@ -9,6 +9,7 @@ import { useToast } from '../hooks/useToast.utils'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { useProductRating, useRatingMutation } from '../hooks/useProductRatings'
 import type { TriedRating } from '../hooks/useProductRatings'
+import { IngredientRow } from '../components/products/IngredientCard'
 
 type ReviewWithProfile = ProductReview & {
   profile?: Pick<Profile, 'display_name' | 'curl_pattern' | 'porosity'> | null
@@ -92,10 +93,17 @@ export function ProductDetail() {
   if (loading) return <div className="text-center py-12 text-gray-500">Loading…</div>
   if (!product) return <div className="text-center py-12 text-gray-500">Product not found</div>
 
-  const isCg = product.cg_status === 'approved'
+  const cgStatusConfig = {
+    approved: { className: 'bg-green-50 text-green-600', label: '🟢 CG Approved' },
+    caution: { className: 'bg-amber-50 text-amber-600', label: '🟡 Caution' },
+    not_approved: { className: 'bg-red-50 text-red-600', label: '🔴 Not CG' },
+  }[product.cg_status]
   const isCf = product.cruelty_free === 'yes'
   const productNotes = (product.notes || '').toLowerCase()
-  const isFragFree = productNotes.includes('fragrance-free') || productNotes.includes('fragrance free') || productNotes.includes('no added fragrance')
+  const isFragFree = product.fragrance_free === true
+    || productNotes.includes('fragrance-free')
+    || productNotes.includes('fragrance free')
+    || productNotes.includes('no added fragrance')
 
   // Community rating stats
   const allRatings = [...reviews, ...(myReview ? [myReview] : [])].filter(r => r.rating != null)
@@ -134,8 +142,8 @@ export function ProductDetail() {
             <span className="text-gray-400 ml-1 cursor-help" title={PRODUCT_CATEGORY_DESCRIPTIONS[product.category]}>ⓘ</span>
           </p>
           <div className="flex flex-wrap items-center gap-2">
-            <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${isCg ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
-              {isCg ? '🟢 CG Approved' : '🔴 Not CG'}
+            <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${cgStatusConfig.className}`}>
+              {cgStatusConfig.label}
             </span>
             {isCf && <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 font-medium">🐰 Cruelty-Free</span>}
             {isFragFree && <span className="text-xs px-2.5 py-1 rounded-full bg-violet-50 text-violet-600 font-medium">🌸 Fragrance-Free</span>}
@@ -149,6 +157,16 @@ export function ProductDetail() {
         </div>
       </div>
 
+      {/* Compare CTA */}
+      <div className="mb-6">
+        <Link
+         to={`/compare?a=${product.id}`}
+         className="inline-flex items-center gap-2 px-4 py-2 min-h-[44px] text-sm font-medium text-violet-600 bg-violet-50 border border-violet-200 rounded-lg hover:bg-violet-100 transition no-underline"
+        >
+         ⚖️ Compare with another product
+        </Link>
+      </div>
+
       {/* Notes */}
       {product.notes && (
         <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800 mb-6">
@@ -159,20 +177,19 @@ export function ProductDetail() {
       {/* Ingredients */}
       {product.ingredients.length > 0 && (
         <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-          <h2 className="font-semibold text-gray-900 mb-3">Ingredients</h2>
+          <h2 className="font-semibold text-gray-900 mb-1">Ingredients</h2>
+          <p className="text-xs text-gray-500 mb-3">Tap any ingredient with ⓘ to learn more</p>
           <div className="space-y-1 text-sm">
             {product.ingredients.map((ing, i) => {
               const flagged = product.flagged_ingredients.find(
                 f => ing.toLowerCase().includes(f.name.toLowerCase())
               )
               return (
-                <div key={i} className="flex items-start gap-2">
-                  <span className="mt-0.5 shrink-0">{flagged ? (flagged.severity === 'bad' ? '🔴' : '🟡') : '🟢'}</span>
-                  <span className={`break-words ${flagged ? 'text-gray-900 font-medium' : 'text-gray-600'}`}>
-                    {ing}
-                    {flagged && <span className="text-gray-500 font-normal"> - {flagged.reason}</span>}
-                  </span>
-                </div>
+                <IngredientRow
+                  key={i}
+                  ingredient={ing}
+                  flagged={flagged ?? null}
+                />
               )
             })}
           </div>
