@@ -418,7 +418,7 @@ export const SEED_PRODUCTS: SeedProduct[] = [
   { brand: 'adwoa beauty', name: 'Melonberry Hair Milk', category: 'leave_in_conditioner', cg_status: 'approved', cruelty_free: 'unclear', notes: '#HairTok trending. Lightweight moisturizer for all curl types', image_url: 'https://media.ulta.com/i/ulta/2590667?w=400', hairtok_trending: true },
 
   // ── GEL (HairTok additions) ─────────────────────────────────────────
-  { brand: 'Rizos Curls', name: 'Strong Hold Gel', category: 'gel', cg_status: 'approved', cruelty_free: 'unclear', notes: '#HairTok trending. Strong hold without crunch', image_url: 'https://media.ulta.com/i/ulta/2622460?w=400', hairtok_trending: true },
+  { brand: 'Rizos Curls', name: 'Strong Hold Gel', category: 'gel', cg_status: 'approved', cruelty_free: 'unclear', notes: '#HairTok trending. Strong hold without crunch', image_url: 'https://rizoscurls.com/cdn/shop/files/SHG1_ddf32613-9c41-4844-9236-81a385f7c90a.png?v=1762491936', hairtok_trending: true },
   { brand: 'The Doux', name: 'Big Poppa Defining Gel', category: 'gel', cg_status: 'approved', cruelty_free: 'unclear', notes: '#HairTok trending. Textured hair specialist brand', image_url: 'https://media.ulta.com/i/ulta/2564345?w=400', hairtok_trending: true },
 
   // ── SCALP TREATMENT (HairTok additions) ──────────────────────────────────

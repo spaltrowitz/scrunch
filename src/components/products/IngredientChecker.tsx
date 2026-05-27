@@ -1,16 +1,13 @@
 import { useState } from 'react'
-import { analyzeIngredients, type IngredientResult } from '../../utils/ingredientAnalyzer'
-import { CG_STATUS_CONFIG } from '../../lib/constants'
+import { analyzeIngredients } from '../../utils/ingredientAnalyzer'
+import { CG_STATUS_CONFIG, HEALTH_SCORE_CONFIG } from '../../lib/constants'
+import { HAZARD_CATEGORY_LABELS } from '../../utils/healthHazardDb'
 
 const EXAMPLE_INGREDIENTS = `Water, Cetearyl Alcohol, Glycerin, Behentrimonium Chloride, Fragrance, Dimethicone, Panthenol, Coconut Oil`
 
 export function IngredientChecker() {
   const [input, setInput] = useState('')
-  const [results, setResults] = useState<{
-    ingredients: IngredientResult[]
-    overallStatus: 'approved' | 'caution' | 'not_approved'
-    summary: string
-  } | null>(null)
+  const [results, setResults] = useState<ReturnType<typeof analyzeIngredients> | null>(null)
 
   const handleAnalyze = () => {
     if (!input.trim()) return
@@ -72,10 +69,54 @@ export function IngredientChecker() {
                   {ing.reason && (
                     <span className="text-gray-500 ml-2">- {ing.reason}</span>
                   )}
+                  {ing.healthFlags && ing.healthFlags.length > 0 && (
+                    <div className="mt-0.5">
+                      {ing.healthFlags.map((flag, j) => (
+                        <span key={j} className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded bg-orange-50 text-orange-700 mr-1">
+                          {HAZARD_CATEGORY_LABELS[flag.category].icon} {flag.concern}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
           </div>
+
+          {/* Health Safety Score Section */}
+          {results.healthScore && (
+            <div className="mt-6 pt-4 border-t border-gray-100">
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">🛡️ Health & Safety Score</h3>
+              <div className={`flex items-center gap-2 p-3 rounded-lg ${HEALTH_SCORE_CONFIG[results.healthScore.grade].bg}`}>
+                <span className="text-xl">{HEALTH_SCORE_CONFIG[results.healthScore.grade].icon}</span>
+                <div>
+                  <p className={`font-semibold ${HEALTH_SCORE_CONFIG[results.healthScore.grade].color}`}>
+                    {results.healthScore.score}/100 — {HEALTH_SCORE_CONFIG[results.healthScore.grade].label}
+                  </p>
+                  <p className="text-sm text-gray-600">{results.healthScore.summary}</p>
+                </div>
+              </div>
+              {results.healthScore.flags.length > 0 && (
+                <div className="mt-3 space-y-1.5">
+                  {results.healthScore.flags.map((flag, i) => (
+                    <div key={i} className="flex items-start gap-2 text-xs text-gray-600">
+                      <span className={`shrink-0 px-1.5 py-0.5 rounded font-medium ${
+                        flag.severity === 'high' ? 'bg-red-100 text-red-700' :
+                        flag.severity === 'moderate' ? 'bg-amber-100 text-amber-700' :
+                        'bg-gray-100 text-gray-600'
+                      }`}>
+                        {flag.severity}
+                      </span>
+                      <span>
+                        <strong>{flag.hazardName}</strong> — {flag.concern}
+                        <span className="text-gray-400 ml-1">({flag.source})</span>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

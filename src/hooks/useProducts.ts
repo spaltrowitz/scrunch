@@ -142,6 +142,14 @@ export function useProduct(id?: string) {
     enabled: !!id,
     queryFn: async () => {
       if (!id) return null
+
+      // Seed products don't exist in Supabase — resolve from local data
+      if (id.startsWith('seed-')) {
+        const index = parseInt(id.replace('seed-', ''), 10)
+        const seed = SEED_PRODUCTS[index]
+        return seed ? seedToProduct(seed, index) : null
+      }
+
       const { data, error } = await supabase
         .from('products')
         .select(PRODUCT_SELECT)
@@ -193,6 +201,10 @@ export function useProductReviews(productId?: string) {
     enabled: !!productId,
     queryFn: async () => {
       if (!productId) return []
+
+      // Seed products have no Supabase reviews
+      if (productId.startsWith('seed-')) return []
+
       const { data, error } = await supabase
         .from('product_reviews')
         .select('id,user_id,product_id,rating,results_notes,created_at, profile:profiles!product_reviews_user_id_fkey(display_name,curl_pattern,porosity)')

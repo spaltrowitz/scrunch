@@ -105,8 +105,13 @@ export function ProductDetail() {
     || productNotes.includes('fragrance free')
     || productNotes.includes('no added fragrance')
 
-  // Community rating stats
-  const allRatings = [...reviews, ...(myReview ? [myReview] : [])].filter(r => r.rating != null)
+  // Community rating stats — include local rating if not already in reviews
+  const RATING_NUMERIC: Record<TriedRating, number> = { loved: 5, liked: 4, ok: 3, disliked: 1 }
+  const hasMyReviewInList = !!myReview
+  const localRatingEntry = (!hasMyReviewInList && currentRating)
+    ? [{ rating: RATING_NUMERIC[currentRating], profile: null, id: 'local', user_id: '', product_id: '', results_notes: null, created_at: new Date().toISOString() }]
+    : []
+  const allRatings = [...reviews, ...(myReview ? [myReview] : []), ...localRatingEntry].filter(r => r.rating != null)
   const lovedCount = allRatings.filter(r => r.rating != null && r.rating >= 5).length
   const lovedPct = allRatings.length > 0 ? Math.round((lovedCount / allRatings.length) * 100) : 0
 
@@ -137,9 +142,15 @@ export function ProductDetail() {
         <div className="flex-1 min-w-0">
           <p className="text-sm text-gray-500">{product.brand}</p>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">{product.name}</h1>
-          <p className="text-sm text-gray-600 mb-2" title={PRODUCT_CATEGORY_DESCRIPTIONS[product.category]}>
+          <p className="text-sm text-gray-600 mb-2">
             {PRODUCT_CATEGORY_LABELS[product.category]}
-            <span className="text-gray-400 ml-1 cursor-help" title={PRODUCT_CATEGORY_DESCRIPTIONS[product.category]}>ⓘ</span>
+            <span className="relative inline-block ml-1 group">
+              <span className="text-gray-400 cursor-default">ⓘ</span>
+              <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity z-20 shadow-lg">
+                <strong>About {PRODUCT_CATEGORY_LABELS[product.category]}</strong><br />
+                {PRODUCT_CATEGORY_DESCRIPTIONS[product.category]}
+              </span>
+            </span>
           </p>
           <div className="flex flex-wrap items-center gap-2">
             <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${cgStatusConfig.className}`}>
@@ -332,11 +343,6 @@ export function ProductDetail() {
         )}
       </div>
 
-      {/* Category Info */}
-      <div className="bg-gray-50 rounded-xl border border-gray-200 p-6">
-        <h2 className="font-semibold text-gray-900 mb-2">About {PRODUCT_CATEGORY_LABELS[product.category]}</h2>
-        <p className="text-sm text-gray-600">{PRODUCT_CATEGORY_DESCRIPTIONS[product.category]}</p>
-      </div>
     </div>
   )
 }

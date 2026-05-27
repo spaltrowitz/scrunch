@@ -6,6 +6,7 @@ import { useAuth } from '../lib/auth.utils'
 import type { Product, ProductReview, Profile } from '../lib/database.types'
 import { useRecommendationProducts, useUserProfile, useUserReviews } from '../hooks/useProducts'
 import { getLocalReviewsForRecs, getLocalRatings } from '../lib/localProfile'
+import { useToast } from '../hooks/useToast.utils'
 import {
   buildTier1,
   buildTier2,
@@ -94,6 +95,7 @@ async function loadCollaborativeRecs(
 export function Recommendations() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
+  const { addToast } = useToast()
   const userId = user?.id
   const { data: profile, isLoading: profileLoading } = useUserProfile(userId)
   const { data: remoteReviews = [], isLoading: reviewsLoading } = useUserReviews(userId)
@@ -266,8 +268,9 @@ export function Recommendations() {
       localRatings[productId] = ratingLabel
       safeLocalSet('scrunch_ratings', JSON.stringify(localRatings))
       setShowRatingPopup(null)
+      addToast('Saved on this device · Sign in to sync across devices', 'success')
     }
-  }, [userId, rateMutation, tier])
+  }, [userId, rateMutation, tier, addToast])
 
   const handleBookmark = useCallback((productId: string) => {
     trackRecommendationEngaged({
