@@ -61,17 +61,18 @@ export const RecommendedCard = memo(function RecommendedCard({
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 relative">
-      <div className="flex items-center gap-4 p-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4">
+        <div className="flex items-center gap-4 flex-1 min-w-0">
         <ProductImage
           brand={product.brand}
           name={product.name}
           seedImageUrl={product.image_url} category={product.category}
-          className="w-14 h-14 shrink-0"
+          className="w-16 h-16 sm:w-14 sm:h-14 shrink-0"
         />
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className="text-xs text-gray-500">{product.brand}</p>
+            <p className="text-[13px] text-gray-500">{product.brand}</p>
             {matchScore != null && matchScore > 0 && (
               <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${
                 matchScore >= 80 ? 'bg-emerald-50 text-emerald-700' :
@@ -84,7 +85,7 @@ export const RecommendedCard = memo(function RecommendedCard({
           </div>
           <Link
             to={`/products/${product.id}`}
-            className="font-semibold text-gray-900 hover:text-violet-600 no-underline truncate block"
+            className="font-semibold text-gray-900 hover:text-violet-600 no-underline line-clamp-2 block"
           >
             {product.name}
           </Link>
@@ -120,23 +121,24 @@ export const RecommendedCard = memo(function RecommendedCard({
             </p>
           )}
         </div>
+        </div>
 
-        <div className="shrink-0 flex items-center gap-2">
+        <div className="shrink-0 flex items-center gap-2 max-sm:w-full">
           <button
             onClick={onBookmark}
-            className="text-xs px-3 py-2 min-h-[44px] rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition cursor-pointer border-0"
+            className="text-xs px-3 py-2 min-h-[44px] flex-1 sm:flex-none inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition cursor-pointer border-0"
           >
             👍 Try it
           </button>
           <button
             onClick={onOpenRating}
-            className="text-xs px-3 py-2 min-h-[44px] rounded-lg bg-violet-50 text-violet-600 hover:bg-violet-100 transition cursor-pointer border-0"
+            className="text-xs px-3 py-2 min-h-[44px] flex-1 sm:flex-none inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-violet-50 text-violet-600 hover:bg-violet-100 transition cursor-pointer border-0"
           >
             Tried it?
           </button>
           <button
             onClick={isDismissing ? onCloseDismiss : onOpenDismiss}
-            className={`text-xs px-3 py-2 min-h-[44px] rounded-lg transition cursor-pointer border-0 ${
+            className={`text-xs px-3 py-2 min-h-[44px] flex-1 sm:flex-none inline-flex items-center justify-center whitespace-nowrap rounded-lg transition cursor-pointer border-0 ${
               isDismissing
                 ? 'bg-red-100 text-red-600'
                 : 'bg-gray-50 text-gray-500 hover:bg-gray-100'

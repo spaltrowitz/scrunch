@@ -72,12 +72,12 @@ export const ProductCard = memo(function ProductCard({
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2 mb-1">
           <div className="min-w-0">
-            <p className="text-xs text-gray-500 truncate">{product.brand}</p>
+            <p className="text-[13px] text-gray-500 truncate">{product.brand}</p>
             <h3 className="font-semibold text-gray-900 text-[15px] sm:text-sm leading-snug line-clamp-2">{product.name}</h3>
           </div>
           {badges}
         </div>
-        <p className="text-xs text-gray-500">{PRODUCT_CATEGORY_LABELS[product.category]}</p>
+        <p className="text-[13px] text-gray-500">{PRODUCT_CATEGORY_LABELS[product.category]}</p>
       </div>
     </>
   )
