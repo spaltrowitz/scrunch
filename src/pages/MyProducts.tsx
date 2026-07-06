@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../lib/auth.utils'
 import { CG_STATUS_CONFIG, PRODUCT_CATEGORY_LABELS } from '../lib/constants'
 import { useUserReviews } from '../hooks/useProducts'
+import { CardListSkeleton } from '../components/ui/Skeletons'
 
 export function MyProducts() {
   const { user } = useAuth()
@@ -25,7 +26,7 @@ export function MyProducts() {
       <p className="text-gray-600 mb-8">Products you've reviewed and logged.</p>
 
       {loading ? (
-        <div className="text-center py-12 text-gray-500">Loading...</div>
+        <CardListSkeleton count={4} itemClassName="h-24" />
       ) : filteredReviews.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-500 mb-2">You haven't logged any products yet.</p>

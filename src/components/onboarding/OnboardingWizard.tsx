@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../../lib/auth.utils'
 import { supabase } from '../../lib/supabase'
 import { setLocalProfile } from '../../lib/localProfile'
+import { OnboardingSkeleton } from '../ui/Skeletons'
 import {
   CURL_PATTERNS, POROSITY_OPTIONS, HAIR_GOALS, HAIR_GOAL_LABELS,
   INGREDIENT_PREFERENCES, INGREDIENT_PREFERENCE_LABELS,
@@ -192,7 +193,7 @@ export function OnboardingWizard() {
     setStep(s => s + 1)
   }
 
-  if (loadingProfile) return <div className="text-center py-12 text-gray-500">Loading...</div>
+  if (loadingProfile) return <OnboardingSkeleton />
 
   const OptionButton = ({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: React.ReactNode }) => (
     <button

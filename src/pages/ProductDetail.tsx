@@ -8,6 +8,7 @@ import { useProduct, useProductReviews } from '../hooks/useProducts'
 import { useToast } from '../hooks/useToast.utils'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { useProductRating, useRatingMutation } from '../hooks/useProductRatings'
+import { ProductDetailSkeleton } from '../components/ui/Skeletons'
 import type { TriedRating } from '../hooks/useProductRatings'
 import { IngredientRow } from '../components/products/IngredientCard'
 
@@ -48,7 +49,7 @@ export function ProductDetail() {
   const { data: myRatingData } = useProductRating(id ?? null)
   const ratingMutation = useRatingMutation()
 
-  const { data: reviewsData = [] } = useProductReviews(id) as { data: ReviewWithProfile[]; isLoading: boolean; error: unknown }
+  const { data: reviewsData = [] } = useProductReviews(id) as unknown as { data: ReviewWithProfile[]; isLoading: boolean; error: unknown }
   const loading = productLoading && !productError
   const userId = user?.id
   const { reviews, myReview } = useMemo(() => {
@@ -90,7 +91,7 @@ export function ProductDetail() {
     setRatingPopup(false)
   }
 
-  if (loading) return <div className="text-center py-12 text-gray-500">Loading…</div>
+  if (loading) return <ProductDetailSkeleton />
   if (!product) return <div className="text-center py-12 text-gray-500">Product not found</div>
 
   const cgStatusConfig = {

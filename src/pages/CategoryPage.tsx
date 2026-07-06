@@ -4,6 +4,7 @@ import type { ProductCategory } from '../lib/database.types'
 import { PRODUCT_CATEGORY_LABELS, PRODUCT_CATEGORY_DESCRIPTIONS } from '../lib/constants'
 import { useCatalogProducts } from '../hooks/useProducts'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { CardGridSkeleton } from '../components/ui/Skeletons'
 import { ProductImage } from '../hooks/useProductImage'
 
 const SLUG_TO_CATEGORY: Record<string, ProductCategory> = Object.fromEntries(
@@ -51,11 +52,7 @@ export function CategoryPage() {
   }
 
   if (isLoading) {
-    return (
-      <div className="max-w-5xl mx-auto px-4 py-16 text-center">
-        <p className="text-gray-500">Loading products...</p>
-      </div>
-    )
+    return <CardGridSkeleton count={6} />
   }
 
   if (isError) {

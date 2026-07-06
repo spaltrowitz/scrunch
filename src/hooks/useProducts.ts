@@ -216,13 +216,35 @@ export function useProductReviews(productId?: string) {
       // Seed products have no Supabase reviews
       if (productId.startsWith('seed-')) return []
 
-      const { data, error } = await supabase
+      const { data: reviews, error } = await supabase
         .from('product_reviews')
-        .select('id,user_id,product_id,rating,results_notes,created_at, profile:profiles!product_reviews_user_id_fkey(display_name,curl_pattern,porosity)')
+        .select('id,user_id,product_id,rating,results_notes,created_at')
         .eq('product_id', productId)
         .order('created_at', { ascending: false })
       if (error) throw error
-      return data ?? []
+      if (!reviews || reviews.length === 0) return []
+
+      // There is no FK relationship between product_reviews and profiles
+      // (user_id references auth.users), so PostgREST cannot embed the profile.
+      // Fetch public profiles separately and stitch them in. RLS limits this to
+      // profiles the viewer is allowed to see (public ones, or their own).
+      const userIds = [...new Set(reviews.map(r => r.user_id).filter(Boolean))]
+      const profileMap = new Map<string, { display_name: string | null; curl_pattern: string | null; porosity: string | null }>()
+      if (userIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id,display_name,curl_pattern,porosity')
+          .in('id', userIds)
+        for (const p of profiles ?? []) {
+          profileMap.set(p.id, {
+            display_name: p.display_name,
+            curl_pattern: p.curl_pattern,
+            porosity: p.porosity,
+          })
+        }
+      }
+
+      return reviews.map(r => ({ ...r, profile: profileMap.get(r.user_id) ?? null }))
     },
     retry: false,
     staleTime: 5 * 60 * 1000,

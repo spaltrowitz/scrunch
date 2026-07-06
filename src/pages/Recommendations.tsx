@@ -7,6 +7,7 @@ import type { Product, ProductReview, Profile } from '../lib/database.types'
 import { useRecommendationProducts, useUserProfile, useUserReviews } from '../hooks/useProducts'
 import { getLocalReviewsForRecs, getLocalRatings } from '../lib/localProfile'
 import { useToast } from '../hooks/useToast.utils'
+import { CardListSkeleton } from '../components/ui/Skeletons'
 import {
   buildTier1,
   buildTier2,
@@ -343,7 +344,7 @@ export function Recommendations() {
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <div className="text-center py-12 text-gray-500">Loading recommendations…</div>
+        <CardListSkeleton count={4} />
       </div>
     )
   }
