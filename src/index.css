@@ -28,3 +28,13 @@ body {
   from { opacity: 0; transform: translateY(0.5rem); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Prevent iOS Safari auto-zoom when focusing form fields.
+   Text inputs render at >= 16px on phones; Tailwind's smaller sizing stays on desktop. */
+@media (max-width: 767.98px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}

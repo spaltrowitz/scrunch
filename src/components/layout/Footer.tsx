@@ -16,9 +16,9 @@ export function Footer() {
           <FeedbackButton inline />
         </nav>
         <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-gray-400">
-          <Link to="/terms" className="hover:text-violet-600 no-underline">Terms</Link>
+          <Link to="/terms" className="hover:text-violet-600 no-underline min-h-[44px] inline-flex items-center px-1">Terms</Link>
           <span aria-hidden="true">·</span>
-          <Link to="/privacy" className="hover:text-violet-600 no-underline">Privacy</Link>
+          <Link to="/privacy" className="hover:text-violet-600 no-underline min-h-[44px] inline-flex items-center px-1">Privacy</Link>
           <span aria-hidden="true">·</span>
           <span>© {year} Scrunch</span>
         </div>

@@ -58,7 +58,7 @@ export function FeedbackButton({ inline }: { inline?: boolean }) {
       {inline ? (
         <button
           onClick={() => setIsOpen(true)}
-          className="text-sm text-gray-600 hover:text-violet-600 cursor-pointer"
+          className="text-sm text-gray-600 hover:text-violet-600 cursor-pointer min-h-[44px] inline-flex items-center py-2"
         >
           Feedback
         </button>
