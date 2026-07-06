@@ -51,6 +51,17 @@ export function seedToProduct(seed: SeedProduct, index: number): Product {
   }
 }
 
+function normalizeProduct(data: unknown): Product {
+  const p = data as Product
+  return {
+    ...p,
+    ingredients: p.ingredients ?? [],
+    flagged_ingredients: p.flagged_ingredients ?? [],
+    key_ingredients: p.key_ingredients ?? [],
+    country_availability: p.country_availability ?? [],
+  }
+}
+
 async function loadSeedProducts(): Promise<Product[]> {
   const { SEED_PRODUCTS } = await import('../data/seedProducts')
   return dedupeProducts(SEED_PRODUCTS.map(seedToProduct))
@@ -156,7 +167,7 @@ export function useProduct(id?: string) {
         .eq('id', id)
         .single()
       if (error) return null
-      return data as unknown as Product
+      return normalizeProduct(data)
     },
     placeholderData: () => {
       if (!id) return undefined
@@ -167,7 +178,7 @@ export function useProduct(id?: string) {
       ]
       for (const cache of caches) {
         const found = cache?.products?.find((p: Product) => p.id === id)
-        if (found) return found
+        if (found) return normalizeProduct(found)
       }
       const seed = SEED_PRODUCTS.find((_s, i) => `seed-${i}` === id)
       return seed ? seedToProduct(seed, SEED_PRODUCTS.indexOf(seed)) : undefined
