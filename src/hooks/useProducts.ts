@@ -224,6 +224,7 @@ export function useProductReviews(productId?: string) {
       if (error) throw error
       return data ?? []
     },
+    retry: false,
     staleTime: 5 * 60 * 1000,
   })
 }

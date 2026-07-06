@@ -48,8 +48,8 @@ export function ProductDetail() {
   const { data: myRatingData } = useProductRating(id ?? null)
   const ratingMutation = useRatingMutation()
 
-  const { data: reviewsData = [], isLoading: reviewsLoading, error: reviewsError } = useProductReviews(id) as { data: ReviewWithProfile[]; isLoading: boolean; error: unknown }
-  const loading = (productLoading || reviewsLoading) && !(productError || reviewsError)
+  const { data: reviewsData = [] } = useProductReviews(id) as { data: ReviewWithProfile[]; isLoading: boolean; error: unknown }
+  const loading = productLoading && !productError
   const userId = user?.id
   const { reviews, myReview } = useMemo(() => {
     const allReviews = reviewsData as ReviewWithProfile[]
